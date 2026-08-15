@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Banco de Ideas - ActuemosYaColombia</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter & Montserrat -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#a9c7ff",
+                        "tertiary-fixed": "#ffdfa0",
+                        "on-secondary-container": "#003670",
+                        "on-primary-fixed": "#410003",
+                        "on-tertiary-fixed": "#261a00",
+                        "surface-container-high": "#ffe2de",
+                        "on-background": "#271816",
+                        "surface-tint": "#ba1a20",
+                        "outline-variant": "#e4beba",
+                        "tertiary-container": "#8f6a00",
+                        "surface-container-low": "#fff0ef",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#fff8f7",
+                        "on-error": "#ffffff",
+                        "surface": "#fff8f7",
+                        "on-primary-container": "#fff2f0",
+                        "on-tertiary-container": "#fff3e3",
+                        "inverse-surface": "#3e2c2a",
+                        "primary-fixed": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "error": "#ba1a1a",
+                        "on-surface": "#271816",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#930010",
+                        "inverse-on-surface": "#ffedeb",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#f1d3d0",
+                        "surface-container-highest": "#f9dcd9",
+                        "secondary": "#005db7",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#715300",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#64a1ff",
+                        "surface-container": "#ffe9e7",
+                        "on-secondary-fixed": "#001b3d",
+                        "secondary-fixed": "#d6e3ff",
+                        "outline": "#8f6f6c",
+                        "background": "#fff8f7",
+                        "on-secondary-fixed-variant": "#00468c",
+                        "surface-variant": "#f9dcd9",
+                        "primary-container": "#d32f2f",
+                        "primary": "#af101a",
+                        "tertiary-fixed-dim": "#f8bd2a",
+                        "inverse-primary": "#ffb3ac",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "on-surface-variant": "#5b403d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "32px",
+                        "container-max": "1280px",
+                        "stack-md": "24px",
+                        "stack-sm": "12px",
+                        "stack-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen flex overflow-hidden">
+<!-- SideNavBar (Desktop Shell) -->
+<aside class="hidden lg:flex flex-col p-base gap-stack-sm bg-surface-container-low border-r border-outline-variant h-full w-64 fixed left-0 top-0 z-40">
+<div class="px-4 py-6">
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">ActuemosYa</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1 uppercase tracking-widest">Acción Humanitaria</p>
+</div>
+<nav class="flex flex-col gap-2 flex-1 mt-4">
+<!-- Hub -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Hub</span>
+</a>
+<!-- Ideas (Active) -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full bg-secondary-container text-on-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">lightbulb</span>
+<span>Ideas</span>
+</a>
+<!-- Initiatives -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span>Initiatives</span>
+</a>
+<!-- Search -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">search</span>
+<span>Search</span>
+</a>
+<!-- Volunteers -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">volunteer_activism</span>
+<span>Volunteers</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 px-4 rounded-full font-bold uppercase tracking-wide hover:bg-on-primary-fixed-variant transition-colors shadow-sm">
+                Proponer Idea
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-screen overflow-y-auto lg:ml-64 relative">
+<!-- TopNavBar (Mobile Shell) -->
+<header class="lg:hidden flex justify-between items-center px-margin-mobile py-4 w-full sticky top-0 z-50 bg-surface border-b border-outline-variant shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">ActuemosYaColombia</h1>
+</div>
+<button class="bg-primary text-on-primary font-label-sm text-label-sm px-4 py-2 rounded-full uppercase font-bold">
+                Proponer Idea
+            </button>
+</header>
+<!-- Canvas -->
+<main class="flex-1 px-margin-mobile md:px-margin-desktop py-stack-lg max-w-container-max mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-stack-md mb-stack-lg">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Banco de Ideas</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-2xl">Repositorio central de propuestas comunitarias e institucionales. Explora, apoya y únete a las iniciativas que transforman realidades.</p>
+</div>
+<div class="hidden lg:block">
+<button class="bg-primary text-on-primary font-label-md text-label-md py-3 px-6 rounded-full font-bold uppercase tracking-wide hover:bg-on-primary-fixed-variant transition-colors shadow-sm">
+                        Proponer Idea
+                    </button>
+</div>
+</div>
+<!-- Filters -->
+<div class="flex flex-wrap gap-stack-sm mb-stack-lg bg-surface-container-lowest p-4 rounded-lg border border-outline-variant">
+<div class="flex-1 min-w-[200px]">
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Estado</label>
+<select class="w-full bg-surface border border-outline-variant rounded px-3 py-2 font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none">
+<option>Todos los estados</option>
+<option>Idea</option>
+<option>Promovida</option>
+<option>En acción</option>
+</select>
+</div>
+<div class="flex-1 min-w-[200px]">
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Geografía</label>
+<select class="w-full bg-surface border border-outline-variant rounded px-3 py-2 font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none">
+<option>General</option>
+<option>Región Andina</option>
+<option>Región Caribe</option>
+</select>
+</div>
+<div class="flex-1 min-w-[200px]">
+<label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Categoría</label>
+<select class="w-full bg-surface border border-outline-variant rounded px-3 py-2 font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none">
+<option>Todas las categorías</option>
+<option>Salud</option>
+<option>Logística</option>
+</select>
+</div>
+</div>
+<!-- Ideas Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1: Idea -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg border-t-4 border-t-secondary hover:shadow-sm transition-shadow flex flex-col h-full relative overflow-hidden group">
+<div class="p-stack-md flex flex-col h-full gap-stack-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm px-2 py-1 rounded-sm uppercase tracking-wider font-bold">
+                                Idea
+                            </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 2h
+                            </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface flex-1">Sistema de alerta temprana comunitaria</h3>
+<div class="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface">Junta Vecinal Sur</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 text-[10px]">
+<span class="material-symbols-outlined text-[12px]">location_on</span> Pasto, Nariño
+                                    </span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span> 14
+                            </div>
+</div>
+</div>
+</article>
+<!-- Card 2: Promovida -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg border-t-4 border-t-tertiary-container hover:shadow-sm transition-shadow flex flex-col h-full relative overflow-hidden group">
+<div class="p-stack-md flex flex-col h-full gap-stack-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm px-2 py-1 rounded-sm uppercase tracking-wider font-bold">
+                                Promovida
+                            </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface flex-1">Red de acopio logístico descentralizado</h3>
+<div class="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">domain</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface">Defensa Civil</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 text-[10px]">
+<span class="material-symbols-outlined text-[12px]">location_on</span> General
+                                    </span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span> 89
+                            </div>
+</div>
+</div>
+</article>
+<!-- Card 3: En Acción -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg border-t-4 border-t-primary hover:shadow-sm transition-shadow flex flex-col h-full relative overflow-hidden group">
+<div class="p-stack-md flex flex-col h-full gap-stack-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-2 py-1 rounded-sm uppercase tracking-wider font-bold">
+                                En Acción
+                            </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface flex-1">Brigada móvil de atención primaria</h3>
+<div class="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">medical_services</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface">Cruz Roja Seccional</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 text-[10px]">
+<span class="material-symbols-outlined text-[12px]">location_on</span> Mocoa, Putumayo
+                                    </span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span> 234
+                            </div>
+</div>
+</div>
+</article>
+<!-- Card 4: Idea (Anonymous) -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg border-t-4 border-t-secondary hover:shadow-sm transition-shadow flex flex-col h-full relative overflow-hidden group">
+<div class="p-stack-md flex flex-col h-full gap-stack-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm px-2 py-1 rounded-sm uppercase tracking-wider font-bold">
+                                Idea
+                            </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 1d
+                            </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface flex-1">Mapeo colaborativo de zonas seguras</h3>
+<div class="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">incognito</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface italic">Anónimo</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 text-[10px]">
+<span class="material-symbols-outlined text-[12px]">location_on</span> Chocó
+                                    </span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span> 5
+                            </div>
+</div>
+</div>
+</article>
+</div>
+<!-- Pagination -->
+<div class="mt-stack-lg flex justify-center items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded border border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded bg-secondary-container text-on-secondary-container font-label-md font-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded border border-outline-variant text-on-surface hover:bg-surface-variant transition-colors font-label-md">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded border border-outline-variant text-on-surface hover:bg-surface-variant transition-colors font-label-md">3</button>
+<span class="text-on-surface-variant mx-1">...</span>
+<button class="w-10 h-10 flex items-center justify-center rounded border border-outline-variant text-on-surface hover:bg-surface-variant transition-colors font-label-md">12</button>
+<button class="w-10 h-10 flex items-center justify-center rounded border border-outline-variant text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-inverse-surface mt-stack-lg border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-margin-desktop py-stack-md w-full shrink-0">
+<div class="mb-4 md:mb-0">
+<p class="font-label-sm text-label-sm text-on-primary">© 2024 ActuemosYaColombia. Institucionalidad y Acción.</p>
+</div>
+<nav class="flex gap-4">
+<a class="font-label-sm text-label-sm text-surface-variant hover:text-primary-fixed transition-colors opacity-90 hover:opacity-100" href="#">Canales Oficiales</a>
+<a class="font-label-sm text-label-sm text-surface-variant hover:text-primary-fixed transition-colors opacity-90 hover:opacity-100" href="#">Privacidad</a>
+<a class="font-label-sm text-label-sm text-surface-variant hover:text-primary-fixed transition-colors opacity-90 hover:opacity-100" href="#">Contacto</a>
+<a class="font-label-sm text-label-sm text-surface-variant hover:text-primary-fixed transition-colors opacity-90 hover:opacity-100" href="#">Mapa de Sitio</a>
+</nav>
+</footer>
+</div>
+</body></html>

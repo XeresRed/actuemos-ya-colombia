@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Búsqueda - ActuemosYaColombia</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#a9c7ff",
+                    "tertiary-fixed": "#ffdfa0",
+                    "on-secondary-container": "#003670",
+                    "on-primary-fixed": "#410003",
+                    "on-tertiary-fixed": "#261a00",
+                    "surface-container-high": "#ffe2de",
+                    "on-background": "#271816",
+                    "surface-tint": "#ba1a20",
+                    "outline-variant": "#e4beba",
+                    "tertiary-container": "#8f6a00",
+                    "surface-container-low": "#fff0ef",
+                    "on-tertiary": "#ffffff",
+                    "surface-bright": "#fff8f7",
+                    "on-error": "#ffffff",
+                    "surface": "#fff8f7",
+                    "on-primary-container": "#fff2f0",
+                    "on-tertiary-container": "#fff3e3",
+                    "inverse-surface": "#3e2c2a",
+                    "primary-fixed": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#5c4300",
+                    "error": "#ba1a1a",
+                    "on-surface": "#271816",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#930010",
+                    "inverse-on-surface": "#ffedeb",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#f1d3d0",
+                    "surface-container-highest": "#f9dcd9",
+                    "secondary": "#005db7",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#715300",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#64a1ff",
+                    "surface-container": "#ffe9e7",
+                    "on-secondary-fixed": "#001b3d",
+                    "secondary-fixed": "#d6e3ff",
+                    "outline": "#8f6f6c",
+                    "background": "#fff8f7",
+                    "on-secondary-fixed-variant": "#00468c",
+                    "surface-variant": "#f9dcd9",
+                    "primary-container": "#d32f2f",
+                    "primary": "#af101a",
+                    "tertiary-fixed-dim": "#f8bd2a",
+                    "inverse-primary": "#ffb3ac",
+                    "primary-fixed-dim": "#ffb3ac",
+                    "on-surface-variant": "#5b403d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "margin-desktop": "32px",
+                    "container-max": "1280px",
+                    "stack-md": "24px",
+                    "stack-sm": "12px",
+                    "stack-lg": "48px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Montserrat"],
+                    "headline-md": ["Montserrat"],
+                    "label-md": ["Inter"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "headline-lg": ["Montserrat"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for horizontal lists */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md min-h-screen flex flex-col lg:flex-row antialiased">
+<!-- SideNavBar (Desktop) -->
+<nav class="bg-surface-container-low h-full w-64 fixed left-0 top-0 border-r border-outline-variant hidden lg:flex flex-col p-base gap-stack-sm z-50">
+<div class="px-4 py-6 mb-4">
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">ActuemosYa</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Acción Humanitaria</p>
+</div>
+<div class="flex-1 flex flex-col gap-2 px-2">
+<!-- Nav Item: Hub -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+                Hub
+            </a>
+<!-- Nav Item: Ideas -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="lightbulb">lightbulb</span>
+                Ideas
+            </a>
+<!-- Nav Item: Initiatives -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="rocket_launch">rocket_launch</span>
+                Initiatives
+            </a>
+<!-- Nav Item: Search (ACTIVE) -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full bg-secondary-container text-on-secondary-container transition-all duration-200 ease-in-out font-label-md text-label-md font-bold" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="search" data-weight="fill">search</span>
+                Search
+            </a>
+<!-- Nav Item: Volunteers -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="volunteer_activism">volunteer_activism</span>
+                Volunteers
+            </a>
+</div>
+<div class="p-4 mt-auto">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md font-bold uppercase tracking-wide py-3 px-4 rounded-DEFAULT hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200">
+                Proponer Idea
+            </button>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col lg:ml-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 w-full sticky top-0 z-40 bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-4 lg:hidden">
+<span class="material-symbols-outlined text-on-surface cursor-pointer" data-icon="menu">menu</span>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">ActuemosYaColombia</span>
+</div>
+<div class="hidden lg:flex items-center gap-6">
+<!-- Desktop top links (if needed, though sidebar handles it, JSON provides them) -->
+<nav class="flex gap-6 font-body-md text-body-md">
+<a class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors px-2 py-1 rounded-DEFAULT" href="#">Hub</a>
+<a class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors px-2 py-1 rounded-DEFAULT" href="#">Ideas</a>
+<a class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors px-2 py-1 rounded-DEFAULT" href="#">Initiatives</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 px-2" href="#">Search</a>
+<a class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors px-2 py-1 rounded-DEFAULT" href="#">Volunteers</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant focus-within:border-secondary transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant mr-2 text-[20px]" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md font-body-md text-on-surface w-48 placeholder-on-surface-variant" placeholder="Buscar..." type="text"/>
+</div>
+<button class="lg:hidden bg-primary text-on-primary font-label-sm text-label-sm font-bold uppercase px-4 py-2 rounded-DEFAULT">
+                    Proponer
+                </button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop bg-surface-bright flex flex-col gap-stack-lg">
+<!-- Page Header & Primary CTA -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background tracking-tight">Búsqueda Humanitaria y Mascotas</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2 max-w-2xl">Directorio centralizado de reportes activos. Ayúdanos a localizar personas y animales desplazados o desaparecidos.</p>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md font-bold uppercase tracking-wider px-6 py-3 rounded-DEFAULT shadow-sm hover:shadow-md active:scale-95 transition-all duration-200 flex items-center gap-2 whitespace-nowrap">
+<span class="material-symbols-outlined text-[20px]" data-icon="add_circle">add_circle</span>
+                    Crear Reporte de Búsqueda
+                </button>
+</div>
+<!-- Controls: Tabs & Filters -->
+<div class="flex flex-col gap-stack-sm border-b border-outline-variant pb-4">
+<!-- Navigation Tabs -->
+<div class="flex gap-8 overflow-x-auto hide-scrollbar">
+<button class="font-label-md text-label-md text-primary border-b-2 border-primary pb-2 font-bold whitespace-nowrap">Todos</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface pb-2 whitespace-nowrap transition-colors">Personas</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface pb-2 whitespace-nowrap transition-colors">Animales/Mascotas</button>
+</div>
+<!-- Status Filters (Chips) -->
+<div class="flex gap-3 overflow-x-auto hide-scrollbar mt-2">
+<button class="bg-surface-container-high text-on-surface font-label-sm text-label-sm px-4 py-1.5 rounded-full border border-outline-variant hover:bg-surface-variant transition-colors whitespace-nowrap flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+                        Buscado
+                    </button>
+<button class="bg-surface-container-high text-on-surface font-label-sm text-label-sm px-4 py-1.5 rounded-full border border-outline-variant hover:bg-surface-variant transition-colors whitespace-nowrap flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                        En refugio
+                    </button>
+<button class="bg-surface-container-high text-on-surface font-label-sm text-label-sm px-4 py-1.5 rounded-full border border-outline-variant hover:bg-surface-variant transition-colors whitespace-nowrap flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                        Localizado/Rescatado
+                    </button>
+</div>
+</div>
+<!-- Report Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Person Card (Buscado) -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow duration-200 border-t-4 border-t-error">
+<div class="relative h-48 w-full bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A highly detailed close-up portrait photograph of an elderly Colombian woman with kind eyes and silver hair, lit by soft natural daylight. The image has a clean, professional journalistic aesthetic, emphasizing dignity and clarity against a neutral modern background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAC0nQMxcY3F0vOf1vxUdF2NCH6anjoEIFBEN_W-wizufxCfCndgZpGAxzYIft1s3C29YFNryqKWFG0yZODmxNccLL0y0-4zD-8hVkA9sV2vPRzhy3mN7uE5CiaoZj-jq90Rc5Tv8L-QsOY_C-8BO5IoKAwnxa2Yn47REyCh6V5AoAJunboems_ZAt4Tfbs7027HEBrNnRf46xy8U0EbPHhUFhzqb4A-lT7zMwKXI2O0NIakk2q7afx"/>
+<div class="absolute top-3 right-3 bg-error-container text-on-error-container font-label-sm text-label-sm px-2 py-1 rounded-DEFAULT font-bold uppercase tracking-wider shadow-sm">
+                            Buscado
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1 gap-3">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-background font-bold line-clamp-1">María Josefina Pérez</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Edad aprox: 78 años</p>
+</div>
+<div class="flex items-start gap-2 mt-auto pt-3 border-t border-surface-variant">
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="location_on">location_on</span>
+<p class="font-label-sm text-label-sm text-on-surface">Visto por última vez: Barrio La Candelaria, Bogotá</p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-DEFAULT flex items-center justify-between border border-outline-variant">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Contacto Emergencia</span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">310-555-0198</span>
+</div>
+<button class="text-secondary hover:text-secondary-fixed-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Pet Card (En refugio) -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow duration-200 border-t-4 border-t-tertiary">
+<div class="relative h-48 w-full bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A crisp, high-resolution photo of a medium-sized mixed-breed dog with golden-brown fur and a distinct blue collar. The dog is looking attentively at the camera. The setting is a clean, well-lit modern shelter environment with neutral white and gray tones, conveying safety and care." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCH9E_H30UtPIzTEKyyKSe15_K7MOJPGEod3L-DvqoWoSILaSQ5Jv6qFSaiBfa5kf3NKaqg16iG8b-EkqQbY_xSSY9prBRi_70gcjKOCIt5mJMgJ3V7Uzi-8tebZuMrkZZwe2bJiftWPyGr4npL8Ao8yVgjv865vf4hCrvRs2eDbArgMwStPgYsVX-AqeU2dc8y8_COtUGzVmPwI5TT0Hp3AGx8m5ctd5riPJOrzwOD1BslehDJx_nI"/>
+<div class="absolute top-3 right-3 bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm px-2 py-1 rounded-DEFAULT font-bold uppercase tracking-wider shadow-sm">
+                            En refugio
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1 gap-3">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="pets">pets</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium uppercase tracking-wider">Perro / Mestizo</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-background font-bold line-clamp-1">"Max" (Nombre temporal)</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 line-clamp-2">Rasgos: Collar azul desgastado, mancha blanca característica sobre el ojo derecho. Muy dócil.</p>
+</div>
+<div class="flex items-start gap-2 mt-auto pt-3 border-t border-surface-variant">
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="home_work">home_work</span>
+<p class="font-label-sm text-label-sm text-on-surface">Ubicación actual: Refugio San Roque, Zona Norte</p>
+</div>
+<button class="w-full mt-2 border border-secondary text-secondary font-label-md text-label-md font-bold uppercase py-2 rounded-DEFAULT hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-colors">
+                            Contactar Refugio
+                        </button>
+</div>
+</article>
+<!-- Person Card (Localizado) -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow duration-200 border-t-4 border-t-secondary opacity-90">
+<div class="relative h-48 w-full bg-surface-variant">
+<img class="w-full h-full object-cover grayscale-[30%]" data-alt="A clear documentary-style portrait of a young man in his twenties wearing a simple t-shirt. The photograph is slightly desaturated to fit a modern UI grid, but clear enough for identification. The lighting is neutral and flat, typical of official registration photos." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7WKu6D2MfKBwPBEoV1IK7KVi8iRuBDCwImoQqS7B4OPiYD5csBepwcfbQ5S2OSTs-m8vEcMvKlYo3qEetOGYxkf4MTvanmxzqllvkSHHLLElf1y2tpRCDTGOq6bXHSrS2GybNhGqEB8L_0xN4pgCgGop4p3wC2k1qRLywmxzaiWY3jpA3fyz0nEilxR6S35daUTCuPspfNa1rRNhw-_0FvYpaVxU2pqJumutHeoPcsPUZ-JhvierE"/>
+<div class="absolute top-3 right-3 bg-secondary text-on-secondary font-label-sm text-label-sm px-2 py-1 rounded-DEFAULT font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                            Localizado
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1 gap-3">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-background font-bold line-clamp-1 text-on-surface-variant">Andrés Felipe Vargas</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Edad aprox: 24 años</p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-DEFAULT flex items-start gap-2 border border-outline-variant mt-auto">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="verified_user">verified_user</span>
+<p class="font-label-sm text-label-sm text-on-surface">Persona reunida con su familia el 12 de Octubre. Caso cerrado administrativamente.</p>
+</div>
+</div>
+</article>
+<!-- Pet Card (Buscado) -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow duration-200 border-t-4 border-t-error">
+<div class="relative h-48 w-full bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A well-lit, sharp photograph of an orange tabby cat sitting on a windowsill. The image uses a modern, high-contrast visual style with deep shadows and bright highlights, creating a sense of urgency and clarity required for a missing animal report in a digital interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsFPA9nNoJOL33E-ASMzYNkCur0py2DkGwP48L7LKwNWoqmjebK7qT8aghPDt_XeX4tIZ5BSHtJhvguuIYXPIvt00x1YhzKV4sJ3yGWIaAsDPGQ5QDJWVwLnqxiOHxWwew9ynTXhl1MSq4ZY52JWqBo0O695q0C8YPTx8Hop8p6CDup9AeeAJOw-XHEAmSF5FYCwQMGLAvdKE4MDjfF29TT_rqlg9MIBwdss5D4n7gpkyXt1FbTLz5"/>
+<div class="absolute top-3 right-3 bg-error-container text-on-error-container font-label-sm text-label-sm px-2 py-1 rounded-DEFAULT font-bold uppercase tracking-wider shadow-sm">
+                            Buscado
+                        </div>
+</div>
+<div class="p-4 flex flex-col flex-1 gap-3">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="pets">pets</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium uppercase tracking-wider">Gato / Tabby</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-background font-bold line-clamp-1">Simba</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 line-clamp-2">Gato naranjo con rayas. Sin collar, microchip terminado en 4589. Asustadizo.</p>
+</div>
+<div class="flex items-start gap-2 mt-auto pt-3 border-t border-surface-variant">
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="location_on">location_on</span>
+<p class="font-label-sm text-label-sm text-on-surface">Extraviado cerca al Parque Principal</p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-DEFAULT flex items-center justify-between border border-outline-variant">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Contacto Dueño</span>
+<span class="font-body-md text-body-md text-on-surface font-semibold">300-123-4567</span>
+</div>
+<button class="text-secondary hover:text-secondary-fixed-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-inverse-surface mt-stack-lg border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-margin-desktop py-stack-md w-full">
+<div class="mb-4 md:mb-0 text-center md:text-left">
+<span class="font-headline-md text-headline-md text-surface block mb-1">ActuemosYa</span>
+<span class="font-label-sm text-label-sm text-surface-variant">© 2024 ActuemosYaColombia. Institucionalidad y Acción.</span>
+</div>
+<nav class="flex flex-wrap justify-center gap-4 md:gap-6 font-label-sm text-label-sm">
+<a class="text-surface-variant hover:text-surface opacity-90 hover:opacity-100 hover:text-primary-fixed transition-colors" href="#">Canales Oficiales</a>
+<a class="text-surface-variant hover:text-surface opacity-90 hover:opacity-100 hover:text-primary-fixed transition-colors" href="#">Privacidad</a>
+<a class="text-surface-variant hover:text-surface opacity-90 hover:opacity-100 hover:text-primary-fixed transition-colors" href="#">Contacto</a>
+<a class="text-surface-variant hover:text-surface opacity-90 hover:opacity-100 hover:text-primary-fixed transition-colors" href="#">Mapa de Sitio</a>
+</nav>
+</footer>
+</div>
+</body></html>

@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.gitignore
+.dockerignore
+README.md
+CHANGELOG.md
+docs
+.agents
+.claude
+npm-debug.log
+data/*.sqlite*
+!data/.gitkeep
+.env*.local

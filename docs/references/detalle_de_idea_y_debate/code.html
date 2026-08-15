@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detalle de Idea - ActuemosYaColombia</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#a9c7ff",
+                        "tertiary-fixed": "#ffdfa0",
+                        "on-secondary-container": "#003670",
+                        "on-primary-fixed": "#410003",
+                        "on-tertiary-fixed": "#261a00",
+                        "surface-container-high": "#ffe2de",
+                        "on-background": "#271816",
+                        "surface-tint": "#ba1a20",
+                        "outline-variant": "#e4beba",
+                        "tertiary-container": "#8f6a00",
+                        "surface-container-low": "#fff0ef",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#fff8f7",
+                        "on-error": "#ffffff",
+                        "surface": "#fff8f7",
+                        "on-primary-container": "#fff2f0",
+                        "on-tertiary-container": "#fff3e3",
+                        "inverse-surface": "#3e2c2a",
+                        "primary-fixed": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "error": "#ba1a1a",
+                        "on-surface": "#271816",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#930010",
+                        "inverse-on-surface": "#ffedeb",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#f1d3d0",
+                        "surface-container-highest": "#f9dcd9",
+                        "secondary": "#005db7",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#715300",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#64a1ff",
+                        "surface-container": "#ffe9e7",
+                        "on-secondary-fixed": "#001b3d",
+                        "secondary-fixed": "#d6e3ff",
+                        "outline": "#8f6f6c",
+                        "background": "#fff8f7",
+                        "on-secondary-fixed-variant": "#00468c",
+                        "surface-variant": "#f9dcd9",
+                        "primary-container": "#d32f2f",
+                        "primary": "#af101a",
+                        "tertiary-fixed-dim": "#f8bd2a",
+                        "inverse-primary": "#ffb3ac",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "on-surface-variant": "#5b403d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "32px",
+                        "container-max": "1280px",
+                        "stack-md": "24px",
+                        "stack-sm": "12px",
+                        "stack-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopNavBar -->
+<nav class="flex justify-between items-center px-margin-desktop w-full sticky top-0 z-50 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-gutter h-16">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">ActuemosYaColombia</span>
+<div class="hidden md:flex items-center h-full gap-stack-md">
+<a class="text-on-surface-variant dark:text-on-surface hover:text-primary font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors cursor-pointer active:scale-95 duration-200 h-full flex items-center px-2" href="#">Hub</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors cursor-pointer active:scale-95 duration-200 h-full flex items-center px-2" href="#">Ideas</a>
+<a class="text-on-surface-variant dark:text-on-surface hover:text-primary font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors cursor-pointer active:scale-95 duration-200 h-full flex items-center px-2" href="#">Initiatives</a>
+</div>
+</div>
+<div class="flex items-center gap-stack-md h-16">
+<div class="hidden md:flex items-center h-full gap-stack-md">
+<a class="text-on-surface-variant dark:text-on-surface hover:text-primary font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors cursor-pointer active:scale-95 duration-200 h-full flex items-center px-2" href="#">Search</a>
+<a class="text-on-surface-variant dark:text-on-surface hover:text-primary font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors cursor-pointer active:scale-95 duration-200 h-full flex items-center px-2" href="#">Volunteers</a>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md uppercase font-bold py-2 px-4 rounded hover:bg-primary-container transition-colors shadow-sm">Proponer Idea</button>
+</div>
+</nav>
+<!-- Main Layout -->
+<div class="flex-1 flex max-w-container-max mx-auto w-full">
+<!-- SideNavBar (Hidden on Mobile) -->
+<aside class="hidden lg:flex flex-col p-base gap-stack-sm h-[calc(100vh-4rem)] w-64 sticky top-16 bg-surface-container-low dark:bg-surface-container-highest border-r border-outline-variant dark:border-outline">
+<div class="p-4 mb-4 flex flex-col gap-1">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A small circular avatar image representing a generic user profile. The image is a stylized, modern minimalist illustration of a person's head and shoulders against a light blue background. The style is clean, corporate, and trustworthy, matching a professional light-mode UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf-i_r1VOxw7wYhQBq89VT7TiZNA8hVS3FZcdWTFVZapApM9W3kHkUJHSikZuRmWBiH41fC6DbLg3w53EO_1Q-rXyvFFVZlHr2kMmChUlZpuArGNSlUo5IIXQQDs8B7E0-GtY9vTTYww3tNLxCiEhCLBJxqAl342nZZmMXfJXQQ8QL93D97hskIbYs6ZRpp02TMYMv4I0wV-9UeX4j80DvFXEik_EZ2c5Zd9n90NE5ljHoKnNBTqak"/>
+<div>
+<h2 class="font-headline-md text-headline-md font-bold text-primary text-sm leading-tight">ActuemosYa</h2>
+<span class="text-xs text-on-surface-variant">Acción Humanitaria</span>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant hover:bg-surface-variant hover:text-on-surface duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Hub
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-full duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined icon-fill" data-icon="lightbulb">lightbulb</span>
+                    Ideas
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant hover:bg-surface-variant hover:text-on-surface duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+                    Initiatives
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant hover:bg-surface-variant hover:text-on-surface duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+                    Search
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-on-surface-variant hover:bg-surface-variant hover:text-on-surface duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+                    Volunteers
+                </a>
+</nav>
+</aside>
+<!-- Canvas -->
+<main class="flex-1 w-full px-margin-mobile md:px-margin-desktop py-stack-lg max-w-4xl mx-auto">
+<!-- Redirection Banner -->
+<div class="bg-surface-container-high border-l-4 border-primary p-4 rounded-r mb-stack-lg flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1" data-icon="info">info</span>
+<div>
+<h3 class="font-label-md text-label-md text-on-background font-bold mb-1">Iniciativa Redirigida</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">Esta idea ha sido adoptada por una ONG externa para su ejecución inmediata.</p>
+<a class="text-primary font-label-md text-label-md hover:underline flex items-center gap-1" href="#">
+                        Ver progreso en Fundación Solidaria <span class="material-symbols-outlined text-[16px]" data-icon="open_in_new">open_in_new</span>
+</a>
+</div>
+</div>
+<!-- Status Pipeline -->
+<div class="mb-stack-lg bg-surface border border-outline-variant rounded p-6">
+<h4 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-4">Estado de la Iniciativa</h4>
+<div class="relative flex items-center justify-between w-full before:content-[''] before:absolute before:top-1/2 before:-translate-y-1/2 before:left-0 before:w-full before:h-2 before:bg-surface-variant before:-z-10">
+<!-- Progress Bar Fill -->
+<div class="absolute top-1/2 -translate-y-1/2 left-0 h-2 bg-secondary-container w-[75%] -z-10"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center border-2 border-surface">
+<span class="material-symbols-outlined text-[18px] icon-fill" data-icon="check">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-background">Idea</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center border-2 border-surface">
+<span class="material-symbols-outlined text-[18px] icon-fill" data-icon="check">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-background">Promovida</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border-2 border-primary text-primary flex items-center justify-center shadow-[0_0_0_4px_rgba(255,218,214,0.5)]">
+<span class="material-symbols-outlined text-[18px]" data-icon="pending_actions">pending_actions</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-background font-bold">En Acción</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center border-2 border-surface">
+<span class="material-symbols-outlined text-[18px]" data-icon="lock">lock</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Cerrada</span>
+</div>
+</div>
+</div>
+<!-- Main Proposal View -->
+<article class="bg-surface border border-outline-variant border-t-4 border-t-primary rounded shadow-sm p-6 md:p-8 mb-stack-lg">
+<header class="mb-6 border-b border-outline-variant pb-6">
+<div class="flex justify-between items-start gap-4 mb-4">
+<h1 class="font-display-lg text-display-lg text-on-background md:hidden">Suministro de Agua Potable en Alta Guajira</h1>
+<h1 class="font-headline-lg text-headline-lg text-on-background hidden md:block">Suministro de Agua Potable en Alta Guajira</h1>
+<!-- Quick Share -->
+<div class="flex gap-2 shrinks-0">
+<button class="w-10 h-10 rounded-full bg-surface-container-low hover:bg-surface-variant flex items-center justify-center text-on-surface-variant transition-colors border border-outline-variant" title="Share on WhatsApp">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+</div>
+<div class="flex flex-wrap gap-4 text-on-surface-variant font-label-md text-label-md">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+                            La Guajira, Colombia
+                        </div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+                            Publicado: 24 Oct, 2023
+                        </div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="person">person</span>
+                            Por: Juan D.
+                        </div>
+</div>
+</header>
+<div class="prose prose-p:font-body-md prose-p:text-body-md prose-p:text-on-background prose-headings:font-headline-md prose-headings:text-headline-md prose-headings:text-on-background max-w-none">
+<p class="mb-4">La comunidad de Uribia enfrenta una escasez crítica de agua potable debido a la prolongada sequía. Esta iniciativa propone la instalación de 5 sistemas de desalinización portátiles alimentados por energía solar para abastecer a más de 500 familias de la región.</p>
+<h3 class="mt-6 mb-3 font-bold">Objetivos Principales</h3>
+<ul class="list-disc pl-6 mb-4 space-y-2">
+<li>Adquisición e instalación de 5 plantas desalinizadoras solares.</li>
+<li>Capacitación de 15 líderes comunitarios para el mantenimiento de los equipos.</li>
+<li>Establecimiento de una red de distribución equitativa de agua.</li>
+</ul>
+<div class="bg-surface-container-low p-4 rounded border border-outline-variant mt-6">
+<h4 class="font-label-md text-label-md font-bold mb-2">Recursos Necesarios</h4>
+<p class="mb-0">Se requieren fondos por valor de $50,000 USD y logística de transporte desde Riohacha hasta las comunidades afectadas.</p>
+</div>
+</div>
+</article>
+<!-- Discussion Section -->
+<section class="mt-stack-lg">
+<div class="flex items-center gap-2 mb-6 border-b border-outline-variant pb-2">
+<span class="material-symbols-outlined text-primary" data-icon="forum">forum</span>
+<h2 class="font-headline-md text-headline-md text-on-background">Espacio de Debate (12)</h2>
+</div>
+<!-- Comment Input -->
+<div class="bg-surface border border-outline-variant rounded p-4 mb-8">
+<div class="flex gap-4">
+<img class="w-10 h-10 rounded-full bg-surface-variant object-cover" data-alt="A placeholder avatar for the current user in the comment section. A simple geometric face icon on a soft gray background, conveying a neutral, professional identity suitable for a corporate humanitarian application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj9Z2QR53bCUchEeOxTiwbbBlQ_oLzzB11TbM5w0oxgil5Prb2rYHxaU6eLFShS5SSbeYww9PxZqsNYcoDbm2yvoLzpoJLsInMDcoqz4EcpreEDfs-7LGeuzLNinhbUawfGOe8VFmD6VzO7KNmHyscLi2rZH6fP_3JLk8B3IlX7WhvZsRmP77e9EwOXS8YIJWmiXg50I40TL9rnwFCtg-iT-KPxlMWovUlSzPp_bU-fvxwjfs0jW5R"/>
+<div class="flex-1">
+<textarea class="w-full bg-surface border border-outline-variant rounded p-3 font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary min-h-[100px] resize-y" placeholder="Aporta a esta iniciativa... (Soporta Markdown)"></textarea>
+<div class="flex justify-between items-center mt-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Por favor mantén un tono respetuoso y constructivo.</span>
+<button class="bg-secondary text-on-secondary font-label-md text-label-md px-4 py-2 rounded hover:bg-on-secondary-container transition-colors">Publicar Aporte</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Comment Thread -->
+<div class="space-y-6">
+<!-- Comment 1 -->
+<div class="flex gap-4">
+<img class="w-10 h-10 rounded-full bg-surface-variant object-cover shrink-0" data-alt="Avatar of a commenter named Carlos R., showing a stylized silhouette of a man against a dark blue background. Corporate and minimal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5xVPGQ02K1-vEV3f2pPPtLgeAaDSa48tpKzU5YFYY_MU1yhWlfEHsS1VlGU0YbPmWxDQHskBpfQ-8UdYeVq1Rf_G0p8rp0yxTbpSRNwwLI9AqYATYytMf_MUlHs2sqBGNh8-b_QWonC_wHOvd0FSY3P_obWuUA8H7932ONvcrRBM5rZ5ObczCyPEZn9Lz9VIophgZP2FaNi0CEH6yYiI7emeAh8NMSBvPsjs7-clHd1MUsxCZzq_Y"/>
+<div class="flex-1">
+<div class="bg-surface border border-outline-variant rounded p-4">
+<div class="flex justify-between items-center mb-2">
+<div>
+<span class="font-label-md text-label-md font-bold text-on-background">Carlos R.</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-2">Hace 2 horas</span>
+</div>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded text-xs font-label-sm text-label-sm border border-outline flex items-center gap-1" title="Verificado anti-spam">
+<span class="material-symbols-outlined text-[14px]" data-icon="shield">shield</span> Seguro
+                                    </span>
+</div>
+<p class="font-body-md text-body-md text-on-background">Tengo contacto con una empresa local en Riohacha que podría facilitar el transporte de los equipos a costo reducido. ¿Con quién me puedo contactar para coordinar esto?</p>
+<div class="flex gap-4 mt-3">
+<button class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="thumb_up">thumb_up</span> 5
+                                    </button>
+<button class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors">Responder</button>
+</div>
+</div>
+<!-- Nested Reply -->
+<div class="flex gap-4 mt-4 ml-8">
+<img class="w-8 h-8 rounded-full bg-surface-variant object-cover shrink-0" data-alt="Avatar of the idea author, Juan D., showing a bright yellow abstract icon on a dark background. Minimalist design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDQCSg5V9PWrPMNje6CX7NAjKGFVauosVFrm5V4IJkyJSjIgza9fXpxHBccqohrY8J0RlW7T6XkAiv6gGYL6iQovlPIvR_E4tuDjaWQqbUncbIwZFTkcPqy4CT4J_11XtJk2uOhTkh2QIZmRqm8m9WV2M7Gkwx4HoaW5_2G1ND3WC38kVw4_zqGNqcAe5Rayi1iBAm5UVWi-APBVr5t_M6D91gCa_9h8sr21afE0goTiWSee8t0XUv"/>
+<div class="flex-1">
+<div class="bg-surface-container-low border border-outline-variant rounded p-3">
+<div class="flex justify-between items-center mb-1">
+<div>
+<span class="font-label-md text-label-md font-bold text-on-background">Juan D.</span>
+<span class="bg-primary-fixed text-on-primary-fixed text-[10px] px-1 rounded ml-1 font-bold">AUTOR</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-2">Hace 1 hora</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-background text-sm">¡Excelente Carlos! Por favor escríbeme al correo logistica@actuemosyacolombia.org con el asunto "Transporte Uribia" para gestionar los detalles.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-inverse-surface dark:bg-surface-container-lowest border-t border-outline-variant w-full mt-stack-lg">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop py-stack-md w-full max-w-container-max mx-auto gap-4">
+<span class="font-headline-md text-headline-md text-surface">ActuemosYaColombia</span>
+<span class="text-on-primary dark:text-primary font-label-sm text-label-sm">© 2024 ActuemosYaColombia. Institucionalidad y Acción.</span>
+<div class="flex flex-wrap gap-4 justify-center">
+<a class="text-surface-variant hover:text-surface font-label-sm text-label-sm opacity-90 hover:opacity-100 hover:text-primary-fixed transition-colors" href="#">Canales Oficiales</a>
+<a class="text-surface-variant hover:text-surface font-label-sm text-label-sm opacity-90 hover:opacity-100 hover:text-primary-fixed transition-colors" href="#">Privacidad</a>
+<a class="text-surface-variant hover:text-surface font-label-sm text-label-sm opacity-90 hover:opacity-100 hover:text-primary-fixed transition-colors" href="#">Contacto</a>
+<a class="text-surface-variant hover:text-surface font-label-sm text-label-sm opacity-90 hover:opacity-100 hover:text-primary-fixed transition-colors" href="#">Mapa de Sitio</a>
+</div>
+</div>
+</footer>
+</body></html>

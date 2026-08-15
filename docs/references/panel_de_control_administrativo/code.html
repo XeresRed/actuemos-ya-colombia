@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Panel de Moderación y Control - ActuemosYa</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-filled {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom scrollbar for admin interface */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff8f7; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e4beba; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8f6f6c; 
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#a9c7ff",
+                        "tertiary-fixed": "#ffdfa0",
+                        "on-secondary-container": "#003670",
+                        "on-primary-fixed": "#410003",
+                        "on-tertiary-fixed": "#261a00",
+                        "surface-container-high": "#ffe2de",
+                        "on-background": "#271816",
+                        "surface-tint": "#ba1a20",
+                        "outline-variant": "#e4beba",
+                        "tertiary-container": "#8f6a00",
+                        "surface-container-low": "#fff0ef",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#fff8f7",
+                        "on-error": "#ffffff",
+                        "surface": "#fff8f7",
+                        "on-primary-container": "#fff2f0",
+                        "on-tertiary-container": "#fff3e3",
+                        "inverse-surface": "#3e2c2a",
+                        "primary-fixed": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "error": "#ba1a1a",
+                        "on-surface": "#271816",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#930010",
+                        "inverse-on-surface": "#ffedeb",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#f1d3d0",
+                        "surface-container-highest": "#f9dcd9",
+                        "secondary": "#005db7",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#715300",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#64a1ff",
+                        "surface-container": "#ffe9e7",
+                        "on-secondary-fixed": "#001b3d",
+                        "secondary-fixed": "#d6e3ff",
+                        "outline": "#8f6f6c",
+                        "background": "#fff8f7",
+                        "on-secondary-fixed-variant": "#00468c",
+                        "surface-variant": "#f9dcd9",
+                        "primary-container": "#d32f2f",
+                        "primary": "#af101a",
+                        "tertiary-fixed-dim": "#f8bd2a",
+                        "inverse-primary": "#ffb3ac",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "on-surface-variant": "#5b403d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "32px",
+                        "container-max": "1280px",
+                        "stack-md": "24px",
+                        "stack-sm": "12px",
+                        "stack-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background h-screen flex overflow-hidden font-body-md text-body-md antialiased">
+<!-- Admin SideNavBar -->
+<aside class="hidden md:flex flex-col w-64 bg-surface-container-low border-r border-outline-variant h-full flex-shrink-0 relative z-20">
+<!-- Logo Area -->
+<div class="p-margin-desktop border-b border-outline-variant">
+<h1 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined icon-filled text-3xl">admin_panel_settings</span>
+                ActuemosYa
+            </h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1 uppercase tracking-wider">Moderación &amp; Control</p>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 overflow-y-auto p-base gap-stack-sm flex flex-col mt-4">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-full font-label-md text-label-md transition-all duration-200" href="#">
+<span class="material-symbols-outlined icon-filled" data-icon="dashboard">dashboard</span>
+                Panel Principal
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full font-label-md text-label-md transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inbox">inbox</span>
+                Bandeja de Triage
+                <span class="ml-auto bg-primary text-on-primary text-xs font-bold px-2 py-0.5 rounded-full">12</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full font-label-md text-label-md transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+                Gestión de Ideas
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full font-label-md text-label-md transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+                Moderación Reportes
+                <span class="ml-auto bg-error text-on-error text-xs font-bold px-2 py-0.5 rounded-full">5</span>
+</a>
+<div class="my-2 border-t border-outline-variant mx-4"></div>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface rounded-full font-label-md text-label-md transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="manage_accounts">manage_accounts</span>
+                Accesos y Roles
+            </a>
+</nav>
+<!-- Admin Profile Snippet -->
+<div class="p-4 border-t border-outline-variant bg-surface-container-highest">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border-2 border-outline-variant object-cover" data-alt="A small, professional circular avatar portrait of a system administrator in a brightly lit office setting, communicating trust and authority." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3plzjFbc4HyHzeVOP0GjXK3t-NbKX7Cj-eSbRHHJqDLrES51wyxuxfZ6FpubUGWfVmBUt_PbtsbH11c-kOqJ0yXlX4KiLyx1d5PVJY9f87Dwaj9ldttunAZPj2Pzp4DA3N3qK_zWStnXlg5t4NYdnxki34yCW3z2FNL94p9lV7_TZ-TcBE4pRPdrd0yi8b61uZiTKih6eKXQWy_KMJ5ePi_U1SW0c5V0khO0RFWD1xdIhatxzHzCS"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Sup. Operaciones</span>
+<span class="font-label-sm text-label-sm text-secondary">Nivel: Administrador</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col h-full bg-surface-container-lowest overflow-hidden relative">
+<!-- Top App Bar (Admin Context) -->
+<header class="h-16 flex items-center justify-between px-margin-desktop border-b border-outline-variant bg-surface sticky top-0 z-10">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+<h2 class="font-headline-md text-headline-md text-on-surface">Panel Principal</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Dashboard Grid -->
+<div class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop">
+<div class="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- KPI Row -->
+<div class="col-span-1 md:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-gutter mb-4">
+<!-- Metric 1 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-4 hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant">Borradores Pendientes</span>
+<span class="material-symbols-outlined text-primary bg-primary-fixed p-1 rounded-full text-sm">inbox</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-surface">12</div>
+<div class="font-label-sm text-label-sm text-error mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +3 desde ayer
+                        </div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-4 hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant">Ideas Activas</span>
+<span class="material-symbols-outlined text-secondary bg-secondary-fixed p-1 rounded-full text-sm">lightbulb</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-surface">148</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-1 flex items-center gap-1">
+                            Estable
+                        </div>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-4 hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant">En Acción (Crítico)</span>
+<span class="material-symbols-outlined text-error bg-error-container p-1 rounded-full text-sm">emergency</span>
+</div>
+<div class="font-display-lg text-display-lg text-error">5</div>
+<div class="font-label-sm text-label-sm text-error mt-1 flex items-center gap-1 font-bold">
+                            Requieren monitoreo
+                        </div>
+</div>
+<!-- Metric 4 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-4 hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant">Reportes de Usuarios</span>
+<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed p-1 rounded-full text-sm">flag</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-surface">8</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-1 flex items-center gap-1">
+                            Pendientes de revisión
+                        </div>
+</div>
+</div>
+<!-- Triage Inbox (Bento Cell) -->
+<section class="col-span-1 md:col-span-8 bg-surface border border-outline-variant rounded-xl flex flex-col hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low rounded-t-xl">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">filter_list</span>
+                            Bandeja de Triage
+                        </h3>
+<button class="font-label-md text-label-md text-secondary hover:underline">Ver todos</button>
+</div>
+<div class="flex-1 overflow-y-auto max-h-[400px]">
+<!-- Triage Item 1 -->
+<div class="p-4 border-b border-outline-variant hover:bg-surface-variant transition-colors flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-surface-dim text-on-surface-variant px-2 py-0.5 rounded font-label-sm text-label-sm uppercase tracking-wider">Borrador Anónimo</span>
+<span class="font-label-sm text-label-sm text-outline">Hace 10 min</span>
+</div>
+<h4 class="font-headline-md text-label-md text-on-surface mb-1">Derrumbe bloquea acceso rural en Vía La Calera</h4>
+<p class="font-body-md text-label-sm text-on-surface-variant line-clamp-1">Se reporta deslizamiento de tierra significativo bloqueando el paso de vehículos de emergencia...</p>
+</div>
+<div class="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+<button class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-secondary text-on-secondary rounded font-label-md text-label-md hover:bg-on-secondary-fixed transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                    Aprobar Idea
+                                </button>
+<button class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 border border-outline text-on-surface-variant rounded font-label-md text-label-md hover:bg-error-container hover:text-error hover:border-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">block</span>
+                                    Rechazar
+                                </button>
+</div>
+</div>
+<!-- Triage Item 2 -->
+<div class="p-4 border-b border-outline-variant hover:bg-surface-variant transition-colors flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-surface-dim text-on-surface-variant px-2 py-0.5 rounded font-label-sm text-label-sm uppercase tracking-wider">Usuario Verificado</span>
+<span class="font-label-sm text-label-sm text-outline">Hace 45 min</span>
+</div>
+<h4 class="font-headline-md text-label-md text-on-surface mb-1">Falta de insumos para albergue temporal comuna 8</h4>
+<p class="font-body-md text-label-sm text-on-surface-variant line-clamp-1">Necesitamos urgentemente cobijas y agua potable para 50 familias reubicadas...</p>
+</div>
+<div class="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+<button class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 bg-secondary text-on-secondary rounded font-label-md text-label-md hover:bg-on-secondary-fixed transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                    Aprobar Idea
+                                </button>
+<button class="flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-2 border border-outline text-on-surface-variant rounded font-label-md text-label-md hover:bg-error-container hover:text-error hover:border-error transition-colors">
+<span class="material-symbols-outlined text-[18px]">block</span>
+                                    Rechazar
+                                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Comment Moderation (Bento Cell) -->
+<section class="col-span-1 md:col-span-4 bg-surface border border-outline-variant rounded-xl flex flex-col hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow">
+<div class="p-4 border-b border-outline-variant bg-surface-container-low rounded-t-xl flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">gavel</span>
+                            Moderación
+                        </h3>
+<span class="bg-error text-on-error font-label-sm text-label-sm px-2 py-0.5 rounded-full">5</span>
+</div>
+<div class="flex-1 p-4 flex flex-col gap-4 overflow-y-auto max-h-[400px]">
+<!-- Reported Comment 1 -->
+<div class="bg-surface-container-lowest border border-error-container rounded-lg p-3">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-sm text-label-sm text-error font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span> Reportado x3
+                                </span>
+<span class="font-label-sm text-label-sm text-outline">Idea #402</span>
+</div>
+<p class="font-body-md text-label-sm text-on-surface italic mb-3">"Esto es una farsa, no envíen nada a esa dirección, se lo están robando todo los líderes."</p>
+<div class="flex gap-2">
+<button class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-error text-on-error rounded font-label-sm text-label-sm hover:bg-on-error-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">visibility_off</span> Ocultar
+                                </button>
+<button class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 border border-outline-variant text-on-surface-variant rounded font-label-sm text-label-sm hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[16px]">verified</span> Ignorar
+                                </button>
+</div>
+</div>
+<!-- Reported Comment 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-3">
+<div class="flex justify-between items-start mb-2">
+<span class="font-label-sm text-label-sm text-tertiary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">flag</span> Reportado x1
+                                </span>
+<span class="font-label-sm text-label-sm text-outline">Idea #118</span>
+</div>
+<p class="font-body-md text-label-sm text-on-surface italic mb-3">"Alguien sabe si el número de contacto sigue activo? Llamo y no contestan."</p>
+<div class="flex gap-2">
+<button class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-error text-on-error rounded font-label-sm text-label-sm hover:bg-on-error-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">visibility_off</span> Ocultar
+                                </button>
+<button class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 border border-outline-variant text-on-surface-variant rounded font-label-sm text-label-sm hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[16px]">verified</span> Ignorar
+                                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Idea State Manager (Full Width Table) -->
+<section class="col-span-1 md:col-span-12 bg-surface border border-outline-variant rounded-xl flex flex-col mb-8 hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-shadow">
+<div class="p-4 border-b border-outline-variant bg-surface-container-low rounded-t-xl flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">account_tree</span>
+                            Gestor de Estados de Ideas
+                        </h3>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-full font-body-md text-label-sm focus:border-secondary focus:ring-1 focus:ring-secondary outline-none w-64 transition-all" placeholder="Buscar ID o título..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-bright border-b border-outline-variant">
+<th class="p-4 font-label-md text-label-sm text-on-surface-variant uppercase tracking-wider w-24">ID</th>
+<th class="p-4 font-label-md text-label-sm text-on-surface-variant uppercase tracking-wider">Título de la Iniciativa</th>
+<th class="p-4 font-label-md text-label-sm text-on-surface-variant uppercase tracking-wider w-40">Estado Actual</th>
+<th class="p-4 font-label-md text-label-sm text-on-surface-variant uppercase tracking-wider w-48 text-right">Acción Rápida</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-md text-label-md">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-variant transition-colors">
+<td class="p-4 text-secondary font-bold">#AY-1042</td>
+<td class="p-4 text-on-surface">Punto de acopio de medicinas para damnificados norte</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary-fixed text-on-secondary-fixed">
+                                            Idea
+                                        </span>
+</td>
+<td class="p-4 text-right">
+<select class="form-select text-sm border-outline-variant rounded-md py-1 pl-2 pr-8 bg-surface-container-lowest focus:border-secondary focus:ring-secondary text-on-surface">
+<option selected="">Cambiar a...</option>
+<option>Promovida</option>
+<option>En Acción</option>
+<option>Completada</option>
+<option>Redirigida</option>
+</select>
+</td>
+</tr>
+<!-- Row 2 (Urgent priority header style simulated) -->
+<tr class="hover:bg-surface-variant transition-colors bg-error-container bg-opacity-20">
+<td class="p-4 text-error font-bold border-l-4 border-error">#AY-0988</td>
+<td class="p-4 text-on-surface font-semibold">Evacuación prioritaria sector Bajo Cauca (Riesgo Inminente)</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-fixed text-on-primary-fixed">
+                                            En Acción
+                                        </span>
+</td>
+<td class="p-4 text-right flex justify-end gap-2">
+<button class="bg-surface text-on-surface-variant border border-outline px-3 py-1 rounded text-sm hover:bg-surface-variant">Detalles</button>
+<select class="form-select text-sm border-outline-variant rounded-md py-1 pl-2 pr-8 bg-surface-container-lowest focus:border-secondary focus:ring-secondary text-on-surface w-32">
+<option>Estado...</option>
+<option>Promovida</option>
+<option selected="">En Acción</option>
+<option>Completada</option>
+</select>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-variant transition-colors">
+<td class="p-4 text-secondary font-bold">#AY-0855</td>
+<td class="p-4 text-on-surface text-on-surface-variant line-through opacity-75">Reparación techo escuela veredal San José</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-surface-container-high text-on-surface">
+                                            Completada
+                                        </span>
+</td>
+<td class="p-4 text-right">
+<button class="text-secondary hover:underline text-sm font-label-md">Ver Informe</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ActuemosYa - Matching y Voluntariado Profesional</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#a9c7ff",
+                        "tertiary-fixed": "#ffdfa0",
+                        "on-secondary-container": "#003670",
+                        "on-primary-fixed": "#410003",
+                        "on-tertiary-fixed": "#261a00",
+                        "surface-container-high": "#ffe2de",
+                        "on-background": "#271816",
+                        "surface-tint": "#ba1a20",
+                        "outline-variant": "#e4beba",
+                        "tertiary-container": "#8f6a00",
+                        "surface-container-low": "#fff0ef",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#fff8f7",
+                        "on-error": "#ffffff",
+                        "surface": "#fff8f7",
+                        "on-primary-container": "#fff2f0",
+                        "on-tertiary-container": "#fff3e3",
+                        "inverse-surface": "#3e2c2a",
+                        "primary-fixed": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "error": "#ba1a1a",
+                        "on-surface": "#271816",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#930010",
+                        "inverse-on-surface": "#ffedeb",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#f1d3d0",
+                        "surface-container-highest": "#f9dcd9",
+                        "secondary": "#005db7",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#715300",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#64a1ff",
+                        "surface-container": "#ffe9e7",
+                        "on-secondary-fixed": "#001b3d",
+                        "secondary-fixed": "#d6e3ff",
+                        "outline": "#8f6f6c",
+                        "background": "#fff8f7",
+                        "on-secondary-fixed-variant": "#00468c",
+                        "surface-variant": "#f9dcd9",
+                        "primary-container": "#d32f2f",
+                        "primary": "#af101a",
+                        "tertiary-fixed-dim": "#f8bd2a",
+                        "inverse-primary": "#ffb3ac",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "on-surface-variant": "#5b403d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "32px",
+                        "container-max": "1280px",
+                        "stack-md": "24px",
+                        "stack-sm": "12px",
+                        "stack-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar (Desktop) -->
+<nav class="bg-surface-container-low dark:bg-surface-container-highest border-r border-outline-variant dark:border-outline h-full w-64 fixed left-0 top-0 hidden lg:flex flex-col p-base gap-stack-sm z-40">
+<div class="px-margin-mobile py-stack-md">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">ActuemosYa</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Acción Humanitaria</p>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-2 px-margin-mobile">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                        Hub
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="lightbulb">lightbulb</span>
+                        Ideas
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+                        Initiatives
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-on-surface duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+                        Search
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full bg-secondary-container text-on-secondary-container duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+                        Volunteers
+                    </a>
+</li>
+</ul>
+</div>
+<div class="px-margin-mobile mt-auto">
+<button class="w-full bg-primary text-on-primary py-3 rounded-full font-label-md text-label-md uppercase tracking-wider hover:bg-primary-container transition-colors">
+                Proponer Idea
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar (Mobile) -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile py-4 w-full sticky top-0 z-50 lg:hidden">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">ActuemosYaColombia</h1>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full p-2">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full">
+<div class="mb-stack-lg">
+<h2 class="font-display-lg text-display-lg text-primary mb-2">Matching Profesional</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Conecta habilidades especializadas con necesidades críticas en terreno. Acción inmediata, sin burocracia.</p>
+</div>
+<!-- Mode Selector Tabs & Filters -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter mb-stack-md">
+<!-- Left: Tabs & Quick Form -->
+<div class="xl:col-span-4 flex flex-col gap-stack-md">
+<!-- Tabs -->
+<div class="bg-surface p-1 rounded-xl border border-outline-variant flex">
+<button class="flex-1 py-3 text-center rounded-lg bg-primary text-on-primary font-label-md text-label-md shadow-sm transition-all">
+                            Ofrezco mi Habilidad
+                        </button>
+<button class="flex-1 py-3 text-center rounded-lg text-on-surface-variant hover:bg-surface-container-low font-label-md text-label-md transition-all">
+                            Busco Talento Técnico
+                        </button>
+</div>
+<!-- Fast Link Form -->
+<div class="bg-surface border border-outline-variant rounded-xl p-6 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary"></div>
+<h3 class="font-headline-md text-headline-md mb-4 text-secondary">Registro Rápido</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">Ingresa tus datos para contacto inmediato.</p>
+<form class="space-y-4">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Nombre Completo</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" placeholder="Ej. Ana García" type="text"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Especialidad Principal</label>
+<select class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors text-on-surface">
+<option>Salud / Medicina</option>
+<option>Logística / Transporte</option>
+<option>Ingeniería / Construcción</option>
+<option>Psicología / Apoyo</option>
+<option>Legal</option>
+</select>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Teléfono (WhatsApp)</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" placeholder="+57 300 000 0000" type="tel"/>
+</div>
+<button class="w-full bg-secondary text-on-secondary py-3 rounded-lg font-label-md text-label-md uppercase tracking-wider hover:bg-secondary-fixed-variant transition-colors mt-2" type="button">
+                                Disponibilidad Inmediata
+                            </button>
+</form>
+</div>
+</div>
+<!-- Right: Filters & List -->
+<div class="xl:col-span-8 flex flex-col gap-stack-md">
+<!-- Filters Bar -->
+<div class="bg-surface border border-outline-variant rounded-xl p-4 flex flex-wrap gap-4 items-center">
+<div class="flex-1 min-w-[200px]">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-transparent rounded-full pl-10 pr-4 py-2 font-body-md text-body-md focus:bg-surface focus:border-secondary transition-colors" placeholder="Buscar habilidades o necesidades..." type="text"/>
+</div>
+</div>
+<div class="flex gap-2">
+<select class="bg-surface border border-outline-variant rounded-full px-4 py-2 font-label-sm text-label-sm text-on-surface focus:border-secondary outline-none">
+<option>Todas las Áreas</option>
+<option>Salud</option>
+<option>Construcción</option>
+</select>
+<select class="bg-surface border border-outline-variant rounded-full px-4 py-2 font-label-sm text-label-sm text-on-surface focus:border-secondary outline-none">
+<option>Toda Colombia</option>
+<option>Bogotá</option>
+<option>Medellín</option>
+</select>
+</div>
+</div>
+<!-- Profiles Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Card 1 -->
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden hover:shadow-lg transition-shadow relative group">
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary-container"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-block px-2 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-md font-label-sm text-label-sm mb-2">Salud / Medicina</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Dr. Carlos Mendoza</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Medellín, Antioquia
+                                        </p>
+</div>
+<img class="w-16 h-16 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a serious, middle-aged Latino male doctor wearing a white coat, set against a neutral clinical background. High-key lighting, modern bright-mode corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC2grKvNpWdXKKgQU8fH-bMDd5zFurVVbAVMD7QObu2PrkXlxduTBAKN4sgcHioTjyCDQhu8bHeGXyp04TOQW_e-sAKQwTBvjYMnyhCFZg4xI4lTVoMprzEIXoFEg2761nHuIyqiSHdp_zPDJ7sReu5ZlumQN2K8-wlgFvqwWtLJkAgvvsL1FBLhcj1-F2M1w5ed0U0kWF0Zc_uAJJrBn9WIAeibG2oObNAED7ImlEdy1q4_TC1BME"/>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2">Especialista en emergencias traumáticas. Disponible fines de semana para despliegue en zonas afectadas. Cuento con equipo básico de primeros auxilios.</p>
+<div class="flex gap-2">
+<button class="flex-1 border border-secondary text-secondary py-2 rounded-lg font-label-md text-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-colors">
+                                        Ver Perfil
+                                    </button>
+<button class="bg-secondary text-on-secondary px-4 py-2 rounded-lg hover:bg-secondary-fixed-variant transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden hover:shadow-lg transition-shadow relative group">
+<div class="absolute top-0 left-0 w-full h-1 bg-tertiary-fixed"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-block px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded-md font-label-sm text-label-sm mb-2">Ingeniería Estructural</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Elena Rojas</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Bogotá D.C.
+                                        </p>
+</div>
+<div class="w-16 h-16 rounded-full bg-surface-container-highest flex items-center justify-center text-tertiary border border-outline-variant">
+<span class="material-symbols-outlined text-3xl">engineering</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2">Evaluación de daños estructurales post-desastre. 10 años de experiencia. Puedo realizar asesorías remotas o despliegue en Cundinamarca.</p>
+<div class="flex gap-2">
+<button class="flex-1 border border-secondary text-secondary py-2 rounded-lg font-label-md text-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-colors">
+                                        Ver Perfil
+                                    </button>
+<button class="bg-secondary text-on-secondary px-4 py-2 rounded-lg hover:bg-secondary-fixed-variant transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden hover:shadow-lg transition-shadow relative group">
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary-container"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-block px-2 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-md font-label-sm text-label-sm mb-2">Logística</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Flota Transportes SA</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Cali, Valle
+                                        </p>
+</div>
+<img class="w-16 h-16 rounded-full object-cover border border-outline-variant" data-alt="A modern commercial delivery truck parked outside a bright, clean warehouse. Clear blue sky, corporate light-mode aesthetic, emphasizing logistics and transport reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfhVYEIy5SbLs5pRgDlNObLWObQbsJ0imI_XfLGYxR93iCrH-vduOTe1Hb3JTZpHE6ULaI002zT_pqb5wlYrb3n7KBNg1KzthtAnbFklSSYP_vv5f2sxaCtCvsThvg8kUQ3KpmuFFYZVsSlhsTbTzO2ZNPLMUh6wl3rpu_RyF7OwgWVK9YhrEro_FkUYK4VmTJvnDfBoNVbhrSmMvPy_XQ_g0pAkfjyznucLf_rxlazdHKJ7-dmbuy"/>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2">Ofrecemos 2 camiones de carga media para transporte de insumos hacia zonas rurales del Cauca y Valle del Cauca. Combustible cubierto.</p>
+<div class="flex gap-2">
+<button class="flex-1 border border-secondary text-secondary py-2 rounded-lg font-label-md text-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-colors">
+                                        Ver Perfil
+                                    </button>
+<button class="bg-secondary text-on-secondary px-4 py-2 rounded-lg hover:bg-secondary-fixed-variant transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden hover:shadow-lg transition-shadow relative group md:hidden lg:block">
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary-container"></div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="inline-block px-2 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-md font-label-sm text-label-sm mb-2">Psicología</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Grupo Apoyo Vital</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Remoto
+                                        </p>
+</div>
+<div class="w-16 h-16 rounded-full bg-surface-container-highest flex items-center justify-center text-secondary border border-outline-variant">
+<span class="material-symbols-outlined text-3xl">psychology</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2">Red de 5 psicólogos clínicos ofreciendo primeros auxilios psicológicos vía telefónica o videollamada para afectados y socorristas.</p>
+<div class="flex gap-2">
+<button class="flex-1 border border-secondary text-secondary py-2 rounded-lg font-label-md text-label-md hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-colors">
+                                        Ver Perfil
+                                    </button>
+<button class="bg-secondary text-on-secondary px-4 py-2 rounded-lg hover:bg-secondary-fixed-variant transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex justify-center mt-4">
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            Cargar más voluntarios <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-inverse-surface dark:bg-surface-container-lowest border-t border-outline-variant w-full mt-stack-lg">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop py-stack-md w-full max-w-container-max mx-auto">
+<div class="mb-4 md:mb-0">
+<span class="font-headline-md text-headline-md text-surface">ActuemosYaColombia</span>
+<p class="font-label-sm text-label-sm text-surface-variant mt-1">© 2024 ActuemosYaColombia. Institucionalidad y Acción.</p>
+</div>
+<ul class="flex flex-wrap gap-4 justify-center">
+<li><a class="font-label-sm text-label-sm text-surface-variant hover:text-surface opacity-90 hover:opacity-100 transition-colors" href="#">Canales Oficiales</a></li>
+<li><a class="font-label-sm text-label-sm text-surface-variant hover:text-surface opacity-90 hover:opacity-100 transition-colors" href="#">Privacidad</a></li>
+<li><a class="font-label-sm text-label-sm text-surface-variant hover:text-surface opacity-90 hover:opacity-100 transition-colors" href="#">Contacto</a></li>
+<li><a class="font-label-sm text-label-sm text-surface-variant hover:text-surface opacity-90 hover:opacity-100 transition-colors" href="#">Mapa de Sitio</a></li>
+</ul>
+</div>
+</footer>
+</div>
+</body></html>
