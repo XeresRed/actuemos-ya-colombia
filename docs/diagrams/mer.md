@@ -96,11 +96,23 @@ erDiagram
         datetime creado_en "Fecha de publicación"
     }
 
+    ALERTAS_SISTEMA {
+        string id PK "UUID / CUID"
+        string nivel "CHECK: critica | alerta_naranja | informativa"
+        string mensaje "Texto prioritario de la alerta"
+        int activa "1: Activa globalmente | 0: Oculta"
+        string enlace_accion_url "URL a canal oficial o comunicado"
+        string enlace_accion_texto "Texto del botón de acción"
+        string actualizado_por "Email/ID del admin emisor"
+        datetime actualizado_en "Fecha de última actualización"
+    }
+
     IDEAS ||--o{ COMENTARIOS : "posee hilos de debate"
     COMENTARIOS ||--o{ COMENTARIOS : "respuestas anidadas (hilo)"
     IDEAS ||--o| INICIATIVAS_ACTIVAS : "puede redirigirse a"
     IDEAS ||--o{ AUTH_TOKENS : "valida autoría vía OTP"
     USUARIOS ||--o{ AUTH_TOKENS : "recibe Magic Link"
+    USUARIOS ||--o{ ALERTAS_SISTEMA : "emite y gestiona"
 ```
 
 ---
@@ -130,13 +142,16 @@ Hilos de discusión anidados asociados a cada idea.
 - **Cascada:** Al eliminarse una idea, sus comentarios se eliminan en cascada (`ON DELETE CASCADE`).
 
 ### 2.5. `iniciativas_activas`
-Directorio de proyectos, ONGs y brigadas activas en el territorio nacional.
+Directorio de proyectos, ONGs y brigadas activas en el territorio nacional. Incluye organismos oficiales categorizados como `organismo_oficial`.
 
 ### 2.6. `reportes_busqueda`
 Registro humanitario urgente de personas desaparecidas o albergadas, así como animales de compañía perdidos o rescatados.
 
 ### 2.7. `voluntariado_profesional`
 Tablero bidireccional de oferta (`ofrezco_habilidad`) y demanda (`busco_profesional`) de talentos técnicos especializados.
+
+### 2.8. `alertas_sistema`
+Control dinámico de avisos y alertas críticas de emergencia nacional o regional desplegadas en el banner global del sistema.
 
 ---
 
@@ -154,3 +169,5 @@ Para garantizar tiempos de respuesta `<5ms` con bajo consumo de memoria:
 | `idx_reportes_ubicacion` | `reportes_busqueda` | `ubicacion` | Búsquedas geográficas rápidas |
 | `idx_voluntariado_area_tipo`| `voluntariado_profesional` | `area_profesional, tipo` | Matching de habilidades profesionales |
 | `idx_auth_tokens_lookup` | `auth_tokens` | `email, tipo, usado, expira_en` | Validación rápida de OTPs y Magic Links |
+| `idx_alertas_activa` | `alertas_sistema` | `activa, actualizado_en DESC` | Consulta ultrarrápida del banner de crisis activo |
+

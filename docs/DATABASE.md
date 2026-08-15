@@ -161,6 +161,20 @@ CREATE TABLE voluntariado_profesional (
     creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ==========================================================
+-- 7. GESTIÓN DINÁMICA DE ALERTAS DE EMERGENCIA
+-- ==========================================================
+CREATE TABLE alertas_sistema (
+    id TEXT PRIMARY KEY,
+    nivel TEXT CHECK(nivel IN ('critica', 'alerta_naranja', 'informativa')) NOT NULL DEFAULT 'critica',
+    mensaje TEXT NOT NULL,
+    activa INTEGER NOT NULL DEFAULT 1,          -- 1: Visible en toda la app, 0: Oculta
+    enlace_accion_url TEXT,                     -- URL oficial (UNGRD, Cruz Roja, etc.)
+    enlace_accion_texto TEXT,                   -- Texto del botón de acción
+    actualizado_por TEXT,                       -- Admin o supervisor responsable
+    actualizado_en DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 ```
 
 ---
@@ -188,6 +202,9 @@ CREATE INDEX idx_voluntariado_area_tipo ON voluntariado_profesional(area_profesi
 -- Índices para Autenticación y Verificación
 CREATE INDEX idx_auth_tokens_lookup ON auth_tokens(email, tipo, usado, expira_en);
 
+-- Índices para Alertas de Emergencia
+CREATE INDEX idx_alertas_activa ON alertas_sistema(activa, actualizado_en DESC);
+
 ```
 
 ---
@@ -196,27 +213,11 @@ CREATE INDEX idx_auth_tokens_lookup ON auth_tokens(email, tipo, usado, expira_en
 
 | Flujo | Estado Inicial | Acción Requerida | Estado Final |
 | --- | --- | --- | --- |
-| **Idea con Email** | `borrador` | Usuario valida el OTP recibido por correo.
-
- | <br>`idea` (Pública) 
-
- |
-| **Idea Anónima** | <br>`borrador` 
-
- | Supervisor o Admin revisa y aprueba.
-
- | <br>`idea` (Pública) 
-
- |
-| **Comentario** | `visible` / `pendiente` | Si supera reCAPTCHA se publica directamente.
-
- | `visible` |
-| **Redirección** | <br>`idea` / `promovida` 
-
- | Se enlaza con `iniciativas_activas` mediante URL.
-
- | <br>`redirigida` 
-
- |
+| **Idea con Email** | `borrador` | Usuario valida el OTP recibido por correo. | `idea` (Pública) |
+| **Idea Anónima** | `borrador` | Supervisor o Admin revisa y aprueba. | `idea` (Pública) |
+| **Comentario** | `visible` / `pendiente` | Si supera reCAPTCHA se publica directamente. | `visible` |
+| **Redirección** | `idea` / `promovida` | Se enlaza con `iniciativas_activas` mediante URL. | `redirigida` |
+| **Alerta de Emergencia** | `desactivada` | Admin/Supervisor emite mensaje de crisis en `alertas_sistema`. | `activa` (Banner Global) |
 
 ---
+

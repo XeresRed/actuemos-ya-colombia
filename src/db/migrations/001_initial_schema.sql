@@ -114,7 +114,21 @@ CREATE TABLE IF NOT EXISTS voluntariado_profesional (
 );
 
 -- ==========================================================
--- 7. ÍNDICES DE RENDIMIENTO Y CONCURRENCIA
+-- 7. GESTIÓN DINÁMICA DE ALERTAS DE EMERGENCIA
+-- ==========================================================
+CREATE TABLE IF NOT EXISTS alertas_sistema (
+    id TEXT PRIMARY KEY,
+    nivel TEXT CHECK(nivel IN ('critica', 'alerta_naranja', 'informativa')) NOT NULL DEFAULT 'critica',
+    mensaje TEXT NOT NULL,
+    activa INTEGER NOT NULL DEFAULT 1,
+    enlace_accion_url TEXT,
+    enlace_accion_texto TEXT,
+    actualizado_por TEXT,
+    actualizado_en DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ==========================================================
+-- 8. ÍNDICES DE RENDIMIENTO Y CONCURRENCIA
 -- ==========================================================
 CREATE INDEX IF NOT EXISTS idx_ideas_estado ON ideas(estado);
 CREATE INDEX IF NOT EXISTS idx_ideas_alcance ON ideas(alcance_tipo, alcance_detalle);
@@ -124,3 +138,5 @@ CREATE INDEX IF NOT EXISTS idx_reportes_tipo_estado ON reportes_busqueda(tipo, e
 CREATE INDEX IF NOT EXISTS idx_reportes_ubicacion ON reportes_busqueda(ubicacion);
 CREATE INDEX IF NOT EXISTS idx_voluntariado_area_tipo ON voluntariado_profesional(area_profesional, tipo);
 CREATE INDEX IF NOT EXISTS idx_auth_tokens_lookup ON auth_tokens(email, tipo, usado, expira_en);
+CREATE INDEX IF NOT EXISTS idx_alertas_activa ON alertas_sistema(activa, actualizado_en DESC);
+

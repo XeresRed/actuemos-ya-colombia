@@ -80,9 +80,45 @@ Ante un desastre natural de gran escala (como un terremoto), las primeras 72 hor
 
 ---
 
-## 6. Restricciones del Entorno de Ejecución
+## 6. Protocolo de Alerta de Emergencia y Canales Oficiales de Socorro
+
+En situaciones de calamidad pública o desastre natural en Colombia, la plataforma opera bajo el principio de **Articulación y No Duplicación con el Estado**. ActuemosYaColombia no reemplaza a los organismos de socorro ni a las entidades gubernamentales; actúa como amplificador, canalizador y filtro previo:
+
+### A. Alerta de Emergencia de Alto Impacto
+* **Banner de Crisis Dinámico:** Un mecanismo de difusión prioritario visible en todo el sitio para emitir directrices inmediatas de evacuación, puntos de encuentro seguro, estado de vías y llamados urgentes de las autoridades.
+* **Niveles de Alerta:**
+  - `critica` (Rojo): Desastre inminente o en desarrollo, evacuación inmediata o peligro vital.
+  - `alerta_naranja` (Ámbar): Estado de precaución, búsqueda masiva activa o afectaciones zonales severas.
+  - `informativa` (Azul): Balance oficial de situación, apertura de centros de acopio o jornadas de donación.
+
+### B. Enlace con Organismos Oficiales de Colombia
+La plataforma conecta de forma permanente y prioritaria con los canales institucionales del Sistema Nacional de Gestión del Riesgo de Desastres (SNGRD):
+
+1. **UNGRD (Unidad Nacional para la Gestión del Riesgo de Desastres):**
+   - Canal oficial de coordinación de la Sala de Crisis Nacional.
+   - Enlace directo al **RUND (Registro Único Nacional de Damnificados)** para garantizar que las familias afectadas reciban los auxilios estatales oficiales.
+2. **Cruz Roja Colombiana:**
+   - Activación de líneas de atención humanitaria y puestos de socorro.
+   - Programa **RCF (Restablecimiento del Contacto entre Familiares)** para centralizar búsquedas formales de personas desaparecidas antes de iniciar reportes comunitarios informales.
+3. **Unidad para la Atención y Reparación Integral a las Víctimas (UARIV):**
+   - Acceso al **RUV (Registro Único de Víctimas)** y canales de orientación humanitaria.
+4. **Defensa Civil Colombiana y Bomberos Oficiales:**
+   - Líneas de marcación rápida para rescate en estructuras colapsadas, primeros auxilios y control de incendios.
+
+### C. Líneas de Emergencia Nacionales de Marcación Rápida
+* **123:** Número Único de Seguridad y Emergencias Nacional.
+* **132:** Cruz Roja Colombiana.
+* **144:** Defensa Civil Colombiana.
+* **119:** Cuerpo Oficial de Bomberos.
+* **125:** Centro Regulador de Urgencias y Emergencias (CRUE / Ambulancias).
+* **165:** Gaula Policía Nacional (Antisecuestro y Prevención de Extorsión en emergencias).
+
+---
+
+## 7. Restricciones del Entorno de Ejecución
 
 - **Servidor Económico:** DigitalOcean Droplet de 1 vCPU, 1 GB de memoria RAM y 10 GB de disco SSD.
 - **Memoria Estricta:** Límite de 600 MB por contenedor Docker y 2 GB de memoria Swap para evitar fallos por saturación (OOM).
 - **Base de Datos Embebida:** SQLite configurado con modo WAL (Write-Ahead Logging) para lecturas rápidas sin sobrecarga de un motor DBMS dedicado.
 - **Cero Costo en Certificados:** Caddy Server aprovisiona y renueva SSL automáticamente vía Let's Encrypt sin costo ni mantenimiento manual.
+

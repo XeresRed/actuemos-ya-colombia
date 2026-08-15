@@ -1,0 +1,67 @@
+# ==============================================================================
+# Dockerfile Multi-stage para ActuemosYaColombia (Next.js 14 + better-sqlite3)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Dependencias (deps)
+# ------------------------------------------------------------------------------
+FROM node:20-alpine AS deps
+# Instalar utilidades del sistema necesarias para compilar better-sqlite3 (C++)
+RUN apk add --no-cache libc6-compat python3 make g++
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# ------------------------------------------------------------------------------
+# 2. Compilación / Construcción (builder)
+# ------------------------------------------------------------------------------
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+RUN npm run build
+
+# ------------------------------------------------------------------------------
+# 3. Entorno de Ejecución Ligero (runner)
+# ------------------------------------------------------------------------------
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV DATABASE_URL=/data/database.sqlite
+
+# Seguridad: Usuario de sistema sin privilegios de superusuario
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Directorio de persistencia SQLite para el volumen bind
+RUN mkdir -p /data && chown -R nextjs:nodejs /data
+
+# Copiar artefactos optimizados de Next.js Standalone
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copiar scripts de migración y entrypoint
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=nextjs:nodejs /app/src/db/migrations ./src/db/migrations
+COPY --from=builder --chown=nextjs:nodejs /app/docker-entrypoint.sh ./docker-entrypoint.sh
+
+RUN chmod +x ./docker-entrypoint.sh
+
+USER nextjs
+
+EXPOSE 3000
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["node", "server.js"]

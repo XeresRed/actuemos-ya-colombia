@@ -1,0 +1,39 @@
+# ==============================================================================
+# Caddyfile: Gateway de Entrada y Proxy Seguro para ActuemosYaColombia (Staging)
+# ==============================================================================
+
+{
+    # Configuración global
+    email {$ACME_EMAIL:admin@actuemosya.org}
+    admin off
+}
+
+{$APP_DOMAIN:localhost} {
+    # Compresión dinámica para optimización de ancho de banda y velocidad
+    encode gzip zstd
+
+    # Inyección de cabeceras HTTP de seguridad (Defense in Depth)
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=(self)"
+        -Server
+    }
+
+    # Proxy inverso hacia el contenedor de la aplicación Next.js
+    reverse_proxy app:3000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Registro estructurado de accesos a stdout
+    log {
+        output stdout
+        format console
+    }
+}
