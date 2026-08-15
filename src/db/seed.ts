@@ -121,12 +121,56 @@ export function runSeed() {
     'visible'
   );
 
-  // 4. Iniciativas Activas
+  // 4. Iniciativas Activas y Canales Oficiales
   const insertInitiative = db.prepare(`
     INSERT OR REPLACE INTO iniciativas_activas (
       id, nombre, descripcion, categoria, url_oficial, contacto, cobertura_geografica, estado_operacion
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);
+
+  insertInitiative.run(
+    'ini-oficial-1',
+    'UNGRD — Sala de Crisis y Registro RUND',
+    'Coordinación nacional del Sistema de Gestión del Riesgo y Registro Único Nacional de Damnificados (RUND).',
+    'organismo_oficial',
+    'http://portal.gestiondelriesgo.gov.co/',
+    '+57 601 5529696',
+    'Nacional',
+    'activa'
+  );
+
+  insertInitiative.run(
+    'ini-oficial-2',
+    'Cruz Roja Colombiana — Búsqueda de Familiares (RCF)',
+    'Atención prehospitalaria, albergues temporales y canal formal de Restablecimiento del Contacto entre Familiares (RCF).',
+    'organismo_oficial',
+    'https://cruzrojacolombiana.org',
+    'Línea 132 / +57 601 4376300',
+    'Nacional',
+    'activa'
+  );
+
+  insertInitiative.run(
+    'ini-oficial-3',
+    'Unidad para las Víctimas — Plataforma RUV',
+    'Orientación humanitaria, atención prioritaria y Registro Único de Víctimas (RUV) ante emergencias.',
+    'organismo_oficial',
+    'https://www.unidadvictimas.gov.co/',
+    '018000 911119',
+    'Nacional',
+    'activa'
+  );
+
+  insertInitiative.run(
+    'ini-oficial-4',
+    'Defensa Civil Colombiana — Rescate y Albergues',
+    'Operaciones de búsqueda, rescate y soporte logístico en zonas de impacto.',
+    'organismo_oficial',
+    'https://www.defensacivil.gov.co/',
+    'Línea 144 / +57 601 3199000',
+    'Nacional',
+    'activa'
+  );
 
   insertInitiative.run(
     'ini-1',
@@ -266,9 +310,27 @@ export function runSeed() {
     'activo'
   );
 
+  // 7. Alertas de Emergencia del Sistema
+  const insertAlert = db.prepare(`
+    INSERT OR REPLACE INTO alertas_sistema (
+      id, nivel, mensaje, activa, enlace_accion_url, enlace_accion_texto, actualizado_por
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  insertAlert.run(
+    'alert-1',
+    'critica',
+    'ALERTA CRÍTICA: Desastre natural en desarrollo. Por favor, siga las instrucciones de los organismos de socorro y reporte cualquier emergencia.',
+    1,
+    'http://portal.gestiondelriesgo.gov.co/',
+    'Ver Comunicado Oficial UNGRD',
+    'admin@actuemosya.org'
+  );
+
   console.log('✅ Seed completado con éxito.');
 }
 
 if (require.main === module || process.argv[1]?.includes('seed')) {
   runSeed();
 }
+

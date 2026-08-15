@@ -69,6 +69,118 @@ export default function EmergencyHubPage() {
         </Link>
       </section>
 
+      {/* Official Colombian Relief & Victim Registries */}
+      <section className="w-full bg-surface-container-low border border-outline-variant rounded-lg p-stack-md" aria-label="Canales oficiales y registro de víctimas">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-2 border-b border-outline-variant">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-secondary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+              verified_user
+            </span>
+            <div>
+              <h2 className="font-headline-md text-base sm:text-lg font-bold text-on-surface">
+                Canales Oficiales y Registro de Víctimas / Damnificados
+              </h2>
+              <p className="font-body-md text-xs text-on-surface-variant">
+                Portales oficiales del Estado Colombiano y organismos de socorro nacional
+              </p>
+            </div>
+          </div>
+          <span className="font-label-sm text-[11px] bg-secondary-fixed text-on-secondary-fixed font-bold px-2 py-0.5 rounded uppercase">
+            Fuentes Oficiales
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* UNGRD RUND */}
+          <a
+            href="http://portal.gestiondelriesgo.gov.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-surface hover:bg-surface-container p-3 rounded border border-outline-variant flex flex-col justify-between gap-2 transition-colors group"
+          >
+            <div>
+              <div className="flex items-center justify-between text-primary font-bold text-xs">
+                <span>UNGRD — RUND</span>
+                <span className="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">open_in_new</span>
+              </div>
+              <p className="font-label-md text-sm font-bold text-on-surface mt-1">
+                Sala de Crisis y Damnificados
+              </p>
+              <p className="font-body-md text-xs text-on-surface-variant mt-0.5">
+                Censo oficial y registro único nacional de damnificados.
+              </p>
+            </div>
+            <span className="text-[11px] font-semibold text-secondary">gestiondelriesgo.gov.co →</span>
+          </a>
+
+          {/* Cruz Roja Colombiana */}
+          <a
+            href="https://cruzrojacolombiana.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-surface hover:bg-surface-container p-3 rounded border border-outline-variant flex flex-col justify-between gap-2 transition-colors group"
+          >
+            <div>
+              <div className="flex items-center justify-between text-primary font-bold text-xs">
+                <span>Cruz Roja (Línea 132)</span>
+                <span className="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">open_in_new</span>
+              </div>
+              <p className="font-label-md text-sm font-bold text-on-surface mt-1">
+                Búsqueda Familiar (RCF)
+              </p>
+              <p className="font-body-md text-xs text-on-surface-variant mt-0.5">
+                Restablecimiento de contacto y atención médica de urgencia.
+              </p>
+            </div>
+            <span className="text-[11px] font-semibold text-secondary">cruzrojacolombiana.org →</span>
+          </a>
+
+          {/* Unidad para las Víctimas (RUV) */}
+          <a
+            href="https://www.unidadvictimas.gov.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-surface hover:bg-surface-container p-3 rounded border border-outline-variant flex flex-col justify-between gap-2 transition-colors group"
+          >
+            <div>
+              <div className="flex items-center justify-between text-primary font-bold text-xs">
+                <span>Unidad para las Víctimas</span>
+                <span className="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">open_in_new</span>
+              </div>
+              <p className="font-label-md text-sm font-bold text-on-surface mt-1">
+                Plataforma RUV
+              </p>
+              <p className="font-body-md text-xs text-on-surface-variant mt-0.5">
+                Registro Único de Víctimas y orientación humanitaria.
+              </p>
+            </div>
+            <span className="text-[11px] font-semibold text-secondary">unidadvictimas.gov.co →</span>
+          </a>
+
+          {/* Defensa Civil Colombiana */}
+          <a
+            href="https://www.defensacivil.gov.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-surface hover:bg-surface-container p-3 rounded border border-outline-variant flex flex-col justify-between gap-2 transition-colors group"
+          >
+            <div>
+              <div className="flex items-center justify-between text-primary font-bold text-xs">
+                <span>Defensa Civil (Línea 144)</span>
+                <span className="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">open_in_new</span>
+              </div>
+              <p className="font-label-md text-sm font-bold text-on-surface mt-1">
+                Operaciones de Rescate
+              </p>
+              <p className="font-body-md text-xs text-on-surface-variant mt-0.5">
+                Búsqueda, rescate en colapso y albergues provisionales.
+              </p>
+            </div>
+            <span className="text-[11px] font-semibold text-secondary">defensacivil.gov.co →</span>
+          </a>
+        </div>
+      </section>
+
       {/* Featured Feed & Quick Búsqueda */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-gutter">
         {/* Featured Ideas Column */}

@@ -26,8 +26,8 @@ export function Navbar() {
             <span className="material-symbols-outlined text-primary text-2xl group-hover:scale-110 transition-transform">
               emergency
             </span>
-            <h1 className="font-headline-md text-headline-md font-bold text-primary tracking-tight">
-              ActuemosYa<span className="text-secondary">Colombia</span>
+            <h1 className="font-headline-md text-headline-md font-bold text-primary tracking-tight flex items-center">
+              ActuemosYa<span className="inline-flex"><span className="text-[#D97706]">Col</span><span className="text-secondary">omb</span><span className="text-primary">ia</span></span>
             </h1>
           </Link>
 

@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
             Acceso Administrativo
           </h1>
           <p className="font-body-md text-xs text-on-surface-variant">
-            Portal seguro para moderadores y coordinadores de ActuemosYaColombia.
+            Portal seguro para moderadores y coordinadores de ActuemosYa<span className="inline-flex font-semibold"><span className="text-[#D97706]">Col</span><span className="text-secondary">omb</span><span className="text-primary">ia</span></span>.
           </p>
         </header>
 

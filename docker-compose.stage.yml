@@ -1,0 +1,85 @@
+# ==============================================================================
+# docker-compose.stage.yml: Entorno de Staging para ActuemosYaColombia
+# ==============================================================================
+# Orquestación de contenedores para servidor con 1 GB RAM (VPS DigitalOcean / similar)
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: actuemosya-app:stage
+    container_name: ayc-stage-app
+    restart: unless-stopped
+    env_file:
+      - path: .env.stage
+        required: false
+      - path: .env
+        required: false
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=/data/database.sqlite
+      - APP_DOMAIN=${APP_DOMAIN:-stage.actuemosya.org}
+      - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}
+      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY:-}
+      - SMTP_HOST=${SMTP_HOST:-smtp.resend.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-resend}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - EMAIL_FROM=${EMAIL_FROM:-no-reply@actuemosya.org}
+    volumes:
+      # Persistencia de la base de datos SQLite en disco del host
+      - ./data:/data
+    networks:
+      - ayc-stage-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:3000/api/health | grep -q 'healthy' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+          cpus: '0.75'
+        reservations:
+          memory: 150M
+
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: ayc-stage-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # Soporte para HTTP/3 (QUIC)
+    environment:
+      - APP_DOMAIN=${APP_DOMAIN:-stage.actuemosya.org}
+      - ACME_EMAIL=${ACME_EMAIL:-admin@actuemosya.org}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - ayc-stage-net
+    depends_on:
+      app:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+          cpus: '0.25'
+
+volumes:
+  caddy_data:
+    name: ayc_stage_caddy_data
+  caddy_config:
+    name: ayc_stage_caddy_config
+
+networks:
+  ayc-stage-net:
+    name: ayc_stage_network
+    driver: bridge

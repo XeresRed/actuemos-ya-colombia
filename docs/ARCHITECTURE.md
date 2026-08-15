@@ -62,15 +62,16 @@ Estructura basada en Next.js (App Router) / Node.js con TypeScript:
     │       ├── iniciativas/        # Gestión del directorio de iniciativas activas
     │       ├── busqueda/           # Reportes de víctimas/animales
     │       ├── voluntarios/        # Matching y solicitudes de voluntariado
+    │       ├── alertas/            # Gestión y consulta de la alerta de crisis activa
     │       └── captcha/            # Verificación de tokens de captcha
     │
     ├── components/                 # Componentes de Interfaz de Usuario (UI)
     │   ├── ui/                     # Componentes base (Botones, Modales, Inputs, Badges)
-    │   ├── layout/                 # Navbar, Footer, Banner de crisis
+    │   ├── layout/                 # Navbar, Footer, EmergencyBanner (Alerta de crisis y marcación rápida)
     │   ├── ideas/                  # CardIdea, PipelineStatus, MarkdownRenderer
     │   ├── comentarios/            # CommentTree, CommentForm
-    │   ├── iniciativas/            # InitiativeCard, AntiDuplicationBanner
-    │   ├── busqueda/               # SearchCard, FiltersBar, BadgeEstado
+    │   ├── iniciativas/            # InitiativeCard, AntiDuplicationBanner, OfficialEntitiesGrid
+    │   ├── busqueda/               # SearchCard, FiltersBar, BadgeEstado, OfficialChannelsNotice
     │   ├── voluntarios/            # VolunteerCard, SkillMatchForm
     │   └── common/                 # ShareButton, CaptchaWidget, MarkdownEditor
     │
@@ -79,15 +80,17 @@ Estructura basada en Next.js (App Router) / Node.js con TypeScript:
     │   │   ├── idea.ts             # Dominio de ideas y pipeline de estados
     │   │   ├── usuario.ts          # Dominio de usuarios, roles y autenticación
     │   │   ├── comentario.ts       # Dominio de comentarios e hilos
-    │   │   ├── iniciativa.ts       # Dominio de iniciativas activas
+    │   │   ├── iniciativa.ts       # Dominio de iniciativas activas y organismos oficiales
     │   │   ├── busqueda.ts         # Dominio de reportes de búsqueda (personas/mascotas)
     │   │   ├── voluntariado.ts     # Dominio de matching profesional
+    │   │   ├── alerta.ts           # Dominio de alertas de emergencia y líneas de auxilio
     │   │   └── auth.ts             # Entidades de auth_tokens, magic links y OTP
     │   ├── services/               # Casos de uso y reglas de negocio
     │   │   ├── idea.service.ts     # Transiciones de estado [Borrador -> Idea -> Promovida]
     │   │   ├── iniciativa.service.ts # Registro y vinculación anti-duplicación
     │   │   ├── busqueda.service.ts # Gestión de reportes de búsqueda y estados
     │   │   ├── voluntariado.service.ts # Lógica de matching técnico/profesional
+    │   │   ├── alerta.service.ts   # Activación, niveles y actualización de alerta de crisis
     │   │   ├── auth.service.ts     # Generación de tokens y verificación OTP / Magic Link
     │   │   ├── email.service.ts    # Envíos transaccionales (SMTP/Resend)
     │   │   ├── captcha.service.ts  # Validación reCAPTCHA / Turnstile
@@ -104,6 +107,7 @@ Estructura basada en Next.js (App Router) / Node.js con TypeScript:
     │       ├── iniciativa.repository.ts
     │       ├── busqueda.repository.ts
     │       ├── voluntariado.repository.ts
+    │       ├── alerta.repository.ts
     │       └── auth.repository.ts
     │
     └── lib/                        # Utilidades y configuración global
@@ -195,3 +199,22 @@ header {
 }
 
 ```
+
+---
+
+## 5. Arquitectura del Módulo de Alerta de Emergencia y Canales Oficiales
+
+### A. Ciclo de Vida y Gestión Dinámica de la Alerta
+1. **Persistencia Centralizada:** El estado de la alerta reside en la tabla `alertas_sistema` de SQLite.
+2. **Control de Emisión (RBAC):** Únicamente usuarios autenticados con rol `admin` o `supervisor` pueden activar, desactivar o modificar el nivel y mensaje de la alerta a través de la ruta `/api/alertas` o desde el panel administrativo.
+3. **Eficiencia en Lectura (Zero Overhead):**
+   - El componente `EmergencyBanner` en `layout.tsx` lee el estado de la alerta directamente en el servidor (RSC) o mediante consultas indexadas ultrarrápidas (`<1ms`).
+   - Si no hay alerta activa (`activa = 0`), el banner se omite completamente del DOM sin penalización de renderizado.
+
+### B. Integración Multinivel de Organismos Oficiales
+Para evitar la duplicación de esfuerzos y combatir la desinformación en emergencias:
+1. **Top Banner (`EmergencyBanner`):** Despliega el nivel de gravedad (`critica`, `alerta_naranja`, `informativa`), mensaje urgente, enlace oficial de acción y marcación rápida a líneas de emergencia (`123`, `132`, `144`, `119`).
+2. **Landing Hub (`/`):** Bloque prioritario de acceso directo a portales institucionales: **UNGRD** (Sala de Crisis y *RUND* - Registro Único Nacional de Damnificados), **Cruz Roja Colombiana** (*RCF* - Restablecimiento del Contacto Familiar) y **Unidad para las Víctimas** (*RUV*).
+3. **Módulo de Búsqueda Humanitaria (`/busqueda`):** Notice institucional obligatorio que instruye al ciudadano a registrar formalmente a personas desaparecidas ante las autoridades y el programa RCF de la Cruz Roja.
+4. **Directorio de Iniciativas (`/iniciativas`):** Clasificación con etiqueta `organismo_oficial` para dar visibilidad prioritaria y verificada a entidades del Estado y ONGs reconocidas.
+

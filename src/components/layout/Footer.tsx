@@ -11,8 +11,8 @@ export function Footer() {
               <span className="material-symbols-outlined text-primary text-xl">
                 emergency
               </span>
-              <h3 className="font-headline-md text-headline-md font-bold text-primary">
-                ActuemosYa<span className="text-secondary">Colombia</span>
+              <h3 className="font-headline-md text-headline-md font-bold text-primary flex items-center">
+                ActuemosYa<span className="inline-flex"><span className="text-[#D97706]">Col</span><span className="text-secondary">omb</span><span className="text-primary">ia</span></span>
               </h3>
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
@@ -45,21 +45,33 @@ export function Footer() {
 
           <div>
             <h4 className="font-label-md text-label-md font-bold text-on-surface mb-3 uppercase tracking-wider">
-              Seguridad & Enlaces
+              Canales Oficiales
             </h4>
             <ul className="space-y-2 font-body-md text-sm text-on-surface-variant">
               <li>
-                <Link href="/admin/login" className="hover:text-primary transition-colors">Acceso Moderadores</Link>
+                <a href="http://portal.gestiondelriesgo.gov.co/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
+                  UNGRD (Sala de Crisis) <span className="material-symbols-outlined text-xs">open_in_new</span>
+                </a>
               </li>
               <li>
                 <a href="https://cruzrojacolombiana.org" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
-                  Cruz Roja Colombiana <span className="material-symbols-outlined text-xs">open_in_new</span>
+                  Cruz Roja Colombiana (RCF) <span className="material-symbols-outlined text-xs">open_in_new</span>
                 </a>
               </li>
               <li>
-                <a href="http://portal.gestiondelriesgo.gov.co/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
-                  UNGRD <span className="material-symbols-outlined text-xs">open_in_new</span>
+                <a href="https://www.unidadvictimas.gov.co/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
+                  Unidad para las Víctimas (RUV) <span className="material-symbols-outlined text-xs">open_in_new</span>
                 </a>
+              </li>
+              <li>
+                <a href="https://www.defensacivil.gov.co/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-1">
+                  Defensa Civil Colombiana <span className="material-symbols-outlined text-xs">open_in_new</span>
+                </a>
+              </li>
+              <li>
+                <Link href="/admin/login" className="hover:text-primary transition-colors inline-block pt-1 text-xs opacity-75">
+                  Acceso Moderadores
+                </Link>
               </li>
             </ul>
           </div>

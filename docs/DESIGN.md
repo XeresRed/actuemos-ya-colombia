@@ -112,7 +112,7 @@ spacing:
 
 The design system is built on the principles of **Urgency, Trust, and Accessibility**. It serves as a bridge between immediate humanitarian needs and institutional action. The visual style is **Corporate Modern with a High-Contrast edge**, ensuring that critical information is never missed while maintaining a professional, reliable atmosphere.
 
-The brand personality reflects a "calm in the storm" approach: bold color accents for immediate attention, balanced by structured, systematic layouts that convey stability. Subtle nods to Colombian identity are integrated through the color palette—using a refined interpretation of the national tricolor—without compromising the utility of the interface.
+The brand personality reflects a "calm in the storm" approach: bold color accents for immediate attention, balanced by structured, systematic layouts that convey stability. Subtle nods to Colombian identity are integrated through the color palette—using a refined interpretation of the national tricolor—without compromising the utility of the interface. In titles and navigation wordmarks, the word **Colombia** reflects the national flag: **Col** (Amarillo Dorado `#D97706`), **omb** (Azul Confianza `#005DB7`), **ia** (Rojo Acción `#AF101A`).
 
 **Design Goals:**
 - **Clarity under pressure:** High information density that remains scannable.
@@ -183,3 +183,14 @@ Inputs must be highly visible with 16px padding and a 1px gray border that turns
 
 ### Progress Indicators
 Used for "Promovida" cases to show funding or resource acquisition. Use a thick 8px track with high-contrast Success Green for the fill.
+
+### Emergency Banner (Alerta de Crisis Dinámica)
+Componente de máxima jerarquía visual fijado en la cabecera superior del viewport:
+- **Nivel Crítica (`critica`):** Fondo Action Red (`#D32F2F`), texto `#FFFFFF`, icono `warning` con micro-animación pulsante.
+- **Nivel Alerta Naranja (`alerta_naranja`):** Fondo Ámbar de Advertencia (`#8F6A00` / `#FFF3E3`), texto de alto contraste, icono `priority_high`.
+- **Nivel Informativa (`informativa`):** Fondo Trust Blue (`#1565C0`), texto `#FFFFFF`, icono `info`.
+- **Líneas de Auxilio Rápido:** Pastillas interactivas de marcado telefónico directo (`tel:123`, `tel:132`, `tel:144`, `tel:119`) con tipografía `label-sm` en negrita.
+
+### Tarjetas de Organismos Oficiales & Avisos de Registro de Víctimas
+- **Sello Institucional:** Borde superior Trust Blue (`#1565C0`) de 4px, badge `OFICIAL VERIFICADO` con fondo `secondary-fixed` y texto `on-secondary-fixed`.
+- **Avisos de Búsqueda Humanitaria:** Caja de alerta preventiva en `/busqueda` con borde outline ámbar que instruye al usuario a acudir primero a la Cruz Roja (*RCF*) y a la UNGRD (*RUND* / Sala de Crisis).

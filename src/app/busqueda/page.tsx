@@ -88,6 +88,32 @@ export default function BusquedaHumanitariaPage() {
         </button>
       </div>
 
+      {/* Official Recommendation Notice */}
+      <div className="bg-secondary-fixed/50 border-l-4 border-secondary p-4 rounded-r-lg mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-on-secondary-fixed">
+        <div className="flex items-start gap-2.5">
+          <span className="material-symbols-outlined text-secondary text-2xl shrink-0">
+            info
+          </span>
+          <div className="text-xs sm:text-sm">
+            <p className="font-bold">
+              ¿Buscas a un familiar o persona desaparecida?
+            </p>
+            <p className="opacity-90 mt-0.5">
+              Te recomendamos registrar el caso simultáneamente ante el programa <strong>RCF (Restablecimiento del Contacto entre Familiares) de la Cruz Roja Colombiana (Línea 132)</strong> y la <strong>Línea Nacional 123</strong>.
+            </p>
+          </div>
+        </div>
+        <a
+          href="https://cruzrojacolombiana.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 bg-secondary text-on-secondary text-xs font-bold px-3 py-1.5 rounded hover:bg-opacity-90 shrink-0 transition-all"
+        >
+          <span>Canal Cruz Roja RCF</span>
+          <span className="material-symbols-outlined text-xs">open_in_new</span>
+        </a>
+      </div>
+
       {/* Tabs & Filter Chips */}
       <div className="flex flex-col gap-4 mb-stack-lg bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm">
         {/* Category Tabs */}
