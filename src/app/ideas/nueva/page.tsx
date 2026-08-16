@@ -384,7 +384,7 @@ export default function PublicarNuevaIdeaPage() {
             </div>
 
             {/* Cloudflare Turnstile Verification */}
-            <TurnstileWidget onSuccess={(token) => setCaptchaToken(token)} />
+            <TurnstileWidget action="proponer_idea" onSuccess={(token) => setCaptchaToken(token)} />
           </section>
 
           {/* Action buttons */}

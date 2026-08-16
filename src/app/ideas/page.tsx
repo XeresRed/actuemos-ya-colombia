@@ -343,10 +343,20 @@ export default function IdeasDirectoryPage() {
 
                 {/* Scope and Existing Initiative indicator */}
                 {idea.iniciativaExistenteUrl ? (
-                  <div className="mb-3 bg-surface-container-low p-2 rounded text-[11px] text-secondary flex items-center gap-1 font-semibold truncate">
-                    <span className="material-symbols-outlined text-xs shrink-0">link</span>
-                    <span className="truncate">Iniciativa vinculada: {idea.iniciativaExistenteUrl}</span>
-                  </div>
+                  <a
+                    href={idea.iniciativaExistenteUrl.startsWith('http') ? idea.iniciativaExistenteUrl : `https://${idea.iniciativaExistenteUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="mb-3 bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/50 p-2 rounded text-[11px] text-secondary hover:text-primary transition-colors flex items-center justify-between gap-1 font-semibold truncate group/link z-10"
+                    title={`Abrir iniciativa externa: ${idea.iniciativaExistenteUrl}`}
+                  >
+                    <div className="flex items-center gap-1 truncate">
+                      <span className="material-symbols-outlined text-xs shrink-0">link</span>
+                      <span className="truncate">Iniciativa: {idea.iniciativaExistenteUrl.replace(/^https?:\/\//, '')}</span>
+                    </div>
+                    <span className="material-symbols-outlined text-[12px] opacity-70 group-hover/link:opacity-100 shrink-0">open_in_new</span>
+                  </a>
                 ) : null}
 
                 <div className="pt-3 border-t border-outline-variant flex justify-between items-center text-xs">

@@ -5,7 +5,7 @@ export const CaptchaService = {
    */
   async verifyToken(token?: string | null, clientIp?: string): Promise<boolean> {
     const isProd = process.env.NODE_ENV === 'production';
-    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY || process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY;
+    const turnstileSecret = process.env.TURNSTILE_SECRET || process.env.TURNSTILE_SECRET_KEY || process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY || '0x4AAAAAAERMwFOLY9_bz1VLk4SkXGACGoY';
     const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
     const secretKey = turnstileSecret || recaptchaSecret;
 

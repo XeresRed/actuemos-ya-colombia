@@ -9,6 +9,7 @@ declare global {
         container: HTMLElement | string,
         options: {
           sitekey: string;
+          action?: string;
           callback: (token: string) => void;
           'error-callback'?: (err?: string) => void;
           'expired-callback'?: () => void;
@@ -27,20 +28,24 @@ export interface TurnstileWidgetProps {
   onSuccess: (token: string) => void;
   onError?: (error?: string) => void;
   onExpire?: () => void;
+  action?: string;
   theme?: 'light' | 'dark' | 'auto';
   className?: string;
 }
+
+const CANONICAL_SITE_KEY = '0x4AAAAAAERMwI1eCPwFzmgW';
 
 export function TurnstileWidget({
   onSuccess,
   onError,
   onExpire,
+  action,
   theme = 'light',
   className = '',
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || CANONICAL_SITE_KEY;
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -50,8 +55,8 @@ export function TurnstileWidget({
   useEffect(() => {
     if (!isClient) return;
 
-    // Si no hay llave de Turnstile configurada (ej. desarrollo local), emitimos un token de bypass
-    if (!siteKey || siteKey.includes('tu_site_key') || siteKey.includes('test_')) {
+    // Si explícitamente se configuró una llave de bypass o test en desarrollo
+    if (siteKey.includes('tu_site_key') || siteKey.includes('test_')) {
       onSuccess('dev-token');
       return;
     }
@@ -64,6 +69,7 @@ export function TurnstileWidget({
       try {
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
+          action: action || undefined,
           callback: (token: string) => {
             if (isMounted) onSuccess(token);
           },
@@ -84,7 +90,7 @@ export function TurnstileWidget({
     if (window.turnstile) {
       initWidget();
     } else {
-      // Cargar script de Cloudflare Turnstile de forma asíncrona
+      // Cargar script canónico de Cloudflare Turnstile
       const scriptId = 'cf-turnstile-script';
       let script = document.getElementById(scriptId) as HTMLScriptElement | null;
 
@@ -112,7 +118,7 @@ export function TurnstileWidget({
             window.turnstile.remove(widgetIdRef.current);
             widgetIdRef.current = null;
           } catch {
-            // Ignorar errores de limpieza
+            // Limpieza segura
           }
         }
       };
@@ -125,18 +131,18 @@ export function TurnstileWidget({
           window.turnstile.remove(widgetIdRef.current);
           widgetIdRef.current = null;
         } catch {
-          // Ignorar errores de limpieza
+          // Limpieza segura
         }
       }
     };
-  }, [isClient, siteKey, onSuccess, onError, onExpire, theme]);
+  }, [isClient, siteKey, action, onSuccess, onError, onExpire, theme]);
 
   if (!isClient) {
     return null;
   }
 
   // En entorno local/dev sin keys reales de Cloudflare
-  if (!siteKey || siteKey.includes('tu_site_key') || siteKey.includes('test_')) {
+  if (siteKey.includes('tu_site_key') || siteKey.includes('test_')) {
     return (
       <div className={`flex items-center gap-2 p-2.5 bg-surface-container-low border border-outline-variant/60 rounded-lg text-xs text-on-surface-variant ${className}`}>
         <span className="material-symbols-outlined text-green-600 text-sm">verified_user</span>

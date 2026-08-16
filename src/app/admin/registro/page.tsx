@@ -159,7 +159,7 @@ export default function SupervisorRegisterPage() {
             </div>
 
             {/* Cloudflare Turnstile Anti-bot Protection */}
-            <TurnstileWidget onSuccess={(token) => setCaptchaToken(token)} />
+            <TurnstileWidget action="postulacion_moderador" onSuccess={(token) => setCaptchaToken(token)} />
 
             <button
               type="submit"

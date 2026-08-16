@@ -5,6 +5,28 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.2.1-beta] - 2026-08-16
+
+### Corregido
+- **Renderizado Markdown en Detalle de Ideas y Comentarios (`REQ-01`):**
+  - Implementación del componente modular y seguro `MarkdownRenderer.tsx` para parsear negritas, cursivas, listas con viñetas, listas ordenadas, citas en bloque y enlaces externos seguros con `target="_blank"` y `rel="noopener noreferrer"`.
+  - Integración en `/ideas/[id]` para la descripción de la propuesta y en el hilo de aportes/comentarios y respuestas ciudadanas.
+
+- **Optimización de Interfaz Móvil y Botón Flotante (`REQ-02`):**
+  - Descongestión del encabezado superior (`Navbar`) en pantallas móviles (`< md`), mostrando únicamente el Logotipo institucional y el menú hamburguesa.
+  - Creación de un Floating Action Button (FAB) persistente en la esquina inferior derecha (`bottom-6 right-6`) para "Proponer Idea" en dispositivos móviles.
+
+- **Protección Visual de Acceso de Desarrollo en Producción (`REQ-03`):**
+  - Ocultamiento condicional del botón *"⚡ Acceso Rápido de Desarrollo"* en `/admin/login` cuando `NODE_ENV === 'production'`.
+
+- **Enlaces Clickeables en Tarjetas de Ideas (`REQ-04`):**
+  - Conversión del badge de iniciativas existentes vinculadas en `/ideas` a enlaces interactivos directos con apertura en nueva pestaña y `e.stopPropagation()` para evitar navegación no deseada.
+
+- **Integración Canónica de Cloudflare Turnstile (`REQ-05`):**
+  - Configuración del widget con la sitekey oficial `0x4AAAAAAERMwI1eCPwFzmgW`, soporte para acciones (`proponer_idea`, `comentar_idea`, `postulacion_moderador`, `registro_voluntario`), callbacks de ciclo de vida y defaults en `Dockerfile` y `docker-compose.yml`.
+
+---
+
 ## [0.2.0-beta] - 2026-08-16
 
 ### Agregado

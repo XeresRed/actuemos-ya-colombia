@@ -455,7 +455,7 @@ export default function VoluntariosMatchingPage() {
               </div>
 
               {/* Cloudflare Turnstile Verification */}
-              <TurnstileWidget onSuccess={(token) => setCaptchaToken(token)} />
+              <TurnstileWidget action="registro_voluntario" onSuccess={(token) => setCaptchaToken(token)} />
 
               <button
                 type="submit"

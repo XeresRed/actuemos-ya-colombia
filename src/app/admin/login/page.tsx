@@ -130,17 +130,19 @@ export default function AdminLoginPage() {
                 <span className="material-symbols-outlined text-base">send</span>
               </button>
 
-              {/* Botón de Acceso Rápido de Desarrollo (Local / Dev) */}
-              <button
-                type="button"
-                onClick={handleDevLogin}
-                disabled={devLoading}
-                className="w-full bg-surface-container border border-outline text-on-surface font-label-md text-xs font-bold py-2 rounded hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1.5"
-                title="Solo disponible en entorno de desarrollo"
-              >
-                <span className="material-symbols-outlined text-amber-500 text-sm">bolt</span>
-                <span>{devLoading ? 'Ingresando...' : '⚡ Acceso Rápido de Desarrollo'}</span>
-              </button>
+              {/* Botón de Acceso Rápido de Desarrollo (Solo en Local / Dev) */}
+              {process.env.NODE_ENV !== 'production' && (
+                <button
+                  type="button"
+                  onClick={handleDevLogin}
+                  disabled={devLoading}
+                  className="w-full bg-surface-container border border-outline text-on-surface font-label-md text-xs font-bold py-2 rounded hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1.5"
+                  title="Solo disponible en entorno de desarrollo"
+                >
+                  <span className="material-symbols-outlined text-amber-500 text-sm">bolt</span>
+                  <span>{devLoading ? 'Ingresando...' : '⚡ Acceso Rápido de Desarrollo'}</span>
+                </button>
+              )}
             </form>
           ) : (
             <div className="flex flex-col items-center text-center gap-2 py-4 animate-in fade-in">

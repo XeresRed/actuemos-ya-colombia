@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Idea, IdeaEstado } from '../../../core/domain/idea';
 import type { ComentarioConRespuestas } from '../../../core/domain/comentario';
 import { TurnstileWidget } from '../../../components/ui/TurnstileWidget';
+import { MarkdownRenderer } from '../../../components/ui/MarkdownRenderer';
 
 interface IdeaDetailPageProps {
   params: {
@@ -279,8 +280,8 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
         </header>
 
         {/* Markdown Content Body */}
-        <div className="prose max-w-none text-on-surface text-sm leading-relaxed whitespace-pre-wrap font-body-md">
-          {idea.descripcionMarkdown}
+        <div className="prose max-w-none text-on-surface text-sm leading-relaxed font-body-md">
+          <MarkdownRenderer content={idea.descripcionMarkdown} />
         </div>
       </article>
 
@@ -348,7 +349,7 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
 
             {/* Cloudflare Turnstile Verification */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-              <TurnstileWidget onSuccess={(token) => setCaptchaToken(token)} className="my-0" />
+              <TurnstileWidget action="comentar_idea" onSuccess={(token) => setCaptchaToken(token)} className="my-0" />
               <button
                 type="submit"
                 disabled={submittingComment}
@@ -383,9 +384,9 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
                   <span className="text-[11px] text-on-surface-variant">{new Date(com.creadoEn).toLocaleDateString()}</span>
                 </div>
 
-                <p className="text-on-surface leading-relaxed mb-2 whitespace-pre-wrap">
-                  {com.contenidoMarkdown}
-                </p>
+                <div className="text-on-surface leading-relaxed mb-2 text-xs">
+                  <MarkdownRenderer content={com.contenidoMarkdown} />
+                </div>
 
                 <button
                   type="button"
@@ -407,9 +408,9 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
                           </span>
                           <span className="text-[10px] text-on-surface-variant">{new Date(reply.creadoEn).toLocaleDateString()}</span>
                         </div>
-                        <p className="text-on-surface-variant leading-relaxed whitespace-pre-wrap">
-                          {reply.contenidoMarkdown}
-                        </p>
+                        <div className="text-on-surface-variant leading-relaxed text-xs">
+                          <MarkdownRenderer content={reply.contenidoMarkdown} />
+                        </div>
                       </div>
                     ))}
                   </div>
