@@ -42,8 +42,8 @@ RUN npm run build
 # ------------------------------------------------------------------------------
 FROM node:20-alpine AS runner
 
-# Instalar compatibilidad libc para módulos C++ nativos en Alpine (better-sqlite3)
-RUN apk add --no-cache libc6-compat
+# Instalar compatibilidad libc para better-sqlite3 y su-exec para gestión de permisos en volúmenes
+RUN apk add --no-cache libc6-compat su-exec
 
 WORKDIR /app
 
@@ -71,8 +71,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/src/db/migrations ./src/db/migrat
 COPY --from=builder --chown=nextjs:nodejs /app/docker-entrypoint.sh ./docker-entrypoint.sh
 
 RUN chmod +x ./docker-entrypoint.sh
-
-USER nextjs
 
 EXPOSE 3000
 

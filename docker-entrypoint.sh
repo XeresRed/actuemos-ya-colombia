@@ -10,26 +10,38 @@ fi
 
 DB_DIR=$(dirname "$DATABASE_URL")
 
-# Asegurar que el directorio de la base de datos exista
-if [ ! -d "$DB_DIR" ]; then
-  mkdir -p "$DB_DIR" 2>/dev/null || true
-fi
+# 1. Asegurar existencia y permisos del directorio de persistencia (volumen montado)
+mkdir -p "$DB_DIR"
+chown -R nextjs:nodejs "$DB_DIR" /app 2>/dev/null || true
+chmod 775 "$DB_DIR" 2>/dev/null || true
 
-# 1. Ejecutar migraciones automáticas de SQLite
+# 2. Ejecutar migraciones automáticas de SQLite como usuario nextjs
 if [ -f "scripts/migrate.js" ]; then
   echo "📦 [AYC Entrypoint] Verificando y aplicando migraciones de base de datos..."
-  node scripts/migrate.js
+  if command -v su-exec >/dev/null 2>&1; then
+    su-exec nextjs node scripts/migrate.js
+  else
+    node scripts/migrate.js
+  fi
 else
   echo "⚠️ [AYC Entrypoint] No se encontró scripts/migrate.js, omitiendo migraciones automáticas."
 fi
 
-# 2. Ejecutar sembrado de datos iniciales si AUTO_SEED está activo
+# 3. Ejecutar sembrado de datos iniciales si AUTO_SEED está activo como usuario nextjs
 if [ "${AUTO_SEED}" = "true" ] || [ "${AUTO_SEED}" = "1" ]; then
   if [ -f "scripts/seed.js" ]; then
     echo "🌱 [AYC Entrypoint] AUTO_SEED detectado: Aplicando datos iniciales y canales oficiales..."
-    node scripts/seed.js
+    if command -v su-exec >/dev/null 2>&1; then
+      su-exec nextjs node scripts/seed.js
+    else
+      node scripts/seed.js
+    fi
   fi
 fi
 
-echo "🚀 [AYC Entrypoint] Iniciando servidor Next.js..."
-exec "$@"
+echo "🚀 [AYC Entrypoint] Iniciando servidor Next.js como usuario nextjs..."
+if command -v su-exec >/dev/null 2>&1; then
+  exec su-exec nextjs "$@"
+else
+  exec "$@"
+fi
