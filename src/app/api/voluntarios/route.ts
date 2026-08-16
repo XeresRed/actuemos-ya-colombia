@@ -21,9 +21,11 @@ export async function GET(req: NextRequest) {
     // Si se pasa 'todos', no filtra por estado. Si no se pasa nada, default 'activo'.
     const estado = estadoParam === 'todos' ? undefined : (estadoParam as EstadoVoluntariado || 'activo');
     const ubicacion = searchParams.get('ubicacion') || undefined;
-    const search = searchParams.get('search') || undefined;
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 50;
-    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!, 10) : 0;
+    const search = searchParams.get('search') || searchParams.get('q') || undefined;
+    const limitParam = searchParams.get('limit') ? Math.max(1, parseInt(searchParams.get('limit')!, 10)) : 20;
+    const pageParam = searchParams.get('page') ? Math.max(1, parseInt(searchParams.get('page')!, 10)) : 1;
+    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!, 10) : (pageParam - 1) * limitParam;
+    const order = (searchParams.get('order')?.toLowerCase() === 'asc' ? 'asc' : 'desc') as 'asc' | 'desc';
 
     const result = VoluntariadoService.listVolunteering({
       tipo: tipo || undefined,
@@ -31,11 +33,20 @@ export async function GET(req: NextRequest) {
       estado,
       ubicacion,
       search,
-      limit,
+      limit: limitParam,
       offset,
+      order,
     });
 
-    return apiSuccess(result);
+    const hasMore = offset + result.voluntariados.length < result.total;
+
+    return apiSuccess({
+      voluntariados: result.voluntariados,
+      total: result.total,
+      page: pageParam,
+      pageSize: limitParam,
+      hasMore,
+    });
   } catch (error) {
     return apiError(error);
   }

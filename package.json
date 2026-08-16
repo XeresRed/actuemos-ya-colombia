@@ -1,6 +1,6 @@
 {
   "name": "actuemos-ya-colombia",
-  "version": "0.0.3-beta-1",
+  "version": "0.0.4-beta",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,7 @@
     "lint": "next lint",
     "db:migrate": "tsx src/db/migrate.ts",
     "db:seed": "tsx src/db/seed.ts",
-    "test": "tsx scripts/test-dal.ts && tsx scripts/test-services.ts && tsx scripts/test-api.ts"
+    "test": "tsx scripts/test-dal.ts && tsx scripts/test-services.ts && tsx scripts/test-api.ts && tsx scripts/test-pagination.ts"
   },
   "dependencies": {
     "better-sqlite3": "^11.8.1",

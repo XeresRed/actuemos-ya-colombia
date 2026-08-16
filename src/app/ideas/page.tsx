@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import type { Idea, IdeaEstado } from '../../core/domain/idea';
 
@@ -19,54 +19,106 @@ const CATEGORIAS = [
 
 export default function IdeasDirectoryPage() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const [activeEstado, setActiveEstado] = useState<string>('todos');
   const [selectedCategoria, setSelectedCategoria] = useState<string>('Todas');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [order, setOrder] = useState<'desc' | 'asc'>('desc');
 
+  // Debounce search input (350ms)
   useEffect(() => {
-    async function loadIdeas() {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  const handleStatusChange = (estado: string) => {
+    setActiveEstado(estado);
+    setPage(1);
+  };
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategoria(cat);
+    setPage(1);
+  };
+
+  const handleOrderChange = (newOrder: 'desc' | 'asc') => {
+    setOrder(newOrder);
+    setPage(1);
+  };
+
+  const fetchIdeas = useCallback(
+    async (currentPage: number, isAppending = false) => {
+      if (isAppending) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+
       try {
-        const res = await fetch('/api/ideas');
+        const params = new URLSearchParams();
+        params.append('page', currentPage.toString());
+        params.append('limit', '9');
+        params.append('order', order);
+
+        if (activeEstado !== 'todos') {
+          params.append('estado', activeEstado);
+        }
+
+        if (selectedCategoria !== 'Todas') {
+          params.append('categoria', selectedCategoria);
+        }
+
+        if (debouncedSearch) {
+          params.append('search', debouncedSearch);
+        }
+
+        const res = await fetch(`/api/ideas?${params.toString()}`);
         const json = await res.json();
-        if (json.ok && json.data.ideas) {
-          setIdeas(json.data.ideas);
+
+        if (json.ok && json.data) {
+          const newItems: Idea[] = json.data.ideas || [];
+          const totalCount: number = json.data.total ?? 0;
+          const serverHasMore: boolean = json.data.hasMore ?? false;
+
+          setTotal(totalCount);
+          setHasMore(serverHasMore);
+
+          if (isAppending) {
+            setIdeas((prev) => [...prev, ...newItems]);
+          } else {
+            setIdeas(newItems);
+          }
         }
       } catch (err) {
         console.error('Error al cargar propuestas ciudadanas:', err);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
+    },
+    [activeEstado, selectedCategoria, debouncedSearch, order]
+  );
+
+  useEffect(() => {
+    fetchIdeas(1, false);
+  }, [fetchIdeas]);
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchIdeas(nextPage, true);
     }
-
-    loadIdeas();
-  }, []);
-
-  const filteredIdeas = useMemo(() => {
-    return ideas.filter((idea) => {
-      // Filtro por Estado
-      if (activeEstado !== 'todos' && idea.estado !== activeEstado) {
-        return false;
-      }
-
-      // Filtro por Categoría
-      if (selectedCategoria !== 'Todas' && !idea.categoria.toLowerCase().includes(selectedCategoria.toLowerCase())) {
-        return false;
-      }
-
-      // Filtro por Búsqueda
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesTitle = idea.titulo.toLowerCase().includes(q);
-        const matchesDesc = idea.descripcionMarkdown.toLowerCase().includes(q);
-        const matchesCat = idea.categoria.toLowerCase().includes(q);
-        const matchesScope = idea.alcanceDetalle ? idea.alcanceDetalle.toLowerCase().includes(q) : false;
-        if (!matchesTitle && !matchesDesc && !matchesCat && !matchesScope) return false;
-      }
-
-      return true;
-    });
-  }, [ideas, activeEstado, selectedCategoria, searchQuery]);
+  };
 
   const getStatusBadge = (estado: IdeaEstado) => {
     switch (estado) {
@@ -120,7 +172,7 @@ export default function IdeasDirectoryPage() {
 
   return (
     <div className="flex-grow w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-stack-md">
-      {/* Banner de Neutralidad Cívica y Apolitismo (REQ-01 & REQ-06) */}
+      {/* Banner de Neutralidad Cívica y Apolitismo */}
       <div className="bg-surface-container-high border-l-4 border-[#005DB7] rounded-r-xl p-4 mb-stack-md flex items-start gap-3.5 shadow-sm">
         <span className="material-symbols-outlined text-secondary text-2xl shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
           policy
@@ -170,7 +222,7 @@ export default function IdeasDirectoryPage() {
           <button
             key={tab.id}
             type="button"
-            onClick={() => setActiveEstado(tab.id)}
+            onClick={() => handleStatusChange(tab.id)}
             className={`px-4 py-2 rounded-lg font-label-md text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeEstado === tab.id
                 ? 'bg-secondary text-on-secondary shadow-sm'
@@ -183,9 +235,9 @@ export default function IdeasDirectoryPage() {
         ))}
       </div>
 
-      {/* Filter & Search Bar */}
+      {/* Filter, Search & Sort Bar */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-stack-lg bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm items-center">
-        <div className="md:col-span-8 relative">
+        <div className="md:col-span-6 relative">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
           <input
             value={searchQuery}
@@ -194,22 +246,49 @@ export default function IdeasDirectoryPage() {
             placeholder="Buscar por palabra clave, agua, puente, kits, Popayán, Pasto..."
             type="text"
           />
+          {searchQuery ? (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface text-xs"
+            >
+              ✕
+            </button>
+          ) : null}
         </div>
 
-        <div className="md:col-span-4 flex items-center gap-2">
+        <div className="md:col-span-3 flex items-center gap-2">
           <label htmlFor="filter-categoria-select" className="text-xs font-bold text-on-surface-variant shrink-0">
             Categoría:
           </label>
           <select
             id="filter-categoria-select"
             value={selectedCategoria}
-            onChange={(e) => setSelectedCategoria(e.target.value)}
-            className="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-secondary outline-none"
+            onChange={(e) => handleCategoryChange(e.target.value)}
+            className="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-secondary outline-none cursor-pointer"
           >
             {CATEGORIAS.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
+        </div>
+
+        <div className="md:col-span-3 flex items-center justify-between md:justify-end gap-3">
+          <span className="text-xs text-on-surface-variant font-medium">
+            <strong>{ideas.length}</strong> de <strong>{total}</strong>
+          </span>
+
+          <div className="flex items-center gap-1.5 bg-surface border border-outline-variant rounded-lg px-2.5 py-1 text-xs">
+            <span className="material-symbols-outlined text-sm text-on-surface-variant">sort</span>
+            <select
+              value={order}
+              onChange={(e) => handleOrderChange(e.target.value as 'desc' | 'asc')}
+              className="bg-transparent text-on-surface text-xs font-semibold outline-none cursor-pointer"
+            >
+              <option value="desc">Más recientes</option>
+              <option value="asc">Más antiguos</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -219,7 +298,7 @@ export default function IdeasDirectoryPage() {
           <span className="material-symbols-outlined text-4xl animate-spin mb-2 text-secondary">refresh</span>
           <p className="text-sm font-medium">Cargando propuestas comunitarias...</p>
         </div>
-      ) : filteredIdeas.length === 0 ? (
+      ) : ideas.length === 0 ? (
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-12 text-center text-on-surface-variant">
           <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-2">lightbulb</span>
           <h3 className="font-bold text-base text-on-surface">No se encontraron propuestas con los filtros actuales</h3>
@@ -235,59 +314,88 @@ export default function IdeasDirectoryPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-          {filteredIdeas.map((idea) => (
-            <article
-              key={idea.id}
-              className={`bg-surface-container-lowest border border-outline-variant rounded-xl border-t-4 ${getBorderColor(
-                idea.estado
-              )} hover:shadow-md transition-all flex flex-col h-full relative overflow-hidden group p-5`}
-            >
-              <div className="flex justify-between items-start mb-3 gap-2">
-                {getStatusBadge(idea.estado)}
-                <span className="font-label-sm text-[11px] text-on-surface-variant flex items-center gap-1 shrink-0">
-                  <span className="material-symbols-outlined text-xs">schedule</span>
-                  {new Date(idea.creadoEn).toLocaleDateString()}
-                </span>
-              </div>
-
-              <h2 className="font-headline-md text-base font-bold text-on-surface group-hover:text-secondary transition-colors mb-2 line-clamp-2">
-                <Link href={`/ideas/${idea.id}`}>
-                  {idea.titulo}
-                </Link>
-              </h2>
-
-              <p className="font-body-md text-xs text-on-surface-variant line-clamp-3 mb-4 flex-1 leading-relaxed">
-                {idea.descripcionMarkdown.replace(/[#*`_\[\]]/g, '')}
-              </p>
-
-              {/* Scope and Existing Initiative indicator */}
-              {idea.iniciativaExistenteUrl ? (
-                <div className="mb-3 bg-surface-container-low p-2 rounded text-[11px] text-secondary flex items-center gap-1 font-semibold truncate">
-                  <span className="material-symbols-outlined text-xs shrink-0">link</span>
-                  <span className="truncate">Iniciativa vinculada: {idea.iniciativaExistenteUrl}</span>
-                </div>
-              ) : null}
-
-              <div className="pt-3 border-t border-outline-variant flex justify-between items-center text-xs">
-                <div className="flex items-center gap-1.5 text-on-surface-variant text-[11px]">
-                  <span className="bg-surface-variant text-on-surface-variant font-bold px-2 py-0.5 rounded text-[10px] uppercase">
-                    {idea.categoria}
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            {ideas.map((idea) => (
+              <article
+                key={idea.id}
+                className={`bg-surface-container-lowest border border-outline-variant rounded-xl border-t-4 ${getBorderColor(
+                  idea.estado
+                )} hover:shadow-md transition-all flex flex-col h-full relative overflow-hidden group p-5`}
+              >
+                <div className="flex justify-between items-start mb-3 gap-2">
+                  {getStatusBadge(idea.estado)}
+                  <span className="font-label-sm text-[11px] text-on-surface-variant flex items-center gap-1 shrink-0">
+                    <span className="material-symbols-outlined text-xs">schedule</span>
+                    {new Date(idea.creadoEn).toLocaleDateString()}
                   </span>
-                  <span>• {idea.alcanceTipo}</span>
                 </div>
 
-                <Link
-                  href={`/ideas/${idea.id}`}
-                  className="text-secondary font-label-md text-xs font-bold hover:underline flex items-center gap-0.5"
-                >
-                  <span>Debatir</span>
-                  <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+                <h2 className="font-headline-md text-base font-bold text-on-surface group-hover:text-secondary transition-colors mb-2 line-clamp-2">
+                  <Link href={`/ideas/${idea.id}`}>
+                    {idea.titulo}
+                  </Link>
+                </h2>
+
+                <p className="font-body-md text-xs text-on-surface-variant line-clamp-3 mb-4 flex-1 leading-relaxed">
+                  {idea.descripcionMarkdown.replace(/[#*`_\[\]]/g, '')}
+                </p>
+
+                {/* Scope and Existing Initiative indicator */}
+                {idea.iniciativaExistenteUrl ? (
+                  <div className="mb-3 bg-surface-container-low p-2 rounded text-[11px] text-secondary flex items-center gap-1 font-semibold truncate">
+                    <span className="material-symbols-outlined text-xs shrink-0">link</span>
+                    <span className="truncate">Iniciativa vinculada: {idea.iniciativaExistenteUrl}</span>
+                  </div>
+                ) : null}
+
+                <div className="pt-3 border-t border-outline-variant flex justify-between items-center text-xs">
+                  <div className="flex items-center gap-1.5 text-on-surface-variant text-[11px]">
+                    <span className="bg-surface-variant text-on-surface-variant font-bold px-2 py-0.5 rounded text-[10px] uppercase">
+                      {idea.categoria}
+                    </span>
+                    <span>• {idea.alcanceTipo}</span>
+                  </div>
+
+                  <Link
+                    href={`/ideas/${idea.id}`}
+                    className="text-secondary font-label-md text-xs font-bold hover:underline flex items-center gap-0.5"
+                  >
+                    <span>Debatir</span>
+                    <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {hasMore ? (
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <button
+                type="button"
+                disabled={loadingMore}
+                onClick={handleLoadMore}
+                className="px-6 py-3 bg-surface-container border border-outline text-on-surface font-label-md text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-surface-container-high transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 active:scale-95"
+              >
+                {loadingMore ? (
+                  <>
+                    <span className="material-symbols-outlined text-sm animate-spin text-secondary">refresh</span>
+                    <span>Cargando más propuestas...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Cargar más propuestas</span>
+                    <span className="material-symbols-outlined text-sm">expand_more</span>
+                  </>
+                )}
+              </button>
+              <span className="text-[11px] text-on-surface-variant">
+                Mostrando {ideas.length} de {total} propuestas ciudadanas
+              </span>
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );

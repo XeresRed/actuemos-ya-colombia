@@ -48,4 +48,5 @@ export interface VoluntariadoFilter {
   search?: string;
   limit?: number;
   offset?: number;
+  order?: 'asc' | 'desc';
 }

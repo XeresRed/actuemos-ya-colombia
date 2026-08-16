@@ -60,4 +60,5 @@ export interface IdeaFilter {
   search?: string;
   limit?: number;
   offset?: number;
+  order?: 'asc' | 'desc';
 }

@@ -19,9 +19,11 @@ export async function GET(req: NextRequest) {
     const estado = searchParams.get('estado') as IdeaEstado | null;
     const categoria = searchParams.get('categoria') || undefined;
     const alcanceTipo = searchParams.get('alcanceTipo') as AlcanceTipo | null;
-    const search = searchParams.get('search') || undefined;
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 20;
-    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!, 10) : 0;
+    const search = searchParams.get('search') || searchParams.get('q') || undefined;
+    const limitParam = searchParams.get('limit') ? Math.max(1, parseInt(searchParams.get('limit')!, 10)) : 20;
+    const pageParam = searchParams.get('page') ? Math.max(1, parseInt(searchParams.get('page')!, 10)) : 1;
+    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!, 10) : (pageParam - 1) * limitParam;
+    const order = (searchParams.get('order')?.toLowerCase() === 'asc' ? 'asc' : 'desc') as 'asc' | 'desc';
 
     // Si el usuario no es moderador/admin, por defecto no ve borradores ajenos
     const session = getSession(req);
@@ -34,11 +36,20 @@ export async function GET(req: NextRequest) {
       categoria,
       alcanceTipo: alcanceTipo || undefined,
       search,
-      limit,
+      limit: limitParam,
       offset,
+      order,
     });
 
-    return apiSuccess(result);
+    const hasMore = offset + result.ideas.length < result.total;
+
+    return apiSuccess({
+      ideas: result.ideas,
+      total: result.total,
+      page: pageParam,
+      pageSize: limitParam,
+      hasMore,
+    });
   } catch (error) {
     return apiError(error);
   }

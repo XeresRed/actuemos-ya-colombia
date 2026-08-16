@@ -48,8 +48,14 @@ export const IniciativaRepository = {
     const params: unknown[] = [];
 
     if (filters.categoria) {
-      conditions.push('categoria = ?');
-      params.push(filters.categoria);
+      if (filters.categoria === 'ong') {
+        conditions.push("(categoria = 'ong' OR categoria = 'ong_colectivo')");
+      } else if (filters.categoria === 'colectivo') {
+        conditions.push("(categoria = 'colectivo' OR categoria = 'campaña' OR categoria = 'ong_colectivo')");
+      } else {
+        conditions.push('categoria = ?');
+        params.push(filters.categoria);
+      }
     }
 
     if (filters.estadoOperacion) {
@@ -63,9 +69,9 @@ export const IniciativaRepository = {
     }
 
     if (filters.search) {
-      conditions.push('(nombre LIKE ? OR descripcion LIKE ? OR categoria LIKE ?)');
+      conditions.push('(nombre LIKE ? OR descripcion LIKE ? OR categoria LIKE ? OR cobertura_geografica LIKE ?)');
       const searchParam = `%${filters.search}%`;
-      params.push(searchParam, searchParam, searchParam);
+      params.push(searchParam, searchParam, searchParam, searchParam);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -76,11 +82,12 @@ export const IniciativaRepository = {
 
     const limit = filters.limit ?? 20;
     const offset = filters.offset ?? 0;
+    const orderDir = filters.order === 'asc' ? 'ASC' : 'DESC';
 
     const queryStmt = db.prepare(`
       SELECT * FROM iniciativas_activas 
       ${whereClause} 
-      ORDER BY creado_en DESC 
+      ORDER BY creado_en ${orderDir}, rowid ${orderDir}
       LIMIT ? OFFSET ?
     `);
 

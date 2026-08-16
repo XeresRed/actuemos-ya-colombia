@@ -1,53 +1,103 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import type { Iniciativa } from '../../core/domain/iniciativa';
 
 export default function IniciativasPage() {
   const [iniciativas, setIniciativas] = useState<Iniciativa[]>([]);
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const [activeCategory, setActiveCategory] = useState<string>('todas');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [order, setOrder] = useState<'desc' | 'asc'>('desc');
 
+  // Debounce search input (350ms)
   useEffect(() => {
-    async function loadInitiatives() {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // Reset page when category or order changes
+  const handleCategoryChange = (cat: string) => {
+    setActiveCategory(cat);
+    setPage(1);
+  };
+
+  const handleOrderChange = (newOrder: 'desc' | 'asc') => {
+    setOrder(newOrder);
+    setPage(1);
+  };
+
+  // Fetch initiatives from API
+  const fetchIniciativas = useCallback(
+    async (currentPage: number, isAppending = false) => {
+      if (isAppending) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+
       try {
-        const res = await fetch('/api/iniciativas');
+        const params = new URLSearchParams();
+        params.append('page', currentPage.toString());
+        params.append('limit', '9');
+        params.append('order', order);
+
+        if (activeCategory !== 'todas') {
+          params.append('categoria', activeCategory);
+        }
+
+        if (debouncedSearch) {
+          params.append('search', debouncedSearch);
+        }
+
+        const res = await fetch(`/api/iniciativas?${params.toString()}`);
         const json = await res.json();
-        if (json.ok && json.data && json.data.iniciativas) {
-          setIniciativas(json.data.iniciativas);
+
+        if (json.ok && json.data) {
+          const newItems: Iniciativa[] = json.data.iniciativas || [];
+          const totalCount: number = json.data.total ?? 0;
+          const serverHasMore: boolean = json.data.hasMore ?? false;
+
+          setTotal(totalCount);
+          setHasMore(serverHasMore);
+
+          if (isAppending) {
+            setIniciativas((prev) => [...prev, ...newItems]);
+          } else {
+            setIniciativas(newItems);
+          }
         }
       } catch (err) {
         console.error('Error al cargar iniciativas:', err);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
+    },
+    [activeCategory, debouncedSearch, order]
+  );
+
+  useEffect(() => {
+    fetchIniciativas(1, false);
+  }, [fetchIniciativas]);
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchIniciativas(nextPage, true);
     }
-
-    loadInitiatives();
-  }, []);
-
-  const filteredIniciativas = useMemo(() => {
-    return iniciativas.filter((item) => {
-      if (activeCategory !== 'todas') {
-        if (activeCategory === 'organismo_oficial' && item.categoria !== 'organismo_oficial') return false;
-        if (activeCategory === 'ong' && item.categoria !== 'ong') return false;
-        if (activeCategory === 'colectivo' && item.categoria !== 'colectivo' && item.categoria !== 'campaña') return false;
-      }
-
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchName = item.nombre.toLowerCase().includes(q);
-        const matchDesc = item.descripcion.toLowerCase().includes(q);
-        const matchLoc = item.coberturaGeografica ? item.coberturaGeografica.toLowerCase().includes(q) : false;
-        const matchCat = item.categoria.toLowerCase().includes(q);
-        if (!matchName && !matchDesc && !matchLoc && !matchCat) return false;
-      }
-
-      return true;
-    });
-  }, [iniciativas, activeCategory, searchQuery]);
+  };
 
   const getCategoryBadge = (categoria: string) => {
     switch (categoria) {
@@ -58,9 +108,16 @@ export default function IniciativasPage() {
           </span>
         );
       case 'ong':
+      case 'ong_colectivo':
         return (
           <span className="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs">public</span> ONG Internacional/Nacional
+            <span className="material-symbols-outlined text-xs">public</span> ONG / Fundación
+          </span>
+        );
+      case 'campaña':
+        return (
+          <span className="bg-amber-100 text-amber-900 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs">campaign</span> Campaña de Acopio
           </span>
         );
       default:
@@ -98,7 +155,7 @@ export default function IniciativasPage() {
           <button
             key={tab.id}
             type="button"
-            onClick={() => setActiveCategory(tab.id)}
+            onClick={() => handleCategoryChange(tab.id)}
             className={`px-4 py-2 rounded-lg font-label-md text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap ${
               activeCategory === tab.id
                 ? 'bg-secondary text-on-secondary shadow-sm'
@@ -111,9 +168,9 @@ export default function IniciativasPage() {
         ))}
       </div>
 
-      {/* Search Filter Bar */}
-      <div className="mb-stack-lg bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm">
-        <div className="relative w-full">
+      {/* Search & Sort Bar */}
+      <div className="mb-stack-lg bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div className="relative flex-1">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
           <input
             value={searchQuery}
@@ -122,6 +179,34 @@ export default function IniciativasPage() {
             placeholder="Buscar por nombre de ONG, entidad oficial, insumos, Cruz Roja, Defensa Civil, Popayán, Pasto..."
             type="text"
           />
+          {searchQuery ? (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface text-xs"
+            >
+              ✕
+            </button>
+          ) : null}
+        </div>
+
+        {/* Sort Selector & Count */}
+        <div className="flex items-center gap-3 shrink-0 justify-between sm:justify-end">
+          <span className="text-xs text-on-surface-variant font-medium">
+            Mostrando <strong>{iniciativas.length}</strong> de <strong>{total}</strong>
+          </span>
+
+          <div className="flex items-center gap-1.5 bg-surface border border-outline-variant rounded-lg px-2.5 py-1 text-xs">
+            <span className="material-symbols-outlined text-sm text-on-surface-variant">sort</span>
+            <select
+              value={order}
+              onChange={(e) => handleOrderChange(e.target.value as 'desc' | 'asc')}
+              className="bg-transparent text-on-surface text-xs font-semibold outline-none cursor-pointer"
+            >
+              <option value="desc">Más recientes primero</option>
+              <option value="asc">Más antiguos primero</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -131,7 +216,7 @@ export default function IniciativasPage() {
           <span className="material-symbols-outlined text-4xl animate-spin mb-2 text-secondary">refresh</span>
           <p className="text-sm font-medium">Cargando directorio de iniciativas...</p>
         </div>
-      ) : filteredIniciativas.length === 0 ? (
+      ) : iniciativas.length === 0 ? (
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-12 text-center text-on-surface-variant">
           <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-2">corporate_fare</span>
           <h3 className="font-bold text-base text-on-surface">No se encontraron iniciativas con los filtros actuales</h3>
@@ -140,56 +225,85 @@ export default function IniciativasPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-          {filteredIniciativas.map((item) => (
-            <article
-              key={item.id}
-              className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-300 relative border-t-4 border-t-secondary p-5"
-            >
-              <div className="flex justify-between items-start mb-3 gap-2">
-                {getCategoryBadge(item.categoria)}
-                <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-0.5 rounded text-[10px] font-bold shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-600 animate-ping"></span>
-                  Activa en Campo
-                </span>
-              </div>
-
-              <h2 className="font-headline-md text-base font-bold text-on-background mb-2">
-                {item.nombre}
-              </h2>
-
-              <p className="font-body-md text-xs text-on-surface-variant mb-4 flex-1 leading-relaxed line-clamp-3">
-                {item.descripcion}
-              </p>
-
-              <div className="flex flex-col gap-1.5 mb-4 bg-surface-container-low p-3 rounded-lg border border-outline-variant text-xs text-on-surface">
-                <div className="flex items-center gap-1.5 text-on-surface-variant">
-                  <span className="material-symbols-outlined text-xs shrink-0">location_on</span>
-                  <span className="truncate"><strong>Cobertura:</strong> {item.coberturaGeografica || 'Nacional'}</span>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            {iniciativas.map((item) => (
+              <article
+                key={item.id}
+                className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-300 relative border-t-4 border-t-secondary p-5"
+              >
+                <div className="flex justify-between items-start mb-3 gap-2">
+                  {getCategoryBadge(item.categoria)}
+                  <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-0.5 rounded text-[10px] font-bold shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-600 animate-ping"></span>
+                    Activa en Campo
+                  </span>
                 </div>
-                {item.contacto ? (
-                  <div className="flex items-center gap-1.5 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-xs shrink-0">call</span>
-                    <span className="truncate"><strong>Contacto:</strong> {item.contacto}</span>
-                  </div>
-                ) : null}
-              </div>
 
-              <div className="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant text-xs">
-                <span className="text-[11px] text-on-surface-variant font-medium">Verificada por AYC</span>
-                <a
-                  href={item.urlOficial.startsWith('http') ? item.urlOficial : `https://${item.urlOficial}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-primary text-on-primary font-label-md text-xs font-bold uppercase px-3 py-1.5 rounded-lg hover:bg-primary-container transition-colors inline-flex items-center gap-1 shadow-sm"
-                >
-                  <span>Canal Oficial</span>
-                  <span className="material-symbols-outlined text-xs">open_in_new</span>
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
+                <h2 className="font-headline-md text-base font-bold text-on-background mb-2">
+                  {item.nombre}
+                </h2>
+
+                <p className="font-body-md text-xs text-on-surface-variant mb-4 flex-1 leading-relaxed line-clamp-3">
+                  {item.descripcion}
+                </p>
+
+                <div className="flex flex-col gap-1.5 mb-4 bg-surface-container-low p-3 rounded-lg border border-outline-variant text-xs text-on-surface">
+                  <div className="flex items-center gap-1.5 text-on-surface-variant">
+                    <span className="material-symbols-outlined text-xs shrink-0">location_on</span>
+                    <span className="truncate"><strong>Cobertura:</strong> {item.coberturaGeografica || 'Nacional'}</span>
+                  </div>
+                  {item.contacto ? (
+                    <div className="flex items-center gap-1.5 text-on-surface-variant">
+                      <span className="material-symbols-outlined text-xs shrink-0">call</span>
+                      <span className="truncate"><strong>Contacto:</strong> {item.contacto}</span>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant text-xs">
+                  <span className="text-[11px] text-on-surface-variant font-medium">Verificada por AYC</span>
+                  <a
+                    href={item.urlOficial.startsWith('http') ? item.urlOficial : `https://${item.urlOficial}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-primary text-on-primary font-label-md text-xs font-bold uppercase px-3 py-1.5 rounded-lg hover:bg-primary-container transition-colors inline-flex items-center gap-1 shadow-sm"
+                  >
+                    <span>Canal Oficial</span>
+                    <span className="material-symbols-outlined text-xs">open_in_new</span>
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {hasMore ? (
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <button
+                type="button"
+                disabled={loadingMore}
+                onClick={handleLoadMore}
+                className="px-6 py-3 bg-surface-container border border-outline text-on-surface font-label-md text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-surface-container-high transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 active:scale-95"
+              >
+                {loadingMore ? (
+                  <>
+                    <span className="material-symbols-outlined text-sm animate-spin text-secondary">refresh</span>
+                    <span>Cargando más iniciativas...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Cargar más iniciativas</span>
+                    <span className="material-symbols-outlined text-sm">expand_more</span>
+                  </>
+                )}
+              </button>
+              <span className="text-[11px] text-on-surface-variant">
+                Mostrando {iniciativas.length} de {total} iniciativas registradas
+              </span>
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );

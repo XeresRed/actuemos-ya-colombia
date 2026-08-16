@@ -73,9 +73,9 @@ export const VoluntariadoRepository = {
     }
 
     if (filters.search) {
-      conditions.push('(titulo_necesidad LIKE ? OR descripcion LIKE ? OR area_profesional LIKE ?)');
+      conditions.push('(titulo_necesidad LIKE ? OR descripcion LIKE ? OR area_profesional LIKE ? OR ubicacion LIKE ? OR nombre_contacto LIKE ?)');
       const searchParam = `%${filters.search}%`;
-      params.push(searchParam, searchParam, searchParam);
+      params.push(searchParam, searchParam, searchParam, searchParam, searchParam);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -86,11 +86,12 @@ export const VoluntariadoRepository = {
 
     const limit = filters.limit ?? 20;
     const offset = filters.offset ?? 0;
+    const orderDir = filters.order === 'asc' ? 'ASC' : 'DESC';
 
     const queryStmt = db.prepare(`
       SELECT * FROM voluntariado_profesional 
       ${whereClause} 
-      ORDER BY creado_en DESC 
+      ORDER BY creado_en ${orderDir}, rowid ${orderDir}
       LIMIT ? OFFSET ?
     `);
 

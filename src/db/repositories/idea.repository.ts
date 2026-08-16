@@ -84,11 +84,12 @@ export const IdeaRepository = {
 
     const limit = filters.limit ?? 20;
     const offset = filters.offset ?? 0;
+    const orderDir = filters.order === 'asc' ? 'ASC' : 'DESC';
 
     const queryStmt = db.prepare(`
       SELECT * FROM ideas 
       ${whereClause} 
-      ORDER BY creado_en DESC 
+      ORDER BY creado_en ${orderDir}, rowid ${orderDir}
       LIMIT ? OFFSET ?
     `);
 

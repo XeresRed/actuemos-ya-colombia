@@ -26,20 +26,31 @@ export async function GET(req: NextRequest) {
     const categoria = searchParams.get('categoria') || undefined;
     const estadoOperacion = searchParams.get('estadoOperacion') as IniciativaEstado | null;
     const coberturaGeografica = searchParams.get('coberturaGeografica') || undefined;
-    const search = searchParams.get('search') || undefined;
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : 20;
-    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!, 10) : 0;
+    const search = searchParams.get('search') || searchParams.get('q') || undefined;
+    const limitParam = searchParams.get('limit') ? Math.max(1, parseInt(searchParams.get('limit')!, 10)) : 20;
+    const pageParam = searchParams.get('page') ? Math.max(1, parseInt(searchParams.get('page')!, 10)) : 1;
+    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!, 10) : (pageParam - 1) * limitParam;
+    const order = (searchParams.get('order')?.toLowerCase() === 'asc' ? 'asc' : 'desc') as 'asc' | 'desc';
 
     const result = IniciativaService.listInitiatives({
       categoria,
       estadoOperacion: estadoOperacion || undefined,
       coberturaGeografica,
       search,
-      limit,
+      limit: limitParam,
       offset,
+      order,
     });
 
-    return apiSuccess(result);
+    const hasMore = offset + result.iniciativas.length < result.total;
+
+    return apiSuccess({
+      iniciativas: result.iniciativas,
+      total: result.total,
+      page: pageParam,
+      pageSize: limitParam,
+      hasMore,
+    });
   } catch (error) {
     return apiError(error);
   }

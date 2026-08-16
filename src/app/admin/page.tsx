@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Voluntariado } from '../../core/domain/voluntariado';
@@ -29,6 +29,78 @@ interface IdeaBorrador {
   creadoEn: string;
 }
 
+const PAGE_SIZE = 8;
+
+interface AdminPaginationProps {
+  currentPage: number;
+  totalItems: number;
+  pageSize?: number;
+  onPageChange: (page: number) => void;
+  order: 'desc' | 'asc';
+  onOrderChange: (order: 'desc' | 'asc') => void;
+}
+
+function AdminPagination({
+  currentPage,
+  totalItems,
+  pageSize = PAGE_SIZE,
+  onPageChange,
+  order,
+  onOrderChange,
+}: AdminPaginationProps) {
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalItems);
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-outline-variant text-xs text-on-surface-variant mt-4">
+      <div className="flex items-center gap-3">
+        <span>
+          Mostrando <strong>{startItem}-{endItem}</strong> de <strong>{totalItems}</strong> registros
+        </span>
+
+        <div className="flex items-center gap-1 bg-surface border border-outline-variant rounded px-2 py-0.5">
+          <span className="material-symbols-outlined text-xs">sort</span>
+          <select
+            value={order}
+            onChange={(e) => onOrderChange(e.target.value as 'desc' | 'asc')}
+            className="bg-transparent text-on-surface text-[11px] font-semibold outline-none cursor-pointer"
+          >
+            <option value="desc">Más recientes (DESC)</option>
+            <option value="asc">Más antiguos (ASC)</option>
+          </select>
+        </div>
+      </div>
+
+      {totalPages > 1 ? (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={currentPage <= 1}
+            onClick={() => onPageChange(currentPage - 1)}
+            className="px-2.5 py-1 border border-outline rounded hover:bg-surface-variant disabled:opacity-40 disabled:hover:bg-transparent font-medium flex items-center gap-1 transition-colors"
+          >
+            <span className="material-symbols-outlined text-xs">chevron_left</span>
+            <span>Anterior</span>
+          </button>
+          <span className="font-semibold text-on-surface px-1">
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            type="button"
+            disabled={currentPage >= totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+            className="px-2.5 py-1 border border-outline rounded hover:bg-surface-variant disabled:opacity-40 disabled:hover:bg-transparent font-medium flex items-center gap-1 transition-colors"
+          >
+            <span>Siguiente</span>
+            <span className="material-symbols-outlined text-xs">chevron_right</span>
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<UsuarioAdmin | null>(null);
@@ -41,6 +113,22 @@ export default function AdminDashboardPage() {
   const [voluntariosPendientes, setVoluntariosPendientes] = useState<Voluntariado[]>([]);
   const [iniciativas, setIniciativas] = useState<Iniciativa[]>([]);
   const [alertas, setAlertas] = useState<AlertaSistema[]>([]);
+
+  // Paginación y Orden para cada pestaña
+  const [borradoresPage, setBorradoresPage] = useState(1);
+  const [borradoresOrder, setBorradoresOrder] = useState<'desc' | 'asc'>('desc');
+
+  const [voluntariosPage, setVoluntariosPage] = useState(1);
+  const [voluntariosOrder, setVoluntariosOrder] = useState<'desc' | 'asc'>('desc');
+
+  const [iniciativasPage, setIniciativasPage] = useState(1);
+  const [iniciativasOrder, setIniciativasOrder] = useState<'desc' | 'asc'>('desc');
+
+  const [alertasPage, setAlertasPage] = useState(1);
+  const [alertasOrder, setAlertasOrder] = useState<'desc' | 'asc'>('desc');
+
+  const [supervisoresPage, setSupervisoresPage] = useState(1);
+  const [supervisoresOrder, setSupervisoresOrder] = useState<'desc' | 'asc'>('desc');
 
   // Estados de formularios
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -74,21 +162,21 @@ export default function AdminDashboardPage() {
         setCurrentUser(sessionJson.data.user);
 
         // 1. Cargar borradores de ideas
-        const ideasRes = await fetch('/api/ideas?estado=borrador');
+        const ideasRes = await fetch('/api/ideas?estado=borrador&limit=100');
         const ideasJson = await ideasRes.json();
         if (ideasJson.ok && ideasJson.data.ideas) {
           setBorradores(ideasJson.data.ideas);
         }
 
         // 2. Cargar voluntariados pendientes
-        const volRes = await fetch('/api/voluntarios?estado=pendiente');
+        const volRes = await fetch('/api/voluntarios?estado=pendiente&limit=100');
         const volJson = await volRes.json();
         if (volJson.ok && volJson.data.voluntariados) {
           setVoluntariosPendientes(volJson.data.voluntariados);
         }
 
         // 3. Cargar iniciativas activas
-        const iniRes = await fetch('/api/iniciativas');
+        const iniRes = await fetch('/api/iniciativas?limit=100');
         const iniJson = await iniRes.json();
         if (iniJson.ok && iniJson.data.iniciativas) {
           setIniciativas(iniJson.data.iniciativas);
@@ -216,6 +304,8 @@ export default function AdminDashboardPage() {
   // Acciones de Alertas (Admin Only)
   const handleCreateAlerta = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!alertMensaje.trim()) return;
+
     setActionLoading('create-alerta');
     try {
       const res = await fetch('/api/alertas', {
@@ -226,7 +316,6 @@ export default function AdminDashboardPage() {
           mensaje: alertMensaje,
           enlaceAccionUrl: alertUrl || null,
           enlaceAccionTexto: alertTexto || null,
-          activa: true,
         }),
       });
       const json = await res.json();
@@ -235,12 +324,12 @@ export default function AdminDashboardPage() {
         setAlertMensaje('');
         setAlertUrl('');
         setAlertTexto('');
-        showToast('¡Alerta de crisis emitida y publicada en el carrusel superior!');
+        showToast('¡Alerta emitida exitosamente en el carrusel global!');
       } else {
-        alert(json.error?.message || 'Error al emitir alerta');
+        alert(json.error?.message || 'Error al emitir alerta.');
       }
     } catch {
-      alert('Error de conexión al emitir alerta.');
+      alert('Error al emitir alerta.');
     } finally {
       setActionLoading(null);
     }
@@ -255,12 +344,12 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({ activa: !currentStatus }),
       });
       const json = await res.json();
-      if (json.ok) {
-        setAlertas(prev => prev.map(a => a.id === id ? { ...a, activa: !currentStatus } : a));
-        showToast(`Estado de la alerta actualizado a: ${!currentStatus ? 'Activa' : 'Pausada'}`);
+      if (json.ok && json.data) {
+        setAlertas(prev => prev.map(a => a.id === id ? json.data : a));
+        showToast(`Alerta ${!currentStatus ? 'activada en el carrusel' : 'pausada'}.`);
       }
     } catch {
-      alert('Error al actualizar alerta.');
+      alert('Error al cambiar estado de la alerta.');
     } finally {
       setActionLoading(null);
     }
@@ -283,9 +372,11 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Acciones de Iniciativas Activas
+  // Acciones de Iniciativas
   const handleCreateIniciativa = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!iniNombre.trim() || !iniDescripcion.trim() || !iniUrl.trim()) return;
+
     setActionLoading('create-iniciativa');
     try {
       const res = await fetch('/api/iniciativas', {
@@ -411,27 +502,73 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Helper de ordenamiento
+  const sortItems = <T extends { creadoEn?: string; actualizadoEn?: string }>(items: T[], order: 'desc' | 'asc'): T[] => {
+    return [...items].sort((a, b) => {
+      const dateA = a.creadoEn || a.actualizadoEn;
+      const dateB = b.creadoEn || b.actualizadoEn;
+      const timeA = dateA ? new Date(dateA).getTime() : 0;
+      const timeB = dateB ? new Date(dateB).getTime() : 0;
+      return order === 'asc' ? timeA - timeB : timeB - timeA;
+    });
+  };
+
+  // Listas ordenadas y paginadas
+  const sortedBorradores = useMemo(() => sortItems(borradores, borradoresOrder), [borradores, borradoresOrder]);
+  const pagedBorradores = useMemo(
+    () => sortedBorradores.slice((borradoresPage - 1) * PAGE_SIZE, borradoresPage * PAGE_SIZE),
+    [sortedBorradores, borradoresPage]
+  );
+
+  const sortedVoluntarios = useMemo(() => sortItems(voluntariosPendientes, voluntariosOrder), [voluntariosPendientes, voluntariosOrder]);
+  const pagedVoluntarios = useMemo(
+    () => sortedVoluntarios.slice((voluntariosPage - 1) * PAGE_SIZE, voluntariosPage * PAGE_SIZE),
+    [sortedVoluntarios, voluntariosPage]
+  );
+
+  const sortedIniciativas = useMemo(() => sortItems(iniciativas, iniciativasOrder), [iniciativas, iniciativasOrder]);
+  const pagedIniciativas = useMemo(
+    () => sortedIniciativas.slice((iniciativasPage - 1) * PAGE_SIZE, iniciativasPage * PAGE_SIZE),
+    [sortedIniciativas, iniciativasPage]
+  );
+
+  const sortedAlertas = useMemo(() => sortItems(alertas, alertasOrder), [alertas, alertasOrder]);
+  const pagedAlertas = useMemo(
+    () => sortedAlertas.slice((alertasPage - 1) * PAGE_SIZE, alertasPage * PAGE_SIZE),
+    [sortedAlertas, alertasPage]
+  );
+
+  const pendingSupervisors = useMemo(() => usuarios.filter((u) => !u.activo), [usuarios]);
+  const sortedPendingSupervisors = useMemo(() => sortItems(pendingSupervisors, supervisoresOrder), [pendingSupervisors, supervisoresOrder]);
+  const pagedPendingSupervisors = useMemo(
+    () => sortedPendingSupervisors.slice((supervisoresPage - 1) * PAGE_SIZE, supervisoresPage * PAGE_SIZE),
+    [sortedPendingSupervisors, supervisoresPage]
+  );
+
+  const activeAlertsCount = useMemo(() => alertas.filter((a) => a.activa).length, [alertas]);
+
   if (loading) {
     return (
       <div className="flex-grow flex items-center justify-center p-12">
         <div className="flex flex-col items-center gap-2">
-          <span className="material-symbols-outlined text-secondary text-4xl animate-spin">refresh</span>
-          <p className="font-body-md text-sm text-on-surface-variant">Cargando panel de supervisión...</p>
+          <span className="material-symbols-outlined text-4xl animate-spin text-secondary">refresh</span>
+          <p className="text-sm text-on-surface-variant font-medium">Cargando panel de administración...</p>
         </div>
       </div>
     );
   }
 
-  const pendingSupervisors = usuarios.filter(u => !u.activo && u.rol === 'supervisor');
-  const activeAlertsCount = alertas.filter(a => a.activa).length;
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <div className="flex-grow w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-stack-md">
       {/* Toast Notification */}
       {notification ? (
-        <div className="mb-4 bg-green-900 text-green-100 p-3 rounded-lg flex items-center justify-between text-xs animate-in fade-in shadow-sm">
+        <div className="mb-stack-md bg-secondary text-on-secondary p-3 rounded-lg text-xs font-semibold flex items-center justify-between shadow-md animate-in fade-in duration-200">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-base text-green-300">check_circle</span>
+            <span className="material-symbols-outlined text-base">check_circle</span>
             <span>{notification}</span>
           </div>
           <button onClick={() => setNotification(null)} className="text-green-300 hover:text-white">
@@ -473,30 +610,28 @@ export default function AdminDashboardPage() {
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-primary">
           <div className="flex justify-between items-start mb-2">
             <span className="font-label-md text-xs text-on-surface-variant">Borradores de Ideas</span>
-            <span className="material-symbols-outlined text-primary bg-primary-fixed p-1 rounded-full text-xs">inbox</span>
+            <span className="material-symbols-outlined text-primary p-1 rounded-full text-xs">lightbulb</span>
           </div>
           <div className="font-headline-lg text-3xl font-bold text-on-surface">{borradores.length}</div>
-          <div className="font-label-sm text-xs text-error mt-1 flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs">priority_high</span> Requieren revisión
-          </div>
+          <div className="font-label-sm text-xs text-on-surface-variant mt-1">Pendientes de revisión</div>
         </div>
 
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-secondary">
           <div className="flex justify-between items-start mb-2">
-            <span className="font-label-md text-xs text-on-surface-variant">Talento por Validar</span>
-            <span className="material-symbols-outlined text-secondary bg-secondary-fixed p-1 rounded-full text-xs">engineering</span>
+            <span className="font-label-md text-xs text-on-surface-variant">Voluntariados Pendientes</span>
+            <span className="material-symbols-outlined text-secondary p-1 rounded-full text-xs">engineering</span>
           </div>
           <div className="font-headline-lg text-3xl font-bold text-on-surface">{voluntariosPendientes.length}</div>
-          <div className="font-label-sm text-xs text-secondary mt-1">Ofertas y Solicitudes</div>
+          <div className="font-label-sm text-xs text-on-surface-variant mt-1">Por validar</div>
         </div>
 
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-amber-600">
           <div className="flex justify-between items-start mb-2">
             <span className="font-label-md text-xs text-on-surface-variant">Alertas Activas</span>
-            <span className="material-symbols-outlined text-amber-800 bg-amber-100 p-1 rounded-full text-xs">warning</span>
+            <span className="material-symbols-outlined text-amber-600 p-1 rounded-full text-xs">warning</span>
           </div>
-          <div className="font-headline-lg text-3xl font-bold text-on-surface">{currentUser?.rol === 'admin' ? activeAlertsCount : '-'}</div>
-          <div className="font-label-sm text-xs text-amber-700 mt-1">En el carrusel global</div>
+          <div className="font-headline-lg text-3xl font-bold text-on-surface">{activeAlertsCount}</div>
+          <div className="font-label-sm text-xs text-on-surface-variant mt-1">En el carrusel global</div>
         </div>
 
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-outline">
@@ -599,49 +734,63 @@ export default function AdminDashboardPage() {
               <p className="font-body-md text-sm font-semibold">No hay borradores pendientes de moderación.</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {borradores.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-surface-container-low transition-colors"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="bg-surface-variant text-on-surface-variant font-label-sm text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-                        {item.categoria}
-                      </span>
-                      <span className="text-xs text-on-surface-variant">Alcance: {item.alcanceTipo} {item.alcanceDetalle ? `(${item.alcanceDetalle})` : ''}</span>
-                      <span className="text-xs text-on-surface-variant">• {item.esAnonimo ? 'Anónimo' : item.emailCreador}</span>
+            <>
+              <div className="space-y-4">
+                {pagedBorradores.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-surface-container-low transition-colors"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-surface-variant text-on-surface-variant font-label-sm text-[10px] font-bold px-2 py-0.5 rounded uppercase">
+                          {item.categoria}
+                        </span>
+                        <span className="text-xs text-on-surface-variant">Alcance: {item.alcanceTipo} {item.alcanceDetalle ? `(${item.alcanceDetalle})` : ''}</span>
+                        <span className="text-xs text-on-surface-variant">• {item.esAnonimo ? 'Anónimo' : item.emailCreador}</span>
+                      </div>
+                      <h3 className="font-headline-md text-base font-bold text-on-surface mb-1">
+                        {item.titulo}
+                      </h3>
+                      <p className="font-body-md text-xs text-on-surface-variant line-clamp-2">
+                        {item.descripcionMarkdown}
+                      </p>
                     </div>
-                    <h3 className="font-headline-md text-base font-bold text-on-surface mb-1">
-                      {item.titulo}
-                    </h3>
-                    <p className="font-body-md text-xs text-on-surface-variant line-clamp-2">
-                      {item.descripcionMarkdown}
-                    </p>
-                  </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      disabled={actionLoading === `idea-close-${item.id}`}
-                      onClick={() => handleCloseIdea(item.id)}
-                      className="px-3 py-1.5 border border-outline text-error font-label-md text-xs font-bold rounded hover:bg-error-container transition-colors disabled:opacity-50"
-                    >
-                      {actionLoading === `idea-close-${item.id}` ? 'Descartando...' : 'Descartar'}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={actionLoading === `idea-${item.id}`}
-                      onClick={() => handleApproveIdea(item.id)}
-                      className="px-4 py-1.5 bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase rounded hover:bg-secondary-container transition-colors shadow-sm disabled:opacity-50"
-                    >
-                      {actionLoading === `idea-${item.id}` ? 'Aprobando...' : 'Aprobar [Idea]'}
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        disabled={actionLoading === `idea-close-${item.id}`}
+                        onClick={() => handleCloseIdea(item.id)}
+                        className="px-3 py-1.5 border border-outline text-error font-label-md text-xs font-bold rounded hover:bg-error-container transition-colors disabled:opacity-50"
+                      >
+                        {actionLoading === `idea-close-${item.id}` ? 'Descartando...' : 'Descartar'}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={actionLoading === `idea-${item.id}`}
+                        onClick={() => handleApproveIdea(item.id)}
+                        className="px-4 py-1.5 bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase rounded hover:bg-secondary-container transition-colors shadow-sm disabled:opacity-50"
+                      >
+                        {actionLoading === `idea-${item.id}` ? 'Aprobando...' : 'Aprobar [Idea]'}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+
+              <AdminPagination
+                currentPage={borradoresPage}
+                totalItems={borradores.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setBorradoresPage}
+                order={borradoresOrder}
+                onOrderChange={(newOrder) => {
+                  setBorradoresOrder(newOrder);
+                  setBorradoresPage(1);
+                }}
+              />
+            </>
           )}
         </section>
       ) : null}
@@ -665,61 +814,75 @@ export default function AdminDashboardPage() {
               <p className="font-body-md text-sm font-semibold">No hay voluntariados pendientes de revisión.</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {voluntariosPendientes.map((vol) => {
-                const isOffer = vol.tipo === 'ofrezco_habilidad';
-                return (
-                  <div
-                    key={vol.id}
-                    className="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-surface-container-low transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className={`font-label-sm text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
-                          isOffer ? 'bg-primary-fixed text-on-primary-fixed' : 'bg-secondary-fixed text-on-secondary-fixed'
-                        }`}>
-                          {isOffer ? 'Oferta' : 'Solicitud'}
-                        </span>
-                        <span className="text-xs font-semibold text-on-surface">{vol.areaProfesional}</span>
-                        {vol.ubicacion ? (
-                          <span className="text-xs text-on-surface-variant">• {vol.ubicacion}</span>
-                        ) : null}
+            <>
+              <div className="space-y-4">
+                {pagedVoluntarios.map((vol) => {
+                  const isOffer = vol.tipo === 'ofrezco_habilidad';
+                  return (
+                    <div
+                      key={vol.id}
+                      className="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-surface-container-low transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className={`font-label-sm text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
+                            isOffer ? 'bg-primary-fixed text-on-primary-fixed' : 'bg-secondary-fixed text-on-secondary-fixed'
+                          }`}>
+                            {isOffer ? 'Oferta' : 'Solicitud'}
+                          </span>
+                          <span className="text-xs font-semibold text-on-surface">{vol.areaProfesional}</span>
+                          {vol.ubicacion ? (
+                            <span className="text-xs text-on-surface-variant">• {vol.ubicacion}</span>
+                          ) : null}
+                        </div>
+
+                        <h3 className="font-headline-md text-base font-bold text-on-surface mb-1">
+                          {vol.tituloNecesidad}
+                        </h3>
+                        <p className="text-xs text-secondary font-semibold mb-1">
+                          Contacto: {vol.nombreContacto} ({vol.emailContacto} {vol.telefonoContacto ? `/ ${vol.telefonoContacto}` : ''})
+                        </p>
+                        <p className="font-body-md text-xs text-on-surface-variant line-clamp-2">
+                          {vol.descripcion}
+                        </p>
                       </div>
 
-                      <h3 className="font-headline-md text-base font-bold text-on-surface mb-1">
-                        {vol.tituloNecesidad}
-                      </h3>
-                      <p className="text-xs text-secondary font-semibold mb-1">
-                        Contacto: {vol.nombreContacto} ({vol.emailContacto} {vol.telefonoContacto ? `/ ${vol.telefonoContacto}` : ''})
-                      </p>
-                      <p className="font-body-md text-xs text-on-surface-variant line-clamp-2">
-                        {vol.descripcion}
-                      </p>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          disabled={actionLoading === `vol-${vol.id}`}
+                          onClick={() => handleDeleteVoluntariado(vol.id)}
+                          className="px-3 py-1.5 border border-outline text-error font-label-md text-xs font-bold rounded hover:bg-error-container transition-colors disabled:opacity-50"
+                        >
+                          Descartar
+                        </button>
+                        <button
+                          type="button"
+                          disabled={actionLoading === `vol-${vol.id}`}
+                          onClick={() => handleApproveVoluntariado(vol.id)}
+                          className="px-4 py-1.5 bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase rounded hover:bg-secondary-container transition-colors shadow-sm disabled:opacity-50 flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-xs">check</span>
+                          <span>Aprobar y Publicar</span>
+                        </button>
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        disabled={actionLoading === `vol-${vol.id}`}
-                        onClick={() => handleDeleteVoluntariado(vol.id)}
-                        className="px-3 py-1.5 border border-outline text-error font-label-md text-xs font-bold rounded hover:bg-error-container transition-colors disabled:opacity-50"
-                      >
-                        Descartar
-                      </button>
-                      <button
-                        type="button"
-                        disabled={actionLoading === `vol-${vol.id}`}
-                        onClick={() => handleApproveVoluntariado(vol.id)}
-                        className="px-4 py-1.5 bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase rounded hover:bg-secondary-container transition-colors shadow-sm disabled:opacity-50 flex items-center gap-1"
-                      >
-                        <span className="material-symbols-outlined text-xs">check</span>
-                        <span>Aprobar y Publicar</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+              <AdminPagination
+                currentPage={voluntariosPage}
+                totalItems={voluntariosPendientes.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setVoluntariosPage}
+                order={voluntariosOrder}
+                onOrderChange={(newOrder) => {
+                  setVoluntariosOrder(newOrder);
+                  setVoluntariosPage(1);
+                }}
+              />
+            </>
           )}
         </section>
       ) : null}
@@ -769,14 +932,14 @@ export default function AdminDashboardPage() {
                   onChange={(e) => setIniDescripcion(e.target.value)}
                   rows={3}
                   required
-                  placeholder="Describe las labores de socorro, centros de acopio o capacidades logísticas..."
+                  placeholder="Describe las labores activas, capacidades en terreno, puntos de atención o albergues desplegados..."
                   className="w-full bg-surface border border-outline-variant rounded p-2 text-xs outline-none focus:border-secondary"
-                ></textarea>
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block font-bold text-on-surface mb-1">URL Oficial / Canal de Articulación *</label>
+                  <label className="block font-bold text-on-surface mb-1">URL Oficial o Red Social *</label>
                   <input
                     value={iniUrl}
                     onChange={(e) => setIniUrl(e.target.value)}
@@ -787,11 +950,11 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-on-surface mb-1">Teléfono o Correo de Contacto</label>
+                  <label className="block font-bold text-on-surface mb-1">Contacto / Teléfono</label>
                   <input
                     value={iniContacto}
                     onChange={(e) => setIniContacto(e.target.value)}
-                    placeholder="+57 601 4376300 / socorro@cruzroja.org"
+                    placeholder="Línea 132 / +57 601 4376300"
                     className="w-full bg-surface border border-outline-variant rounded p-2 text-xs outline-none focus:border-secondary"
                   />
                 </div>
@@ -831,7 +994,7 @@ export default function AdminDashboardPage() {
             </h3>
 
             <div className="space-y-3">
-              {iniciativas.map((item) => (
+              {pagedIniciativas.map((item) => (
                 <div
                   key={item.id}
                   className="bg-surface border border-outline-variant rounded-lg p-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs"
@@ -860,6 +1023,18 @@ export default function AdminDashboardPage() {
                 </div>
               ))}
             </div>
+
+            <AdminPagination
+              currentPage={iniciativasPage}
+              totalItems={iniciativas.length}
+              pageSize={PAGE_SIZE}
+              onPageChange={setIniciativasPage}
+              order={iniciativasOrder}
+              onOrderChange={(newOrder) => {
+                setIniciativasOrder(newOrder);
+                setIniciativasPage(1);
+              }}
+            />
           </section>
         </div>
       ) : null}
@@ -949,61 +1124,75 @@ export default function AdminDashboardPage() {
             {alertas.length === 0 ? (
               <p className="text-xs text-on-surface-variant py-4 text-center">No hay alertas registradas en el sistema.</p>
             ) : (
-              <div className="space-y-3">
-                {alertas.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`font-bold text-[10px] uppercase px-2 py-0.5 rounded ${
-                          item.nivel === 'critica'
-                            ? 'bg-red-100 text-red-900'
-                            : item.nivel === 'alerta_naranja'
-                            ? 'bg-amber-100 text-amber-900'
-                            : 'bg-blue-100 text-blue-900'
-                        }`}>
-                          {item.nivel}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          item.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {item.activa ? '● Activa en Carrusel' : '○ Pausada'}
-                        </span>
-                        <span className="text-[11px] text-on-surface-variant">Por: {item.actualizadoPor}</span>
+              <>
+                <div className="space-y-3">
+                  {pagedAlertas.map((item) => (
+                    <div
+                      key={item.id}
+                      className="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`font-bold text-[10px] uppercase px-2 py-0.5 rounded ${
+                            item.nivel === 'critica'
+                              ? 'bg-red-100 text-red-900'
+                              : item.nivel === 'alerta_naranja'
+                              ? 'bg-amber-100 text-amber-900'
+                              : 'bg-blue-100 text-blue-900'
+                          }`}>
+                            {item.nivel}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            item.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {item.activa ? '● Activa en Carrusel' : '○ Pausada'}
+                          </span>
+                          <span className="text-[11px] text-on-surface-variant">Por: {item.actualizadoPor}</span>
+                        </div>
+                        <p className="font-bold text-sm text-on-surface mt-1">{item.mensaje}</p>
+                        {item.enlaceAccionUrl ? (
+                          <p className="text-secondary text-[11px] mt-0.5">Enlace: {item.enlaceAccionUrl} ({item.enlaceAccionTexto})</p>
+                        ) : null}
                       </div>
-                      <p className="font-bold text-sm text-on-surface mt-1">{item.mensaje}</p>
-                      {item.enlaceAccionUrl ? (
-                        <p className="text-secondary text-[11px] mt-0.5">Enlace: {item.enlaceAccionUrl} ({item.enlaceAccionTexto})</p>
-                      ) : null}
-                    </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        disabled={actionLoading === `alerta-toggle-${item.id}`}
-                        onClick={() => handleToggleAlertaStatus(item.id, item.activa)}
-                        className={`px-3 py-1.5 font-bold rounded transition-colors text-xs ${
-                          item.activa
-                            ? 'bg-amber-100 text-amber-900 hover:bg-amber-200'
-                            : 'bg-green-100 text-green-800 hover:bg-green-200'
-                        }`}
-                      >
-                        {item.activa ? 'Pausar' : 'Activar'}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={actionLoading === `alerta-del-${item.id}`}
-                        onClick={() => handleDeleteAlerta(item.id)}
-                        className="px-3 py-1.5 border border-outline text-error font-bold rounded hover:bg-error-container transition-colors text-xs"
-                      >
-                        Eliminar
-                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          disabled={actionLoading === `alerta-toggle-${item.id}`}
+                          onClick={() => handleToggleAlertaStatus(item.id, item.activa)}
+                          className={`px-3 py-1.5 font-bold rounded transition-colors text-xs ${
+                            item.activa
+                              ? 'bg-amber-100 text-amber-900 hover:bg-amber-200'
+                              : 'bg-green-100 text-green-800 hover:bg-green-200'
+                          }`}
+                        >
+                          {item.activa ? 'Pausar' : 'Activar'}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={actionLoading === `alerta-del-${item.id}`}
+                          onClick={() => handleDeleteAlerta(item.id)}
+                          className="px-3 py-1.5 border border-outline text-error font-bold rounded hover:bg-error-container transition-colors text-xs"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+
+                <AdminPagination
+                  currentPage={alertasPage}
+                  totalItems={alertas.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setAlertasPage}
+                  order={alertasOrder}
+                  onOrderChange={(newOrder) => {
+                    setAlertasOrder(newOrder);
+                    setAlertasPage(1);
+                  }}
+                />
+              </>
             )}
           </section>
         </div>
@@ -1029,42 +1218,56 @@ export default function AdminDashboardPage() {
                 No hay postulaciones pendientes de revisión.
               </p>
             ) : (
-              <div className="space-y-3">
-                {pendingSupervisors.map((user) => (
-                  <div
-                    key={user.id}
-                    className="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3"
-                  >
-                    <div>
-                      <h4 className="font-label-md text-sm font-bold text-on-surface">
-                        {user.nombre || 'Sin nombre'}
-                      </h4>
-                      <p className="text-xs text-secondary font-semibold">{user.email}</p>
-                      <p className="text-[11px] text-on-surface-variant mt-0.5">Postulado el: {new Date(user.creadoEn).toLocaleDateString()}</p>
-                    </div>
+              <>
+                <div className="space-y-3">
+                  {pagedPendingSupervisors.map((user) => (
+                    <div
+                      key={user.id}
+                      className="bg-surface border border-outline-variant rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3"
+                    >
+                      <div>
+                        <h4 className="font-label-md text-sm font-bold text-on-surface">
+                          {user.nombre || 'Sin nombre'}
+                        </h4>
+                        <p className="text-xs text-secondary font-semibold">{user.email}</p>
+                        <p className="text-[11px] text-on-surface-variant mt-0.5">Postulado el: {new Date(user.creadoEn).toLocaleDateString()}</p>
+                      </div>
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        disabled={actionLoading === `user-del-${user.id}`}
-                        onClick={() => handleRejectSupervisor(user.id)}
-                        className="px-3 py-2 border border-outline text-error font-label-md text-xs font-bold rounded hover:bg-error-container transition-colors disabled:opacity-50"
-                      >
-                        {actionLoading === `user-del-${user.id}` ? 'Rechazando...' : 'Rechazar'}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={actionLoading === `user-${user.id}`}
-                        onClick={() => handleApproveSupervisor(user.id)}
-                        className="px-4 py-2 bg-green-700 text-white font-label-md text-xs font-bold uppercase rounded hover:bg-green-800 transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-                      >
-                        <span className="material-symbols-outlined text-sm">how_to_reg</span>
-                        <span>{actionLoading === `user-${user.id}` ? 'Activando...' : 'Aprobar y Enviar Enlace'}</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          disabled={actionLoading === `user-del-${user.id}`}
+                          onClick={() => handleRejectSupervisor(user.id)}
+                          className="px-3 py-2 border border-outline text-error font-label-md text-xs font-bold rounded hover:bg-error-container transition-colors disabled:opacity-50"
+                        >
+                          {actionLoading === `user-del-${user.id}` ? 'Rechazando...' : 'Rechazar'}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={actionLoading === `user-${user.id}`}
+                          onClick={() => handleApproveSupervisor(user.id)}
+                          className="px-4 py-2 bg-green-700 text-white font-label-md text-xs font-bold uppercase rounded hover:bg-green-800 transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                        >
+                          <span className="material-symbols-outlined text-sm">how_to_reg</span>
+                          <span>{actionLoading === `user-${user.id}` ? 'Activando...' : 'Aprobar y Enviar Enlace'}</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+
+                <AdminPagination
+                  currentPage={supervisoresPage}
+                  totalItems={pendingSupervisors.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setSupervisoresPage}
+                  order={supervisoresOrder}
+                  onOrderChange={(newOrder) => {
+                    setSupervisoresOrder(newOrder);
+                    setSupervisoresPage(1);
+                  }}
+                />
+              </>
             )}
           </section>
 
