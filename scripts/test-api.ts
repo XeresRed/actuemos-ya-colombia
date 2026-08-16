@@ -381,6 +381,21 @@ async function runApiTests() {
   const wrongPassJson = await wrongPassRes.json() as any;
   assert(wrongPassRes.status === 401 && wrongPassJson.ok === false, 'Rechaza login master con contraseña errónea');
 
+  // Intento cuando ADMIN_MASTER_PASSWORD es '-' (deshabilitada)
+  const savedPassword = process.env.ADMIN_MASTER_PASSWORD;
+  process.env.ADMIN_MASTER_PASSWORD = '-';
+  const disabledPassReq = new NextRequest('http://localhost:3000/api/auth/master-login', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: 'cam960210@gmail.com',
+      password: 'some_password',
+    }),
+  });
+  const disabledPassRes = await masterLogin(disabledPassReq);
+  const disabledPassJson = await disabledPassRes.json() as any;
+  assert(disabledPassRes.status === 403 && disabledPassJson.error?.message?.includes('no está configurada'), 'Rechaza login master cuando ADMIN_MASTER_PASSWORD es "-"');
+  process.env.ADMIN_MASTER_PASSWORD = savedPassword;
+
   // Intento exitoso con credenciales correctas
   const validMasterReq = new NextRequest('http://localhost:3000/api/auth/master-login', {
     method: 'POST',

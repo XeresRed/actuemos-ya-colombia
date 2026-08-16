@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Verificación de contraseña configurada en el entorno
-    const configuredMasterPassword = process.env.ADMIN_MASTER_PASSWORD;
-    if (!configuredMasterPassword) {
+    const configuredMasterPassword = process.env.ADMIN_MASTER_PASSWORD?.trim();
+    if (!configuredMasterPassword || configuredMasterPassword === '-' || configuredMasterPassword === '') {
       throw new ForbiddenError('La autenticación por contraseña maestra no está configurada en este entorno.');
     }
 
