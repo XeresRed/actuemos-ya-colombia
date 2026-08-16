@@ -14,7 +14,7 @@ export function Navbar() {
     { label: 'Iniciativas', href: '/iniciativas' },
     { label: 'Búsqueda', href: '/busqueda' },
     { label: 'Voluntarios', href: '/voluntarios' },
-    { label: 'Admin', href: '/admin' },
+    { label: 'Recursos', href: '/recursos' },
   ];
 
   return (

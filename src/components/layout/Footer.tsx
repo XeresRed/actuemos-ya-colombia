@@ -40,6 +40,12 @@ export function Footer() {
               <li>
                 <Link href="/voluntarios" className="hover:text-primary transition-colors">Voluntariado Técnico</Link>
               </li>
+              <li>
+                <Link href="/recursos" className="hover:text-primary transition-colors font-medium">Recursos y Trámites</Link>
+              </li>
+              <li>
+                <Link href="/sobre-nosotros" className="hover:text-primary transition-colors font-semibold text-secondary">Sobre Nosotros</Link>
+              </li>
             </ul>
           </div>
 
