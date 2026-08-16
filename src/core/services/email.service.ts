@@ -1,3 +1,4 @@
+import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 
 export interface EmailOptions {
@@ -7,14 +8,27 @@ export interface EmailOptions {
   text?: string;
 }
 
+let resendClient: Resend | null = null;
+
+/**
+ * Obtiene o instancia de manera perezosa (lazy singleton) el cliente de Resend.
+ * Sigue la buena práctica de Vercel (server-hoist-static-io / singleton pattern).
+ */
+function getResend(apiKey: string): Resend {
+  if (!resendClient) {
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
+
 export const EmailService = {
   /**
    * Envía un correo electrónico transaccional.
    * Prioridad de despacho:
-   * 1. Resend API (`RESEND_API_KEY` o `re_...`)
-   * 2. MailerSend API (`MAILERSEND_API_KEY` o `mlsn...`)
-   * 3. SMTP Directo con Nodemailer (Gmail / Servidor dedicado)
-   * 4. Console Logger en desarrollo o testing.
+   * 1. Resend SDK Oficial (`RESEND_API_KEY` o `SMTP_PASS` con prefijo `re_`)
+   * 2. MailerSend API (`MAILERSEND_API_KEY` o `SMTP_PASS` con prefijo `mlsn.`)
+   * 3. Transporte SMTP Directo con Nodemailer (`smtp.resend.com` u otro servidor SMTP)
+   * 4. Console Logger en desarrollo o testing cuando no hay credenciales activas.
    */
   async sendEmail(options: EmailOptions): Promise<boolean> {
     const isProd = process.env.NODE_ENV === 'production';
@@ -23,14 +37,19 @@ export const EmailService = {
     const smtpHost = process.env.SMTP_HOST;
     const smtpUser = process.env.SMTP_USER;
     const apiKey = process.env.SMTP_PASS;
-    const fromEmail = process.env.EMAIL_FROM || process.env.SMTP_USER || 'onboarding@resend.dev';
+    
+    // Remitente predeterminado con nombre amigable
+    const defaultFrom = isProd
+      ? 'ActuemosYa Colombia <no-reply@actuemosyacolombia.org>'
+      : 'ActuemosYa Colombia <onboarding@resend.dev>';
+    const fromEmail = process.env.EMAIL_FROM || defaultFrom;
 
     const effectiveResendKey = resendKey || (apiKey && apiKey.startsWith('re_') ? apiKey : null);
     const effectiveMailerSendKey = mailerSendKey || (apiKey && apiKey.startsWith('mlsn.') ? apiKey : null);
     const hasSmtp = Boolean(smtpHost && smtpUser && apiKey);
 
     // En desarrollo o testing sin credenciales activas, mostramos el correo en consola
-    if (!isProd || (!effectiveResendKey && !effectiveMailerSendKey && !hasSmtp)) {
+    if (!effectiveResendKey && !effectiveMailerSendKey && !hasSmtp) {
       console.log('\n✉️ =================== [EMAIL SIMULADO (DEV/TEST)] ===================');
       console.log(`Para:    ${options.to}`);
       console.log(`De:      ${fromEmail}`);
@@ -41,26 +60,19 @@ export const EmailService = {
     }
 
     try {
-      // 1. Envío prioritario vía Resend API (3,000 correos/mes gratis)
+      // 1. Envío prioritario vía SDK oficial de Resend
       if (effectiveResendKey) {
-        const response = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${effectiveResendKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: fromEmail,
-            to: [options.to],
-            subject: options.subject,
-            html: options.html,
-            text: options.text || options.html.replace(/<[^>]+>/g, ' '),
-          }),
+        const resend = getResend(effectiveResendKey);
+        const { error } = await resend.emails.send({
+          from: fromEmail,
+          to: [options.to],
+          subject: options.subject,
+          html: options.html,
+          text: options.text || options.html.replace(/<[^>]+>/g, ' '),
         });
 
-        if (!response.ok) {
-          const errText = await response.text();
-          console.error('❌ [EmailService] Error enviando correo vía Resend:', errText);
+        if (error) {
+          console.error('❌ [EmailService] Error enviando correo vía Resend SDK:', error);
           return false;
         }
 
@@ -78,7 +90,7 @@ export const EmailService = {
           },
           body: JSON.stringify({
             from: {
-              email: fromEmail,
+              email: fromEmail.includes('<') ? fromEmail.replace(/.*<([^>]+)>.*/, '$1') : fromEmail,
               name: 'ActuemosYa Colombia',
             },
             to: [
@@ -101,7 +113,7 @@ export const EmailService = {
         return true;
       }
 
-      // 3. Envío vía SMTP Real con Nodemailer
+      // 3. Envío vía SMTP Real con Nodemailer (ej. smtp.resend.com puerto 587)
       if (hasSmtp && smtpHost && smtpUser && apiKey) {
         const port = parseInt(process.env.SMTP_PORT || '587', 10);
         const transporter = nodemailer.createTransport({
@@ -115,7 +127,7 @@ export const EmailService = {
         });
 
         await transporter.sendMail({
-          from: `"ActuemosYa Colombia" <${fromEmail}>`,
+          from: fromEmail,
           to: options.to,
           subject: options.subject,
           html: options.html,
