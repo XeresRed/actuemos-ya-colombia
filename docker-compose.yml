@@ -15,15 +15,18 @@ services:
     container_name: ayc-prod-app
     restart: unless-stopped
     env_file:
+      - path: .env.production
+        required: false
       - path: .env
         required: false
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - DATABASE_URL=/data/database.sqlite
       - APP_DOMAIN=${APP_DOMAIN:-actuemosyacolombia.org}
       - SESSION_SECRET=${SESSION_SECRET:-}
       - ADMIN_DEFAULT_EMAIL=${ADMIN_DEFAULT_EMAIL:-cam960210@gmail.com}
-      - AUTO_SEED=${AUTO_SEED:-false}
+      - AUTO_SEED=${AUTO_SEED:-true}
       - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-}
       - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}

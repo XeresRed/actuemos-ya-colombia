@@ -9,11 +9,16 @@ function runSeed() {
   // 1. Asegurar que las migraciones estén ejecutadas
   runMigrations();
 
-  const dbPath = process.env.DATABASE_URL || path.join(process.cwd(), 'data', 'database.sqlite');
+  const rawPath = process.env.DATABASE_URL || path.join(process.cwd(), 'data', 'database.sqlite');
+  const dbPath = path.isAbsolute(rawPath) ? rawPath : path.resolve(process.cwd(), rawPath);
   const dbDir = path.dirname(dbPath);
 
   if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
+    try {
+      fs.mkdirSync(dbDir, { recursive: true });
+    } catch {
+      // Ignorar si ya existe o es gestionado por volumen Docker
+    }
   }
 
   const db = new Database(dbPath);

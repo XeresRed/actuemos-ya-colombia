@@ -57,8 +57,8 @@ ENV DATABASE_URL=/data/database.sqlite
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Directorio de persistencia SQLite para el volumen bind
-RUN mkdir -p /data && chown -R nextjs:nodejs /data
+# Directorio de persistencia SQLite para el volumen bind y directorio de trabajo
+RUN mkdir -p /data /app && chown -R nextjs:nodejs /data /app
 
 # Copiar artefactos optimizados de Next.js Standalone
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public

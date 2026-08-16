@@ -3,9 +3,17 @@ set -e
 
 echo "🟢 [AYC Entrypoint] Iniciando contenedor ActuemosYaColombia..."
 
+# Asegurar que DATABASE_URL use la ruta absoluta del volumen montado (/data) en Docker
+if [ -z "$DATABASE_URL" ] || [ "$DATABASE_URL" = "./data/database.sqlite" ] || [ "$DATABASE_URL" = "data/database.sqlite" ]; then
+  export DATABASE_URL="/data/database.sqlite"
+fi
+
+DB_DIR=$(dirname "$DATABASE_URL")
+
 # Asegurar que el directorio de la base de datos exista
-DB_DIR=$(dirname "${DATABASE_URL:-/data/database.sqlite}")
-mkdir -p "$DB_DIR"
+if [ ! -d "$DB_DIR" ]; then
+  mkdir -p "$DB_DIR" 2>/dev/null || true
+fi
 
 # 1. Ejecutar migraciones automáticas de SQLite
 if [ -f "scripts/migrate.js" ]; then
