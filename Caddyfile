@@ -9,12 +9,12 @@
 }
 
 # Redirección canónica de www hacia el dominio raíz
-www.actuemosyacolombia.org {
-    redir https://actuemosyacolombia.org{uri} permanent
+www.{$APP_DOMAIN:actuayacolombia.org} {
+    redir https://{$APP_DOMAIN:actuayacolombia.org}{uri} permanent
 }
 
 # Dominio principal de producción y staging
-{$APP_DOMAIN:actuemosyacolombia.org} {
+{$APP_DOMAIN:actuayacolombia.org} {
     # Compresión dinámica para optimización de ancho de banda y velocidad (gzip & zstd)
     encode gzip zstd
 

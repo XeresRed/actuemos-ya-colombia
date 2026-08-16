@@ -55,7 +55,7 @@ export const AlertaService = {
       activa: dto.activa !== undefined ? dto.activa : true,
       enlaceAccionUrl: cleanUrl,
       enlaceAccionTexto: cleanActionText,
-      actualizadoPor: userEmail || 'admin@actuemosyacolombia.org',
+      actualizadoPor: userEmail || 'admin@actuayacolombia.org',
     });
   },
 

@@ -40,8 +40,8 @@ export const EmailService = {
     
     // Remitente predeterminado con nombre amigable
     const defaultFrom = isProd
-      ? 'ActuemosYa Colombia <no-reply@actuemosyacolombia.org>'
-      : 'ActuemosYa Colombia <onboarding@resend.dev>';
+      ? 'ActúaYa Colombia <no-reply@actuayacolombia.org>'
+      : 'ActúaYa Colombia <onboarding@resend.dev>';
     const fromEmail = process.env.EMAIL_FROM || defaultFrom;
 
     const effectiveResendKey = resendKey || (apiKey && apiKey.startsWith('re_') ? apiKey : null);

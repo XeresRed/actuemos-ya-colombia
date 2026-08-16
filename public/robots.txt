@@ -6,4 +6,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://actuemosyacolombia.org/sitemap.xml
+Sitemap: https://actuayacolombia.org/sitemap.xml
