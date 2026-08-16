@@ -153,6 +153,27 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleCloseIdea = async (id: string) => {
+    if (!confirm('¿Estás seguro de descartar y cerrar este borrador de propuesta?')) return;
+    setActionLoading(`idea-close-${id}`);
+    try {
+      const res = await fetch(`/api/ideas/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cerrar' }),
+      });
+      const json = await res.json();
+      if (json.ok) {
+        setBorradores(prev => prev.filter(b => b.id !== id));
+        showToast('Propuesta descartada y archivada en estado cerrada.');
+      }
+    } catch {
+      alert('Error al descartar propuesta.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   // Acciones de Voluntariado
   const handleApproveVoluntariado = async (id: string) => {
     setActionLoading(`vol-${id}`);
@@ -351,6 +372,40 @@ export default function AdminDashboardPage() {
       }
     } catch {
       alert('Error al actualizar estado.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRejectSupervisor = async (userId: string) => {
+    if (!confirm('¿Estás seguro de rechazar y remover esta postulación de supervisor?')) return;
+    setActionLoading(`user-del-${userId}`);
+    try {
+      const res = await fetch(`/api/usuarios/${userId}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.ok) {
+        setUsuarios(prev => prev.filter(u => u.id !== userId));
+        showToast('Postulación rechazada y eliminada.');
+      }
+    } catch {
+      alert('Error al rechazar postulación.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteSupervisor = async (userId: string) => {
+    if (!confirm('¿Estás seguro de eliminar permanentemente a este supervisor del equipo?')) return;
+    setActionLoading(`user-del-${userId}`);
+    try {
+      const res = await fetch(`/api/usuarios/${userId}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.ok) {
+        setUsuarios(prev => prev.filter(u => u.id !== userId));
+        showToast('Supervisor revocado y eliminado del sistema.');
+      }
+    } catch {
+      alert('Error al eliminar supervisor.');
     } finally {
       setActionLoading(null);
     }
@@ -567,6 +622,14 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      disabled={actionLoading === `idea-close-${item.id}`}
+                      onClick={() => handleCloseIdea(item.id)}
+                      className="px-3 py-1.5 border border-outline text-error font-label-md text-xs font-bold rounded hover:bg-error-container transition-colors disabled:opacity-50"
+                    >
+                      {actionLoading === `idea-close-${item.id}` ? 'Descartando...' : 'Descartar'}
+                    </button>
                     <button
                       type="button"
                       disabled={actionLoading === `idea-${item.id}`}
@@ -983,12 +1046,20 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
+                        disabled={actionLoading === `user-del-${user.id}`}
+                        onClick={() => handleRejectSupervisor(user.id)}
+                        className="px-3 py-2 border border-outline text-error font-label-md text-xs font-bold rounded hover:bg-error-container transition-colors disabled:opacity-50"
+                      >
+                        {actionLoading === `user-del-${user.id}` ? 'Rechazando...' : 'Rechazar'}
+                      </button>
+                      <button
+                        type="button"
                         disabled={actionLoading === `user-${user.id}`}
                         onClick={() => handleApproveSupervisor(user.id)}
                         className="px-4 py-2 bg-green-700 text-white font-label-md text-xs font-bold uppercase rounded hover:bg-green-800 transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
                       >
                         <span className="material-symbols-outlined text-sm">how_to_reg</span>
-                        <span>Aprobar y Enviar Enlace</span>
+                        <span>{actionLoading === `user-${user.id}` ? 'Activando...' : 'Aprobar y Enviar Enlace'}</span>
                       </button>
                     </div>
                   </div>
@@ -1021,14 +1092,25 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {user.id !== currentUser.id ? (
-                    <button
-                      type="button"
-                      disabled={actionLoading === `user-${user.id}`}
-                      onClick={() => handleToggleSupervisorStatus(user.id, user.activo)}
-                      className="px-3 py-1 border border-outline text-error font-label-sm text-xs rounded hover:bg-error-container transition-colors disabled:opacity-50"
-                    >
-                      Pausar Acceso
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={actionLoading === `user-${user.id}`}
+                        onClick={() => handleToggleSupervisorStatus(user.id, user.activo)}
+                        className="px-3 py-1 border border-outline text-amber-700 font-label-sm text-xs rounded hover:bg-amber-100 transition-colors disabled:opacity-50"
+                      >
+                        {user.activo ? 'Pausar Acceso' : 'Reactivar'}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={actionLoading === `user-del-${user.id}`}
+                        onClick={() => handleDeleteSupervisor(user.id)}
+                        className="px-2.5 py-1 border border-outline text-error font-label-sm text-xs rounded hover:bg-error-container transition-colors disabled:opacity-50"
+                        title="Eliminar usuario"
+                      >
+                        Revocar
+                      </button>
+                    </div>
                   ) : (
                     <span className="text-[11px] text-on-surface-variant italic">(Tu usuario actual)</span>
                   )}

@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { TurnstileWidget } from '../../../components/ui/TurnstileWidget';
 
 export default function SupervisorRegisterPage() {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [organizacion, setOrganizacion] = useState('');
   const [motivacion, setMotivacion] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string>('dev-token');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function SupervisorRegisterPage() {
           email,
           organizacion: organizacion || null,
           motivacion,
-          captchaToken: 'dev-token',
+          captchaToken,
         }),
       });
 
@@ -155,6 +157,9 @@ export default function SupervisorRegisterPage() {
                 minLength={10}
               />
             </div>
+
+            {/* Cloudflare Turnstile Anti-bot Protection */}
+            <TurnstileWidget onSuccess={(token) => setCaptchaToken(token)} />
 
             <button
               type="submit"

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import type { Voluntariado, TipoVoluntariado } from '../../core/domain/voluntariado';
+import { TurnstileWidget } from '../../components/ui/TurnstileWidget';
 
 const AREAS_PROFESIONALES = [
   'Operario de Drones / Sensores Térmicos',
@@ -36,6 +37,7 @@ export default function VoluntariosMatchingPage() {
   const [ubicacion, setUbicacion] = useState('');
   const [esMayorDeEdad, setEsMayorDeEdad] = useState(false);
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string>('dev-token');
 
   const [formLoading, setFormLoading] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
@@ -96,7 +98,7 @@ export default function VoluntariosMatchingPage() {
           ubicacion: ubicacion || null,
           esMayorDeEdad: true,
           aceptaTerminos: true,
-          captchaToken: 'dev-token',
+          captchaToken,
         }),
       });
 
@@ -399,6 +401,9 @@ export default function VoluntariosMatchingPage() {
                       </label>
                     </div>
                   </div>
+
+                  {/* Cloudflare Turnstile Verification */}
+                  <TurnstileWidget onSuccess={(token) => setCaptchaToken(token)} />
 
                   <button
                     type="submit"

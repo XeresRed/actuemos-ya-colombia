@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { TurnstileWidget } from '../../../components/ui/TurnstileWidget';
 
 export default function PublicarNuevaIdeaPage() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function PublicarNuevaIdeaPage() {
   const [alcanceDetalle, setAlcanceDetalle] = useState('');
   const [iniciativaExistenteUrl, setIniciativaExistenteUrl] = useState('');
   const [descripcionMarkdown, setDescripcionMarkdown] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string>('dev-token');
 
   // Estados de proceso
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,7 @@ export default function PublicarNuevaIdeaPage() {
           iniciativaExistenteUrl: iniciativaExistenteUrl || null,
           esAnonimo: authorship === 'anonymous',
           emailCreador: authorship === 'verified' ? email : null,
-          captchaToken: 'dev-token',
+          captchaToken,
         }),
       });
 
@@ -380,6 +382,9 @@ export default function PublicarNuevaIdeaPage() {
                 Puedes usar formato Markdown: **negrita**, *cursiva*, listas (#, -, 1.) y enlaces.
               </p>
             </div>
+
+            {/* Cloudflare Turnstile Verification */}
+            <TurnstileWidget onSuccess={(token) => setCaptchaToken(token)} />
           </section>
 
           {/* Action buttons */}

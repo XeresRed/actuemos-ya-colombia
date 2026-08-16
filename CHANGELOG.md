@@ -5,6 +5,22 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.0.2-beta-2] - 2026-08-16
+
+### Agregado
+- **Acciones de Descarte y Cierre en Panel Administrativo (REQ-01):**
+  - Botón *"Descartar / Cerrar"* en la pestaña de Borradores de Ideas de `/admin`, archivando propuestas inviables como `cerrada` y retirándolas de la cola de revisión.
+  - Botón *"Rechazar Postulación"* en la pestaña de Supervisores de `/admin`, permitiendo a los administradores descartar y eliminar postulantes inactivos.
+  - Botón *"Revocar / Eliminar"* en el listado de Supervisores Activos para retirar permisos de acceso.
+
+- **Protección Anti-Bot con Cloudflare Turnstile (REQ-02):**
+  - Componente oficial [`TurnstileWidget.tsx`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/components/ui/TurnstileWidget.tsx) con inyección asíncrona del script y soporte para `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
+  - Verificación robusta en backend [`CaptchaService.ts`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/core/services/captcha.service.ts) contra el endpoint oficial `https://challenges.cloudflare.com/turnstile/v0/siteverify` con fallback a Google reCAPTCHA.
+  - Integración en los formularios públicos: Postulación de Moderadores (`/admin/registro`), Publicación de Ideas (`/ideas/nueva`), Voluntariado Profesional (`/voluntarios`) y Debate Comunitario (`/ideas/[id]`).
+  - Bypass seguro en entorno de desarrollo local y suites de prueba.
+
+---
+
 ## [0.0.2-beta-1] - 2026-08-16
 
 ### Agregado

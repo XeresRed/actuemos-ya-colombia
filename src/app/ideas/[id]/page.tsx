@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Idea, IdeaEstado } from '../../../core/domain/idea';
 import type { ComentarioConRespuestas } from '../../../core/domain/comentario';
+import { TurnstileWidget } from '../../../components/ui/TurnstileWidget';
 
 interface IdeaDetailPageProps {
   params: {
@@ -22,6 +23,7 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
   const [autorEmail, setAutorEmail] = useState('');
   const [isAnonimo, setIsAnonimo] = useState(true);
   const [replyToId, setReplyToId] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string>('dev-token');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -77,7 +79,7 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
           contenidoMarkdown: commentText,
           esAnonimo: isAnonimo,
           autorEmail: !isAnonimo && autorEmail ? autorEmail : null,
-          captchaToken: 'dev-token',
+          captchaToken,
         }),
       });
 
@@ -340,20 +342,21 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
                   type="email"
                   value={autorEmail}
                   onChange={(e) => setAutorEmail(e.target.value)}
-                  placeholder="tu.correo@ejemplo.com"
-                  className="bg-surface border border-outline-variant rounded px-2.5 py-1 text-xs outline-none"
-                  required
                 />
               ) : null}
             </div>
 
-            <button
-              type="submit"
-              disabled={submittingComment}
-              className="bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase px-5 py-2.5 rounded-lg hover:bg-secondary-container transition-colors active:scale-95 disabled:opacity-50"
-            >
-              {submittingComment ? 'Publicando...' : 'Publicar Comentario'}
-            </button>
+            {/* Cloudflare Turnstile Verification */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+              <TurnstileWidget onSuccess={(token) => setCaptchaToken(token)} className="my-0" />
+              <button
+                type="submit"
+                disabled={submittingComment}
+                className="bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase px-5 py-2.5 rounded-lg hover:bg-secondary-container transition-colors active:scale-95 disabled:opacity-50 shrink-0 ml-auto"
+              >
+                {submittingComment ? 'Publicando...' : 'Publicar Comentario'}
+              </button>
+            </div>
           </div>
         </form>
 
