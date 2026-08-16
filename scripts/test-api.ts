@@ -11,6 +11,8 @@ import { GET as getBusqueda, POST as postBusqueda } from '../src/app/api/busqued
 import { GET as getVoluntarios, POST as postVoluntario } from '../src/app/api/voluntarios/route';
 import { GET as matchVoluntarios } from '../src/app/api/voluntarios/match/route';
 import { GET as getAlertas, POST as postAlerta } from '../src/app/api/alertas/route';
+import { PATCH as patchAlerta, DELETE as deleteAlerta } from '../src/app/api/alertas/[id]/route';
+import { DELETE as deleteIniciativa } from '../src/app/api/iniciativas/[id]/route';
 import { POST as requestMagicLink } from '../src/app/api/auth/magic-link/request/route';
 import { POST as verifyMagicLink } from '../src/app/api/auth/magic-link/verify/route';
 import { GET as getSessionRoute } from '../src/app/api/auth/session/route';
@@ -158,12 +160,22 @@ async function runApiTests() {
     }),
   });
   const postIniRes = await postIniciativa(postIniReq);
+  const postIniJson = await postIniRes.json() as any;
   assert(postIniRes.status === 201, 'Registra organismo oficial con HTTP 201');
 
   const getOficialesReq = new NextRequest('http://localhost:3000/api/iniciativas?oficiales=true');
   const getOficialesRes = await getIniciativas(getOficialesReq);
   const getOficialesJson = await getOficialesRes.json() as any;
   assert(getOficialesRes.status === 200 && getOficialesJson.data.length >= 1, 'Consulta organismos oficiales prioritarios');
+
+  const delIniReq = new NextRequest(`http://localhost:3000/api/iniciativas/${postIniJson.data.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${adminToken}`,
+    },
+  });
+  const delIniRes = await deleteIniciativa(delIniReq, { params: { id: postIniJson.data.id } });
+  assert(delIniRes.status === 200, 'Elimina iniciativa con HTTP 200');
 
   // 5. Tests /api/busqueda
   console.log('\n🔹 Probando /api/busqueda (Reportes Humanitarios)...');
@@ -222,7 +234,7 @@ async function runApiTests() {
   const matchJson = await matchRes.json() as any;
   assert(matchRes.status === 200 && matchJson.data.ofertas.length >= 1, 'Endpoint de matching retorna ofertas');
 
-  // 7. Tests /api/alertas (Emergency Banner)
+  // 7. Tests /api/alertas (Emergency Banner y Carrusel)
   console.log('\n🔹 Probando /api/alertas...');
   const postAlertReq = new NextRequest('http://localhost:3000/api/alertas', {
     method: 'POST',
@@ -237,12 +249,34 @@ async function runApiTests() {
     }),
   });
   const postAlertRes = await postAlerta(postAlertReq);
+  const postAlertJson = await postAlertRes.json() as any;
   assert(postAlertRes.status === 201, 'Emite alerta de crisis con HTTP 201');
 
   const getAlertReq = new NextRequest('http://localhost:3000/api/alertas');
-  const getAlertRes = await getAlertas();
+  const getAlertRes = await getAlertas(getAlertReq);
   const getAlertJson = await getAlertRes.json() as any;
-  assert(getAlertRes.status === 200 && getAlertJson.data.activa === true, 'GET /api/alertas retorna alerta activa');
+  assert(getAlertRes.status === 200 && getAlertJson.data.alertas.length >= 1, 'GET /api/alertas retorna lista de alertas activas para el carrusel');
+
+  // Pausar y reactivar alerta
+  const patchAlertReq = new NextRequest(`http://localhost:3000/api/alertas/${postAlertJson.data.id}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${adminToken}`,
+    },
+    body: JSON.stringify({ activa: false }),
+  });
+  const patchAlertRes = await patchAlerta(patchAlertReq, { params: { id: postAlertJson.data.id } });
+  assert(patchAlertRes.status === 200, 'Pausa alerta con HTTP 200');
+
+  // Eliminar alerta
+  const delAlertReq = new NextRequest(`http://localhost:3000/api/alertas/${postAlertJson.data.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${adminToken}`,
+    },
+  });
+  const delAlertRes = await deleteAlerta(delAlertReq, { params: { id: postAlertJson.data.id } });
+  assert(delAlertRes.status === 200, 'Elimina alerta con HTTP 200');
 
   // 8. Tests /api/auth/session
   console.log('\n🔹 Probando /api/auth/session...');

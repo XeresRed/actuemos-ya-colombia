@@ -99,11 +99,16 @@ export const IniciativaService = {
   },
 
   /**
-   * Elimina una iniciativa activa (solo administradores).
+   * Elimina una iniciativa activa (administradores y supervisores).
    */
   deleteInitiative(id: string, userRole?: UsuarioRol): boolean {
-    if (userRole !== 'admin') {
-      throw new ForbiddenError('Solo administradores pueden eliminar iniciativas.');
+    if (!userRole || (userRole !== 'admin' && userRole !== 'supervisor')) {
+      throw new ForbiddenError('Solo moderadores autorizados pueden eliminar iniciativas.');
+    }
+
+    const existing = IniciativaRepository.findById(id);
+    if (!existing) {
+      throw new NotFoundError(`Iniciativa con ID '${id}' no encontrada.`);
     }
 
     return IniciativaRepository.delete(id);

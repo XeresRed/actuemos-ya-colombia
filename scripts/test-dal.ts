@@ -215,18 +215,23 @@ async function runTests() {
   const activeAlert = AlertaRepository.getActive(db);
   assert(activeAlert !== null && activeAlert.id === alert1.id, 'getActive obtiene alerta crítica activa');
 
-  // Crear segunda alerta activa y verificar que desactiva la anterior atómicamente
+  // Crear segunda alerta activa y verificar que coexisten como carrusel
   const alert2 = AlertaRepository.create({
     nivel: 'informativa',
     mensaje: 'Comités de rescate operando en normalidad.',
     activa: true,
   }, db);
 
-  const newActive = AlertaRepository.getActive(db);
-  assert(newActive !== null && newActive.id === alert2.id, 'Segunda alerta activa reemplaza a la primera');
+  const allActive = AlertaRepository.getActiveAlerts(10, db);
+  assert(allActive.length === 2, 'Múltiples alertas activas coexisten en el sistema');
+  assert(allActive[0].id === alert2.id && allActive[1].id === alert1.id, 'Alertas ordenadas por fecha reciente');
 
-  const oldAlert = AlertaRepository.findById(alert1.id, db);
-  assert(oldAlert !== null && oldAlert.activa === false, 'Alerta previa queda desactivada');
+  AlertaRepository.setActive(alert1.id, false, db);
+  const activeAfterPause = AlertaRepository.getActiveAlerts(10, db);
+  assert(activeAfterPause.length === 1 && activeAfterPause[0].id === alert2.id, 'Pausar alerta 1 deja solo alerta 2 activa');
+
+  AlertaRepository.delete(alert1.id, db);
+  assert(AlertaRepository.findById(alert1.id, db) === null, 'Alerta eliminada correctamente');
 
   AlertaRepository.deactivateAll(db);
   assert(AlertaRepository.getActive(db) === null, 'deactivateAll desactiva todas las alertas');

@@ -89,6 +89,14 @@ export const CreateAlertaSchema = z.object({
   enlaceAccionTexto: z.string().max(100).optional().nullable(),
 });
 
+export const PatchAlertaSchema = z.object({
+  activa: z.boolean().optional(),
+  nivel: z.enum(['critica', 'alerta_naranja', 'informativa']).optional(),
+  mensaje: z.string().min(10).max(500).optional(),
+  enlaceAccionUrl: z.string().optional().nullable(),
+  enlaceAccionTexto: z.string().max(100).optional().nullable(),
+});
+
 export const RequestMagicLinkSchema = z.object({
   email: z.string().email('Debe proporcionar un correo electrónico válido'),
 });

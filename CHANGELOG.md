@@ -5,6 +5,23 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.0.2-beta-1] - 2026-08-16
+
+### Agregado
+- **Gestión de Alertas de Crisis y Carrusel Rotativo Global (REQ-01, REQ-02):**
+  - Módulo de control de alertas en `/admin` restringido exclusivamente al rol `admin`.
+  - Soporte para **múltiples alertas activas simultáneas** rotando suavemente en un carrusel dinámico cada 6 segundos en [`EmergencyBanner.tsx`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/components/layout/EmergencyBanner.tsx).
+  - Pausa automática de rotación al hacer hover, controles táctiles y flechas anterior/siguiente con indicador de posición.
+  - Estilización y contraste adaptativo según nivel de riesgo: `critica` (🔴 rojo emergencia), `alerta_naranja` (🟠 ámbar advertencia), `informativa` (🔵 azul institucional).
+  - Conservación permanente y fija del enlace oficial de la **UNGRD** y del desplegable de **Líneas de Emergencia Nacionales** (123, 132, 144, 119, 165) con marcación directa telefónica.
+  - Switch interactivo para alternar estado Activa/Pausada en 1 clic (`PATCH /api/alertas/[id]`) y eliminación permanente (`DELETE /api/alertas/[id]`).
+
+- **Directorio y Gestión de Iniciativas Activas Anti-Duplicación (REQ-03, REQ-04):**
+  - Módulo de creación y administración de iniciativas activas en `/admin` disponible para administradores y supervisores (`POST /api/iniciativas`, `DELETE /api/iniciativas/[id]`).
+  - Conexión en tiempo real del directorio público [`/iniciativas`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/app/iniciativas) a la base de datos con filtros por pestañas (*Todas*, *Organismos Oficiales 🏛️*, *ONGs 🌐*, *Colectivos Ciudadanos 🤝*), buscador en tiempo real y enlaces oficiales de articulación.
+
+---
+
 ## [0.0.1-beta-5] - 2026-08-15
 
 ### Agregado

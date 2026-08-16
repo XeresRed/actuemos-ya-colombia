@@ -251,7 +251,7 @@ async function runTests() {
   assert(matches.demandas.length >= 1, 'Matching encuentra demandas de psicología activas');
 
   // 8. AlertaService Tests
-  console.log('\n🔹 Probando AlertaService (Banner de Crisis)...');
+  console.log('\n🔹 Probando AlertaService (Banner de Crisis y Carrusel)...');
   const alert = AlertaService.broadcastAlert({
     nivel: 'critica',
     mensaje: 'ALERTA CRÍTICA: Desastre natural activo. Evacuar zonas de ladera.',
@@ -262,11 +262,23 @@ async function runTests() {
   assert(alert.activa === true, 'Emite alerta activa');
   assert(alert.nivel === 'critica', 'Nivel de alerta es crítica');
 
-  const activeAlert = AlertaService.getActiveAlert();
-  assert(activeAlert !== null && activeAlert.id === alert.id, 'getActiveAlert retorna la alerta activa');
+  const alert2 = AlertaService.broadcastAlert({
+    nivel: 'alerta_naranja',
+    mensaje: 'ALERTA NARANJA: Albergues habilitados en Popayán.',
+  }, 'admin', 'admin@actuemosya.org');
 
-  AlertaService.deactivateCurrentAlert('supervisor');
-  assert(AlertaService.getActiveAlert() === null, 'Desactiva alerta correctamente');
+  const activeAlerts = AlertaService.getActiveAlerts();
+  assert(activeAlerts.some(a => a.id === alert.id) && activeAlerts.some(a => a.id === alert2.id), 'getActiveAlerts retorna todas las alertas activas para el carrusel');
+
+  AlertaService.toggleAlertStatus(alert.id, false, 'admin', 'admin@actuemosya.org');
+  const activeAfterPause = AlertaService.getActiveAlerts();
+  assert(!activeAfterPause.some(a => a.id === alert.id) && activeAfterPause.some(a => a.id === alert2.id), 'Pausar alerta actualiza el carrusel');
+
+  AlertaService.deleteAlert(alert.id, 'admin');
+  assert(!AlertaService.listAlertHistory(50, 'admin').some(a => a.id === alert.id), 'Elimina alerta correctamente');
+
+  // Eliminación de iniciativa
+  IniciativaService.deleteInitiative(officialInit.id, 'admin');
 
   console.log('\n✨ ¡Todas las pruebas unitarias de los Servicios de Negocio (Core Services) pasaron exitosamente (100% OK)!');
 }

@@ -38,11 +38,22 @@ export const AlertaRepository = {
     const stmt = db.prepare(`
       SELECT * FROM alertas_sistema 
       WHERE activa = 1 
-      ORDER BY actualizado_en DESC 
+      ORDER BY actualizado_en DESC, rowid DESC 
       LIMIT 1
     `);
     const row = stmt.get() as AlertaRow | undefined;
     return row ? mapRowToAlerta(row) : null;
+  },
+
+  getActiveAlerts(limit = 10, db: Database.Database = getDb()): AlertaSistema[] {
+    const stmt = db.prepare(`
+      SELECT * FROM alertas_sistema 
+      WHERE activa = 1 
+      ORDER BY actualizado_en DESC, rowid DESC 
+      LIMIT ?
+    `);
+    const rows = stmt.all(limit) as AlertaRow[];
+    return rows.map(mapRowToAlerta);
   },
 
   findById(id: string, db: Database.Database = getDb()): AlertaSistema | null {
@@ -51,8 +62,8 @@ export const AlertaRepository = {
     return row ? mapRowToAlerta(row) : null;
   },
 
-  findMany(limit = 10, db: Database.Database = getDb()): AlertaSistema[] {
-    const stmt = db.prepare('SELECT * FROM alertas_sistema ORDER BY actualizado_en DESC LIMIT ?');
+  findMany(limit = 50, db: Database.Database = getDb()): AlertaSistema[] {
+    const stmt = db.prepare('SELECT * FROM alertas_sistema ORDER BY actualizado_en DESC, rowid DESC LIMIT ?');
     const rows = stmt.all(limit) as AlertaRow[];
     return rows.map(mapRowToAlerta);
   },
@@ -62,30 +73,21 @@ export const AlertaRepository = {
     const nivel: NivelAlerta = dto.nivel || 'critica';
     const activa = dto.activa !== undefined ? (dto.activa ? 1 : 0) : 1;
 
-    // Si se activa esta alerta, desactivamos las anteriores en una transacción
-    const createTx = db.transaction(() => {
-      if (activa === 1) {
-        db.prepare('UPDATE alertas_sistema SET activa = 0 WHERE activa = 1').run();
-      }
+    const stmt = db.prepare(`
+      INSERT INTO alertas_sistema (
+        id, nivel, mensaje, activa, enlace_accion_url, enlace_accion_texto, actualizado_por
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
 
-      const stmt = db.prepare(`
-        INSERT INTO alertas_sistema (
-          id, nivel, mensaje, activa, enlace_accion_url, enlace_accion_texto, actualizado_por
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-      `);
-
-      stmt.run(
-        id,
-        nivel,
-        dto.mensaje,
-        activa,
-        dto.enlaceAccionUrl ?? null,
-        dto.enlaceAccionTexto ?? null,
-        dto.actualizadoPor ?? null
-      );
-    });
-
-    createTx();
+    stmt.run(
+      id,
+      nivel,
+      dto.mensaje,
+      activa,
+      dto.enlaceAccionUrl ?? null,
+      dto.enlaceAccionTexto ?? null,
+      dto.actualizadoPor ?? null
+    );
 
     const created = this.findById(id, db);
     if (!created) {
@@ -135,15 +137,8 @@ export const AlertaRepository = {
     fields.push('actualizado_en = CURRENT_TIMESTAMP');
     params.push(id);
 
-    const updateTx = db.transaction(() => {
-      if (dto.activa === true) {
-        db.prepare('UPDATE alertas_sistema SET activa = 0 WHERE id != ?').run(id);
-      }
-      const stmt = db.prepare(`UPDATE alertas_sistema SET ${fields.join(', ')} WHERE id = ?`);
-      stmt.run(...params);
-    });
-
-    updateTx();
+    const stmt = db.prepare(`UPDATE alertas_sistema SET ${fields.join(', ')} WHERE id = ?`);
+    stmt.run(...params);
 
     return this.findById(id, db)!;
   },

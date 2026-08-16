@@ -15,19 +15,26 @@ import type { UsuarioRol } from '../domain/usuario';
 
 export const AlertaService = {
   /**
-   * Obtiene la alerta de crisis actualmente activa para el EmergencyBanner global.
+   * Obtiene todas las alertas de crisis actualmente activas para el EmergencyBanner global.
+   */
+  getActiveAlerts(): AlertaSistema[] {
+    return AlertaRepository.getActiveAlerts();
+  },
+
+  /**
+   * Obtiene la alerta activa más reciente (compatibilidad).
    */
   getActiveAlert(): AlertaSistema | null {
     return AlertaRepository.getActive();
   },
 
   /**
-   * Emite una nueva alerta de emergencia comunitaria (exclusivo para moderadores/admins).
-   * Desactiva automáticamente cualquier alerta previa para mantener un solo foco de atención.
+   * Emite una nueva alerta de emergencia comunitaria (exclusivo para administradores).
+   * Permite múltiples alertas activas en el carrusel de emergencia.
    */
   broadcastAlert(dto: CreateAlertaDTO, userRole?: UsuarioRol, userEmail?: string): AlertaSistema {
-    if (!userRole || (userRole !== 'admin' && userRole !== 'supervisor')) {
-      throw new ForbiddenError('Solo administradores y supervisores pueden emitir alertas de emergencia.');
+    if (!userRole || userRole !== 'admin') {
+      throw new ForbiddenError('Solo los administradores pueden emitir alertas de emergencia.');
     }
 
     if (!dto.mensaje || dto.mensaje.trim().length < 10) {
@@ -48,7 +55,7 @@ export const AlertaService = {
       activa: dto.activa !== undefined ? dto.activa : true,
       enlaceAccionUrl: cleanUrl,
       enlaceAccionTexto: cleanActionText,
-      actualizadoPor: userEmail || 'moderacion@actuemosya.org',
+      actualizadoPor: userEmail || 'admin@actuemosyacolombia.org',
     });
   },
 
@@ -56,8 +63,8 @@ export const AlertaService = {
    * Modifica una alerta existente.
    */
   updateAlert(id: string, dto: UpdateAlertaDTO, userRole?: UsuarioRol, userEmail?: string): AlertaSistema {
-    if (!userRole || (userRole !== 'admin' && userRole !== 'supervisor')) {
-      throw new ForbiddenError('Solo moderadores autorizados pueden actualizar alertas.');
+    if (!userRole || userRole !== 'admin') {
+      throw new ForbiddenError('Solo los administradores pueden modificar alertas.');
     }
 
     const existing = AlertaRepository.findById(id);
@@ -75,11 +82,38 @@ export const AlertaService = {
   },
 
   /**
+   * Alterna el estado activo/pausado de una alerta en 1 clic.
+   */
+  toggleAlertStatus(id: string, activa: boolean, userRole?: UsuarioRol, userEmail?: string): AlertaSistema {
+    if (!userRole || userRole !== 'admin') {
+      throw new ForbiddenError('Solo los administradores pueden activar o pausar alertas.');
+    }
+
+    return this.updateAlert(id, { activa }, userRole, userEmail);
+  },
+
+  /**
+   * Elimina una alerta del sistema (exclusivo para administradores).
+   */
+  deleteAlert(id: string, userRole?: UsuarioRol): boolean {
+    if (!userRole || userRole !== 'admin') {
+      throw new ForbiddenError('Solo los administradores pueden eliminar alertas.');
+    }
+
+    const existing = AlertaRepository.findById(id);
+    if (!existing) {
+      throw new NotFoundError(`Alerta con ID '${id}' no encontrada.`);
+    }
+
+    return AlertaRepository.delete(id);
+  },
+
+  /**
    * Desactiva todas las alertas activas (retorno a estado de normalidad).
    */
   deactivateCurrentAlert(userRole?: UsuarioRol): boolean {
-    if (!userRole || (userRole !== 'admin' && userRole !== 'supervisor')) {
-      throw new ForbiddenError('Solo moderadores autorizados pueden desactivar alertas.');
+    if (!userRole || userRole !== 'admin') {
+      throw new ForbiddenError('Solo los administradores pueden desactivar todas las alertas.');
     }
 
     AlertaRepository.deactivateAll();
@@ -87,11 +121,11 @@ export const AlertaService = {
   },
 
   /**
-   * Consulta el historial de alertas emitidas.
+   * Consulta el listado completo de alertas (para panel de administración).
    */
-  listAlertHistory(limit = 10, userRole?: UsuarioRol): AlertaSistema[] {
-    if (!userRole || (userRole !== 'admin' && userRole !== 'supervisor')) {
-      throw new ForbiddenError('Acceso restringido al historial de alertas.');
+  listAlertHistory(limit = 50, userRole?: UsuarioRol): AlertaSistema[] {
+    if (!userRole || userRole !== 'admin') {
+      throw new ForbiddenError('Acceso restringido a la gestión de alertas.');
     }
 
     return AlertaRepository.findMany(limit);
