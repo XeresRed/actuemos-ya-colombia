@@ -5,7 +5,77 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
-## [0.0.3-beta-1] - 2026-08-16
+## [0.2.0-beta] - 2026-08-16
+
+### Agregado
+- **Integración Global y Dinamización del Hub Principal (`/`) (REQ-01):**
+  - Conexión del Hub de Emergencia en tiempo real a la base de datos de propuestas comunitarias con renderizado dinámico de ideas en acción, promovidas y abiertas (`/api/ideas?limit=4&order=desc`).
+  - Barra de búsqueda global unificada con redirección directa a los listados filtrados.
+  - Cuadrícula de accesos directos de alta prioridad de 6 módulos:
+    1. 💡 *Proponer Solución* (`/ideas/nueva`)
+    2. 🔍 *Buscar Personas / Mascotas* (`/busqueda` ➔ ColombiaTeBusca + MiGenteVe)
+    3. 🏛️ *Trámites de Alcaldía (RUD)* (`/recursos`)
+    4. 🤝 *Talento Técnico* (`/voluntarios`)
+    5. 🌐 *Iniciativas Activas* (`/iniciativas`)
+    6. 💬 *Muro Comunitario* (`/ideas`)
+  - Barra de marcado telefónico directo 24/7 a Línea 123 (Emergencias), 132 (Cruz Roja), 144 (Defensa Civil) y Medicina Legal.
+  - Tarjetas de articulación prioritaria de búsqueda humanitaria y canales oficiales del Estado Colombiano (UNGRD, RUV, Cruz Roja RCF, Defensa Civil).
+
+---
+
+## [0.1.0-beta] - 2026-08-16
+
+### Agregado
+- **Página Institucional: Sobre Nosotros (`/sobre-nosotros`) (REQ-01):**
+  - Misión, origen y principio cívico de anti-duplicación ante emergencias en Colombia.
+  - Declaración explícita de Neutralidad Cívica y Apolitismo (plataforma comunitaria 100% independiente, apolítica y sin fines comerciales).
+  - Perfiles de los fundadores: **Juan Camilo Castaño Bonilla** (Desarrollador Senior de Software) y **Juan David Nuñez Aljure** (Articulación Comunitaria & Data Analyst) con enlaces a LinkedIn.
+  - Filosofía de código abierto bajo licencia MIT (*"Todos unidos hacemos más"*).
+  - Enlazado exclusivamente en el pie de página (`Footer`).
+
+- **Guías Cívicas y Trámites de Alcaldía: Recursos (`/recursos`) (REQ-02):**
+  - Repositorio interactivo con 5 guías paso a paso de trámites clave ante entidades públicas en emergencias:
+    1. *Registro Único de Damnificados (RUD — UNGRD / Alcaldías)*.
+    2. *Certificados Médicos y Registro Civil de Defunción por Desastre (RUAF-ND / Notarías / Medicina Legal)*.
+    3. *Declaración y Registro Único de Víctimas (RUV — Unidad para las Víctimas)*.
+    4. *Subsidio de Arrendamiento Temporal y Asistencia Habitacional*.
+    5. *Directorio y Descarga de Formatos Oficiales y Circulares*.
+  - Buscador interactivo por palabra clave y filtrado por pestañas temáticas.
+  - Advertencia anti-fraude destacada sobre la total gratuidad de los trámites ante el Estado.
+
+- **Reorganización de la Barra de Navegación (REQ-03):**
+  - Se retiró el acceso directo de `Admin` del menú superior `Navbar`.
+  - Se agregó el enlace directo a `/recursos` en `Navbar` y `Footer`.
+  - Los accesos de administración (`/admin/login` y `/admin/registro`) permanecen accesibles en el `Footer`.
+
+---
+
+## [0.0.4-beta] - 2026-08-16
+
+### Agregado
+- **Paginación Progresiva y Filtros Cronológicos Globales (REQ-01, REQ-02):**
+  - Carga progresiva por lotes con botón *"Cargar Más"* e indicador de conteo en vistas públicas: Directorio de Iniciativas (`/iniciativas`), Banco de Talento (`/voluntarios`) y Banco de Ideas (`/ideas`).
+  - Buscador global conectado en backend (`?search=...`) con *debounce* de 350 ms.
+  - Selector de orden cronológico (`Más recientes primero` / `Más antiguos primero`) en todas las vistas públicas.
+  - Paginador numérico clásico (`< Anterior`, `Página X de Y`, `Siguiente >`) con selector de orden FIFO/LIFO en todas las pestañas de `/admin` (Borradores, Voluntariados, Iniciativas, Alertas y Supervisores).
+
+### Corregido
+- **Filtros por Categoría en Directorio de Iniciativas (`BUG-01`):**
+  - Corrección de discrepancias en `src/db/seed.ts` y en el repositorio DAL (`IniciativaRepository.findMany`), permitiendo que las pestañas *ONGs y Fundaciones* y *Colectivos y Brigadas* filtren correctamente las iniciativas activas.
+
+---
+
+## [0.0.3-beta-2] - 2026-08-16
+
+### Agregado
+- **Integración Oficial del SDK de Resend y Vercel Best Practices:**
+  - Adición del paquete oficial `resend` en backend [`src/core/services/email.service.ts`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/core/services/email.service.ts).
+  - Implementación del patrón singleton lazy (`getResend(apiKey)`) para evitar re-instanciaciones innecesarias por solicitud.
+  - Soporte transparente para `RESEND_API_KEY` y `SMTP_PASS` con prefijo `re_`, manteniendo compatibilidad con transporte SMTP de Nodemailer y simulador local de consola para testing.
+
+---
+
+
 
 ### Agregado
 - **Centro de Articulación y Redirección en Búsquedas (`/busqueda`) (REQ-01):**

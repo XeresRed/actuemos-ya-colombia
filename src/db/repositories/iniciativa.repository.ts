@@ -49,9 +49,9 @@ export const IniciativaRepository = {
 
     if (filters.categoria) {
       if (filters.categoria === 'ong') {
-        conditions.push("(categoria = 'ong' OR categoria = 'ong_colectivo')");
+        conditions.push("categoria = 'ong'");
       } else if (filters.categoria === 'colectivo') {
-        conditions.push("(categoria = 'colectivo' OR categoria = 'campaña' OR categoria = 'ong_colectivo')");
+        conditions.push("(categoria = 'colectivo' OR categoria = 'campaña')");
       } else {
         conditions.push('categoria = ?');
         params.push(filters.categoria);

@@ -108,22 +108,27 @@ export default function IniciativasPage() {
           </span>
         );
       case 'ong':
-      case 'ong_colectivo':
         return (
           <span className="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
             <span className="material-symbols-outlined text-xs">public</span> ONG / Fundación
           </span>
         );
+      case 'colectivo':
+        return (
+          <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs text-emerald-700">groups</span> Colectivo / Brigada
+          </span>
+        );
       case 'campaña':
         return (
-          <span className="bg-amber-100 text-amber-900 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs">campaign</span> Campaña de Acopio
+          <span className="bg-amber-100 text-amber-900 border border-amber-300 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs text-amber-700">campaign</span> Campaña de Acopio
           </span>
         );
       default:
         return (
-          <span className="bg-surface-variant text-on-surface-variant font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs">groups</span> Colectivo / Brigada
+          <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs text-emerald-700">groups</span> Colectivo / Brigada
           </span>
         );
     }
