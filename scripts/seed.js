@@ -1,21 +1,37 @@
-import { getDb } from './client';
-import { runMigrations } from './migrate';
+const Database = require('better-sqlite3');
+const path = require('path');
+const fs = require('fs');
+const { runMigrations } = require('./migrate');
 
-export function runSeed() {
-  console.log('🌱 Iniciando seed de datos limpios y oficiales para SQLite...');
+function runSeed() {
+  console.log('🌱 [DB Seed] Iniciando seed de datos iniciales y oficiales para SQLite...');
+
+  // 1. Asegurar que las migraciones estén ejecutadas
   runMigrations();
-  const db = getDb();
 
-  // 1. Super Administrador Oficial
+  const dbPath = process.env.DATABASE_URL || path.join(process.cwd(), 'data', 'database.sqlite');
+  const dbDir = path.dirname(dbPath);
+
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+
+  const db = new Database(dbPath);
+  db.pragma('foreign_keys = ON');
+  db.pragma('journal_mode = WAL');
+  db.pragma('synchronous = NORMAL');
+  db.pragma('busy_timeout = 5000');
+
   const defaultAdminEmail = (process.env.ADMIN_DEFAULT_EMAIL || 'cam960210@gmail.com').trim().toLowerCase();
+
+  // 2. Super Administrador Principal
   const insertUser = db.prepare(`
     INSERT OR REPLACE INTO usuarios (id, email, nombre, rol, activo)
     VALUES (?, ?, ?, ?, ?)
   `);
-
   insertUser.run('usr-admin-principal', defaultAdminEmail, 'Super Administrador', 'admin', 1);
 
-  // 2. Directorio de Iniciativas Activas y Canales Oficiales
+  // 3. Directorio de Iniciativas Activas y Canales Oficiales
   const insertInitiative = db.prepare(`
     INSERT OR REPLACE INTO iniciativas_activas (
       id, nombre, descripcion, categoria, url_oficial, contacto, cobertura_geografica, estado_operacion
@@ -145,7 +161,7 @@ export function runSeed() {
     'activa'
   );
 
-  // 3. Banco de Ideas en Acción (Soluciones y Mapeos Comunitarios en Desarrollo / Desplegados)
+  // 4. Banco de Ideas en Acción (Soluciones y Mapeos Comunitarios en Desarrollo / Desplegados)
   const insertIdea = db.prepare(`
     INSERT OR REPLACE INTO ideas (
       id, titulo, descripcion_markdown, categoria, alcance_tipo, alcance_detalle,
@@ -221,7 +237,7 @@ export function runSeed() {
     1
   );
 
-  // 4. Alertas Preventivas Institucionales
+  // 5. Alertas Preventivas Institucionales
   const insertAlert = db.prepare(`
     INSERT OR REPLACE INTO alertas_sistema (
       id, nivel, mensaje, activa, enlace_accion_url, enlace_accion_texto, actualizado_por
@@ -238,9 +254,12 @@ export function runSeed() {
     defaultAdminEmail
   );
 
-  console.log('✅ Seed limpio y oficial completado con éxito.');
+  console.log('✅ [DB Seed] Seed limpio y oficial completado con éxito.');
+  db.close();
 }
 
 if (require.main === module || process.argv[1]?.includes('seed')) {
   runSeed();
 }
+
+module.exports = { runSeed };

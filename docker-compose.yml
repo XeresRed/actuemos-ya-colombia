@@ -1,7 +1,7 @@
 # ==============================================================================
-# docker-compose.stage.yml: Entorno de Staging para ActuemosYaColombia
+# docker-compose.yml: Entorno de Producción para ActuemosYaColombia
 # ==============================================================================
-# Orquestación de contenedores para servidor con 1 GB RAM (VPS DigitalOcean / similar)
+# Orquestación para servidor VPS (1 vCPU / 1 GB RAM / 2 GB Swap - DigitalOcean)
 
 services:
   app:
@@ -11,12 +11,10 @@ services:
       args:
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
         NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY:-}
-    image: actuemosya-app:stage
-    container_name: ayc-stage-app
+    image: actuemosya-app:latest
+    container_name: ayc-prod-app
     restart: unless-stopped
     env_file:
-      - path: .env.stage
-        required: false
       - path: .env
         required: false
     environment:
@@ -41,7 +39,7 @@ services:
       # Persistencia de la base de datos SQLite en disco del host
       - ./data:/data
     networks:
-      - ayc-stage-net
+      - ayc-network
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:3000/api/health | grep -q 'healthy' || exit 1"]
       interval: 15s
@@ -58,7 +56,7 @@ services:
 
   caddy:
     image: caddy:2.8-alpine
-    container_name: ayc-stage-caddy
+    container_name: ayc-prod-caddy
     restart: unless-stopped
     ports:
       - "80:80"
@@ -72,7 +70,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     networks:
-      - ayc-stage-net
+      - ayc-network
     depends_on:
       app:
         condition: service_healthy
@@ -84,11 +82,11 @@ services:
 
 volumes:
   caddy_data:
-    name: ayc_stage_caddy_data
+    name: ayc_prod_caddy_data
   caddy_config:
-    name: ayc_stage_caddy_config
+    name: ayc_prod_caddy_config
 
 networks:
-  ayc-stage-net:
-    name: ayc_stage_network
+  ayc-network:
+    name: ayc_prod_network
     driver: bridge

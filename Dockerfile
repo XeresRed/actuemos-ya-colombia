@@ -3,7 +3,7 @@
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# 1. Dependencias (deps)
+# 1. Dependencias de Compilación (deps)
 # ------------------------------------------------------------------------------
 FROM node:20-alpine AS deps
 # Instalar utilidades del sistema necesarias para compilar better-sqlite3 (C++)
@@ -23,6 +23,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Argumentos de construcción para Next.js (Variables públicas requeridas en build time)
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
+ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
+ARG NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+ENV NEXT_PUBLIC_RECAPTCHA_SITE_KEY=$NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
@@ -32,6 +38,10 @@ RUN npm run build
 # 3. Entorno de Ejecución Ligero (runner)
 # ------------------------------------------------------------------------------
 FROM node:20-alpine AS runner
+
+# Instalar compatibilidad libc para módulos C++ nativos en Alpine (better-sqlite3)
+RUN apk add --no-cache libc6-compat
+
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -52,7 +62,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copiar scripts de migración y entrypoint
+# Copiar scripts de migración, seed y entrypoint
 COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=nextjs:nodejs /app/src/db/migrations ./src/db/migrations
 COPY --from=builder --chown=nextjs:nodejs /app/docker-entrypoint.sh ./docker-entrypoint.sh
