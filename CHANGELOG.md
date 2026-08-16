@@ -5,6 +5,22 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.0.3-beta-1] - 2026-08-16
+
+### Agregado
+- **Centro de Articulación y Redirección en Búsquedas (`/busqueda`) (REQ-01):**
+  - Rediseño integral de la página de búsqueda aplicando el principio de **no duplicidad y articulación estratégica**.
+  - Tarjeta destacada de **Búsqueda de Personas Desaparecidas** con acceso directo a **[ColombiaTeBusca](https://colombiatebusca.com/?tab=persons)** y al programa formal **RCF (Restablecimiento del Contacto entre Familiares) de la Cruz Roja Colombiana**.
+  - Tarjeta destacada de **Mascotas, Refugios y Veterinaria** con acceso directo a **[MiGenteVe Colombia](https://colombia.migenteve.com/)**, directorio de albergues y red de atención médica animal.
+  - **Protocolo de Acción Inmediata (Primeras 24-48 horas)**: Guía cívica paso a paso con advertencia de seguridad para prevención de falsas llamadas de rescate/extorsión.
+  - **Directorio de Líneas Telefónicas Directas de Emergencia**: Marcado con 1 clic para Línea 123, Cruz Roja 132, Defensa Civil 144 y Medicina Legal.
+
+- **Sincronización Transversal de Iniciativas y Limpieza de Semilla (REQ-02, REQ-03):**
+  - Registro de ColombiaTeBusca y MiGenteVe Colombia en [`src/db/seed.ts`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/db/seed.ts) y en el Directorio Activo (`/iniciativas`).
+  - Depuración completa de datos simulados en la base de datos de arranque: las tablas de propuestas comunitarias, comentarios, reportes y voluntariado inician limpias para recibir exclusivamente aportes reales de la ciudadanía en staging y producción.
+
+---
+
 ## [0.0.2-beta-2] - 2026-08-16
 
 ### Agregado

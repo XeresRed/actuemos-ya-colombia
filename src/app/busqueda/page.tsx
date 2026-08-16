@@ -1,261 +1,232 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import Link from 'next/link';
 
 export default function BusquedaHumanitariaPage() {
-  const [activeTab, setActiveTab] = useState<'todos' | 'persona' | 'animal'>('todos');
-  const [activeStatus, setActiveStatus] = useState<string>('todos');
-
-  const reportes = [
-    {
-      id: 'rep-1',
-      type: 'persona',
-      name: 'Carlos Andrés Mendoza',
-      age: '34 años',
-      details: 'Estatura 1.75m, camiseta azul oscuro, jean gris. Visto cerca al Parque Caldas tras el sismo.',
-      location: 'Popayán, Cauca — Centro',
-      status: 'buscado',
-      contact: '+57 312 4567890',
-      statusLabel: 'Persona Buscada',
-      statusClass: 'bg-error text-on-error',
-      borderClass: 'border-t-error',
-    },
-    {
-      id: 'rep-2',
-      type: 'persona',
-      name: 'María Elena Gómez',
-      age: '62 años',
-      details: 'Cabello castaño corto, suéter de lana rojo. Localizada en albergue con atención médica.',
-      location: 'Pasto, Nariño — Albergue Estadio Libertad',
-      status: 'en_refugio',
-      contact: '+57 315 9876543',
-      statusLabel: 'En Refugio',
-      statusClass: 'bg-tertiary-container text-on-tertiary-container',
-      borderClass: 'border-t-tertiary',
-    },
-    {
-      id: 'rep-3',
-      type: 'animal',
-      name: 'Rocky',
-      species: 'Perro Labrador mestizo',
-      details: 'Color dorado claro, collar rojo sin placa identificadora, mancha blanca en el pecho.',
-      location: 'Popayán — Barrio Bolívar',
-      status: 'buscado',
-      contact: '+57 300 1122334',
-      statusLabel: 'Animal Perdido',
-      statusClass: 'bg-error text-on-error',
-      borderClass: 'border-t-error',
-    },
-    {
-      id: 'rep-4',
-      type: 'animal',
-      name: 'Luna',
-      species: 'Gata Siamesa',
-      details: 'Ojos azules intensos, rescatada de escombros. Recibiendo cuidado veterinario.',
-      location: 'Pasto — Clínica Veterinaria Municipal',
-      status: 'localizado',
-      contact: '+57 318 5544332',
-      statusLabel: 'Rescatado',
-      statusClass: 'bg-secondary text-on-secondary',
-      borderClass: 'border-t-secondary',
-    },
-  ];
-
-  const filteredReportes = reportes.filter((rep) => {
-    if (activeTab !== 'todos' && rep.type !== activeTab) return false;
-    if (activeStatus !== 'todos' && rep.status !== activeStatus) return false;
-    return true;
-  });
-
   return (
-    <div className="flex-grow w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-stack-md">
-      {/* Header & Primary Action */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md mb-stack-lg border-b border-outline-variant pb-6">
-        <div>
-          <h2 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">
-            Búsqueda Humanitaria y Mascotas
-          </h2>
-          <p className="font-body-md text-body-md text-on-surface-variant mt-2 max-w-2xl">
-            Directorio centralizado y validado de personas y animales de compañía no localizados o albergados tras la emergencia.
-          </p>
+    <div className="flex-grow w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-stack-md lg:py-stack-lg flex flex-col gap-stack-lg">
+      {/* Header & Anti-Duplication Philosophy */}
+      <header className="border-b border-outline-variant pb-6">
+        <div className="flex items-center gap-2 text-secondary font-label-md text-xs font-bold uppercase tracking-wider mb-2">
+          <span className="material-symbols-outlined text-base">hub</span>
+          <span>Centro de Articulación y Búsqueda Inmediata</span>
         </div>
-        <button
-          onClick={() => alert('Formulario de nuevo reporte en preparación para la siguiente fase')}
-          className="bg-primary text-on-primary font-label-md text-label-md font-bold uppercase tracking-wider px-6 py-3 rounded shadow-sm hover:bg-primary-container active:scale-95 transition-all inline-flex items-center gap-2"
-        >
-          <span className="material-symbols-outlined text-xl">add_circle</span>
-          Crear Reporte de Búsqueda
-        </button>
+        <h1 className="font-headline-lg text-2xl md:text-3xl font-bold text-on-surface">
+          Búsqueda Humanitaria, Personas y Mascotas
+        </h1>
+        <p className="font-body-md text-sm md:text-base text-on-surface-variant mt-2 max-w-3xl leading-relaxed">
+          En momentos de crisis, la dispersión de información cuesta vidas. En <strong>ActuemosYa<span className="inline-flex font-semibold"><span className="text-[#D97706]">Col</span><span className="text-secondary">omb</span><span className="text-primary">ia</span></span></strong> aplicamos el principio de <em>no reinventar la rueda</em>: canalizamos la ayuda y enlazamos directamente con las plataformas especializadas y organismos oficiales más activos del país.
+        </p>
+      </header>
+
+      {/* Main Dual Cards: ColombiaTeBusca & MiGenteVe */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-stack-lg">
+        {/* Card 1: Búsqueda de Personas Desaparecidas */}
+        <article className="bg-surface-container-lowest border-2 border-primary/30 rounded-2xl p-6 md:p-8 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-primary transition-all">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0 pointer-events-none"></div>
+
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full font-label-md text-xs font-bold">
+                <span className="material-symbols-outlined text-sm">person_search</span>
+                Personas Desaparecidas
+              </span>
+              <span className="text-[11px] text-on-surface-variant font-semibold">Red Cívica Nacional</span>
+            </div>
+
+            <h2 className="font-headline-md text-xl md:text-2xl font-bold text-on-surface mb-3">
+              ColombiaTeBusca — Registro de Personas
+            </h2>
+
+            <p className="font-body-md text-xs md:text-sm text-on-surface-variant mb-6 leading-relaxed">
+              Plataforma digital especializada y ampliamente adoptada en Colombia para el registro, consulta y difusión inmediata de reportes de personas no localizadas tras emergencias y desastres.
+            </p>
+
+            <ul className="space-y-2.5 text-xs text-on-surface mb-8 border-y border-outline-variant/60 py-4">
+              <li className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+                <span>Registro fotográfico con edad, estatura y vestimenta</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+                <span>Filtros geo-referenciados por departamento y municipio</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+                <span>Validación comunitaria y actualización en tiempo real</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <a
+              href="https://colombiatebusca.com/?tab=persons"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 py-3 px-5 bg-primary text-on-primary font-label-md text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-sm text-center active:scale-95"
+            >
+              <span>Ir a ColombiaTeBusca (Personas)</span>
+              <span className="material-symbols-outlined text-sm">open_in_new</span>
+            </a>
+            <a
+              href="https://cruzrojacolombiana.org/rcf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="py-3 px-4 bg-surface border border-outline text-on-surface font-label-md text-xs font-bold rounded-lg hover:bg-surface-variant transition-colors flex items-center justify-center gap-1.5 text-center"
+              title="Restablecimiento del Contacto entre Familiares — Cruz Roja"
+            >
+              <span className="material-symbols-outlined text-sm text-secondary">health_and_safety</span>
+              <span>Cruz Roja RCF</span>
+            </a>
+          </div>
+        </article>
+
+        {/* Card 2: Búsqueda de Mascotas y Servicios Veterinarios */}
+        <article className="bg-surface-container-lowest border-2 border-secondary/30 rounded-2xl p-6 md:p-8 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-secondary transition-all">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-bl-full -z-0 pointer-events-none"></div>
+
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 bg-secondary/10 text-secondary px-3 py-1 rounded-full font-label-md text-xs font-bold">
+                <span className="material-symbols-outlined text-sm">pets</span>
+                Mascotas & Bienestar Animal
+              </span>
+              <span className="text-[11px] text-on-surface-variant font-semibold">Refugios & Veterinaria</span>
+            </div>
+
+            <h2 className="font-headline-md text-xl md:text-2xl font-bold text-on-surface mb-3">
+              MiGenteVe Colombia — Mascotas y Refugios
+            </h2>
+
+            <p className="font-body-md text-xs md:text-sm text-on-surface-variant mb-6 leading-relaxed">
+              Red especializada en el reencuentro de animales de compañía extraviados, mapeo de albergues y refugios temporales, y articulación con servicios médicos veterinarios de emergencia.
+            </p>
+
+            <ul className="space-y-2.5 text-xs text-on-surface mb-8 border-y border-outline-variant/60 py-4">
+              <li className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary text-sm">check_circle</span>
+                <span>Reporte de animales perdidos y encontrados con foto y señas</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary text-sm">check_circle</span>
+                <span>Directorio de albergues de paso y refugios transitorios</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary text-sm">check_circle</span>
+                <span>Canales de urgencias y brigadas de atención veterinaria</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <a
+              href="https://colombia.migenteve.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 px-5 bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-secondary-container transition-all flex items-center justify-center gap-2 shadow-sm text-center active:scale-95"
+            >
+              <span>Ir a MiGenteVe (Mascotas & Veterinaria)</span>
+              <span className="material-symbols-outlined text-sm">open_in_new</span>
+            </a>
+          </div>
+        </article>
       </div>
 
-      {/* Official Recommendation Notice */}
-      <div className="bg-secondary-fixed/50 border-l-4 border-secondary p-4 rounded-r-lg mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-on-secondary-fixed">
-        <div className="flex items-start gap-2.5">
-          <span className="material-symbols-outlined text-secondary text-2xl shrink-0">
-            info
-          </span>
-          <div className="text-xs sm:text-sm">
-            <p className="font-bold">
-              ¿Buscas a un familiar o persona desaparecida?
-            </p>
-            <p className="opacity-90 mt-0.5">
-              Te recomendamos registrar el caso simultáneamente ante el programa <strong>RCF (Restablecimiento del Contacto entre Familiares) de la Cruz Roja Colombiana (Línea 132)</strong> y la <strong>Línea Nacional 123</strong>.
+      {/* Protocol Guide: First 24-48 Hours */}
+      <section className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 md:p-8 shadow-sm">
+        <div className="flex items-center gap-3 mb-6 border-b border-outline-variant pb-4">
+          <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-700">
+            <span className="material-symbols-outlined text-2xl">quick_reference_all</span>
+          </div>
+          <div>
+            <h3 className="font-headline-md text-lg font-bold text-on-surface">
+              Protocolo de Acción Inmediata (Primeras 24 - 48 Horas)
+            </h3>
+            <p className="text-xs text-on-surface-variant">
+              Guía cívica recomendada por organismos de socorro para actuar con rapidez y seguridad.
             </p>
           </div>
         </div>
-        <a
-          href="https://cruzrojacolombiana.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 bg-secondary text-on-secondary text-xs font-bold px-3 py-1.5 rounded hover:bg-opacity-90 shrink-0 transition-all"
-        >
-          <span>Canal Cruz Roja RCF</span>
-          <span className="material-symbols-outlined text-xs">open_in_new</span>
-        </a>
-      </div>
 
-      {/* Tabs & Filter Chips */}
-      <div className="flex flex-col gap-4 mb-stack-lg bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-sm">
-        {/* Category Tabs */}
-        <div className="flex gap-4 border-b border-outline-variant pb-2">
-          <button
-            onClick={() => setActiveTab('todos')}
-            className={`font-label-md text-sm pb-2 font-bold transition-colors ${
-              activeTab === 'todos'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            Todos los Reportes
-          </button>
-          <button
-            onClick={() => setActiveTab('persona')}
-            className={`font-label-md text-sm pb-2 font-bold transition-colors flex items-center gap-1 ${
-              activeTab === 'persona'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <span className="material-symbols-outlined text-sm">person</span> Personas
-          </button>
-          <button
-            onClick={() => setActiveTab('animal')}
-            className={`font-label-md text-sm pb-2 font-bold transition-colors flex items-center gap-1 ${
-              activeTab === 'animal'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <span className="material-symbols-outlined text-sm">pets</span> Animales / Mascotas
-          </button>
-        </div>
-
-        {/* Status Filter Chips */}
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="font-label-sm text-xs text-on-surface-variant mr-2">Filtrar por Estado:</span>
-          <button
-            onClick={() => setActiveStatus('todos')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-              activeStatus === 'todos'
-                ? 'bg-secondary-fixed text-on-secondary-fixed border-secondary'
-                : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-variant'
-            }`}
-          >
-            Todos
-          </button>
-          <button
-            onClick={() => setActiveStatus('buscado')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${
-              activeStatus === 'buscado'
-                ? 'bg-error text-on-error border-error'
-                : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-variant'
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full bg-error inline-block"></span>
-            Buscado / Perdido
-          </button>
-          <button
-            onClick={() => setActiveStatus('en_refugio')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${
-              activeStatus === 'en_refugio'
-                ? 'bg-tertiary-container text-on-tertiary-container border-tertiary'
-                : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-variant'
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full bg-tertiary inline-block"></span>
-            En Refugio
-          </button>
-          <button
-            onClick={() => setActiveStatus('localizado')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${
-              activeStatus === 'localizado'
-                ? 'bg-secondary text-on-secondary border-secondary'
-                : 'bg-surface text-on-surface border-outline-variant hover:bg-surface-variant'
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full bg-secondary inline-block"></span>
-            Localizado / Rescatado
-          </button>
-        </div>
-      </div>
-
-      {/* Grid of Search Reports */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-        {filteredReportes.map((rep) => (
-          <article
-            key={rep.id}
-            className={`bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col hover:shadow-md transition-shadow border-t-4 ${rep.borderClass}`}
-          >
-            {/* Visual Icon Avatar */}
-            <div className="bg-surface-container-low p-6 flex justify-between items-start border-b border-outline-variant">
-              <div className="w-14 h-14 rounded-full bg-surface-variant flex items-center justify-center text-outline">
-                <span className="material-symbols-outlined text-3xl">
-                  {rep.type === 'persona' ? 'person' : 'pets'}
-                </span>
-              </div>
-              <span className={`font-label-sm text-xs font-bold px-2.5 py-1 rounded uppercase tracking-wider ${rep.statusClass}`}>
-                {rep.statusLabel}
-              </span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+          <div className="bg-surface p-4 rounded-xl border border-outline-variant/70 flex flex-col gap-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-on-surface">
+              <span className="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-xs">1</span>
+              <span>Reúne Datos Clave</span>
             </div>
+            <p className="text-on-surface-variant leading-relaxed">
+              Consigue la fotografía más reciente posible, detalle exacto de la ropa/calzado al momento del sismo o evento, señas particulares (cicatrices, tatuajes) y la última coordenada o punto de referencia.
+            </p>
+          </div>
 
-            <div className="p-5 flex flex-col flex-1 gap-3">
-              <div>
-                <h3 className="font-headline-md text-lg font-bold text-on-background">
-                  {rep.name}
-                </h3>
-                {rep.species ? (
-                  <p className="font-label-sm text-xs text-secondary font-semibold">{rep.species}</p>
-                ) : (
-                  <p className="font-label-sm text-xs text-on-surface-variant">{rep.age}</p>
-                )}
-              </div>
-
-              <p className="font-body-md text-xs text-on-surface-variant flex-1">
-                {rep.details}
-              </p>
-
-              <div className="flex items-start gap-2 pt-3 border-t border-outline-variant text-xs text-on-surface">
-                <span className="material-symbols-outlined text-outline text-sm shrink-0">location_on</span>
-                <span>{rep.location}</span>
-              </div>
-
-              <div className="bg-surface-container-low p-3 rounded flex items-center justify-between border border-outline-variant text-xs">
-                <div className="flex flex-col">
-                  <span className="text-on-surface-variant">Contacto de Emergencia</span>
-                  <span className="font-bold text-on-surface">{rep.contact}</span>
-                </div>
-                <button
-                  onClick={() => alert(`Llamando al contacto de emergencia: ${rep.contact}`)}
-                  className="bg-secondary text-on-secondary p-2 rounded hover:bg-secondary-container transition-colors"
-                  title="Contactar"
-                >
-                  <span className="material-symbols-outlined text-base">call</span>
-                </button>
-              </div>
+          <div className="bg-surface p-4 rounded-xl border border-outline-variant/70 flex flex-col gap-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-on-surface">
+              <span className="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-xs">2</span>
+              <span>Reporta en Canales Oficiales</span>
             </div>
-          </article>
-        ))}
-      </div>
+            <p className="text-on-surface-variant leading-relaxed">
+              Registra el caso en <strong>ColombiaTeBusca</strong> (personas) o <strong>MiGenteVe</strong> (mascotas). Comunícate de inmediato con la <strong>Cruz Roja (Línea 132)</strong> para activar el protocolo RCF formal.
+            </p>
+          </div>
+
+          <div className="bg-surface p-4 rounded-xl border border-outline-variant/70 flex flex-col gap-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-error">
+              <span className="material-symbols-outlined text-sm">security</span>
+              <span>Prevención de Estafas</span>
+            </div>
+            <p className="text-on-surface-variant leading-relaxed">
+              <strong>Nunca transfieras dinero:</strong> Los organismos de socorro oficiales jamás cobran por labores de rescate ni por devolver a una mascota. Desconfía de llamadas anónimas que exijan consignaciones urgentes.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Emergency Hotlines Direct Dial */}
+      <section className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 md:p-8 shadow-sm">
+        <h3 className="font-headline-md text-base font-bold text-on-surface mb-4 flex items-center gap-2">
+          <span className="material-symbols-outlined text-secondary">call</span>
+          <span>Líneas Telefónicas Directas de Búsqueda y Emergencia</span>
+        </h3>
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <a
+            href="tel:123"
+            className="p-3.5 bg-surface border border-outline-variant rounded-xl hover:border-primary hover:bg-surface-container-low transition-all flex flex-col items-center text-center gap-1 group"
+          >
+            <span className="material-symbols-outlined text-primary text-2xl group-hover:scale-110 transition-transform">local_police</span>
+            <strong className="text-sm font-bold text-on-surface">123</strong>
+            <span className="text-[11px] text-on-surface-variant">Emergencias Nacional</span>
+          </a>
+
+          <a
+            href="tel:132"
+            className="p-3.5 bg-surface border border-outline-variant rounded-xl hover:border-secondary hover:bg-surface-container-low transition-all flex flex-col items-center text-center gap-1 group"
+          >
+            <span className="material-symbols-outlined text-secondary text-2xl group-hover:scale-110 transition-transform">medical_services</span>
+            <strong className="text-sm font-bold text-on-surface">132</strong>
+            <span className="text-[11px] text-on-surface-variant">Cruz Roja (RCF & Socorro)</span>
+          </a>
+
+          <a
+            href="tel:144"
+            className="p-3.5 bg-surface border border-outline-variant rounded-xl hover:border-amber-600 hover:bg-surface-container-low transition-all flex flex-col items-center text-center gap-1 group"
+          >
+            <span className="material-symbols-outlined text-amber-600 text-2xl group-hover:scale-110 transition-transform">shield</span>
+            <strong className="text-sm font-bold text-on-surface">144</strong>
+            <span className="text-[11px] text-on-surface-variant">Defensa Civil Colombiana</span>
+          </a>
+
+          <a
+            href="tel:+576014069977"
+            className="p-3.5 bg-surface border border-outline-variant rounded-xl hover:border-outline hover:bg-surface-container-low transition-all flex flex-col items-center text-center gap-1 group"
+          >
+            <span className="material-symbols-outlined text-on-surface-variant text-2xl group-hover:scale-110 transition-transform">fingerprint</span>
+            <strong className="text-xs font-bold text-on-surface">(601) 406 9977</strong>
+            <span className="text-[11px] text-on-surface-variant">Medicina Legal (Identificación)</span>
+          </a>
+        </div>
+      </section>
     </div>
   );
 }
