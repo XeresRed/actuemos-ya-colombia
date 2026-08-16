@@ -69,8 +69,13 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <Link href="/admin/login" className="hover:text-primary transition-colors inline-block pt-1 text-xs opacity-75">
-                  Acceso Moderadores
+                <Link href="/admin/registro" className="hover:text-primary transition-colors inline-block pt-1 text-xs opacity-75">
+                  Postularse como Moderador
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/login" className="hover:text-primary transition-colors inline-block text-xs opacity-75">
+                  Acceso Administrativo
                 </Link>
               </li>
             </ul>

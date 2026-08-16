@@ -1,5 +1,6 @@
 export type TipoVoluntariado = 'ofrezco_habilidad' | 'busco_profesional';
-export type EstadoVoluntariado = 'activo' | 'cubierto' | 'pausado';
+export type EstadoVoluntariado = 'pendiente' | 'activo' | 'cubierto' | 'pausado' | 'completado';
+
 
 export interface Voluntariado {
   id: string;

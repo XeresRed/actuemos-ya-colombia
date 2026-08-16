@@ -6,6 +6,7 @@ export const CreateIdeaSchema = z.object({
   categoria: z.string().min(2, 'La categoría debe ser especificada').max(50),
   alcanceTipo: z.enum(['general', 'region', 'ciudad', 'grupo_especifico']).optional().default('general'),
   alcanceDetalle: z.string().max(150).optional().nullable(),
+  iniciativaExistenteUrl: z.string().max(500).optional().nullable(),
   esAnonimo: z.boolean().optional().default(false),
   emailCreador: z.string().email('Debe ser un correo electrónico válido').optional().nullable(),
   captchaToken: z.string().optional(),
@@ -66,8 +67,19 @@ export const CreateVoluntariadoSchema = z.object({
   emailContacto: z.string().email('Debe ser un correo electrónico válido'),
   telefonoContacto: z.string().max(50).optional().nullable(),
   ubicacion: z.string().max(150).optional().nullable(),
+  esMayorDeEdad: z.boolean().refine(val => val === true, {
+    message: 'Debe certificar que es mayor de edad (+18) para registrarse.',
+  }),
+  aceptaTerminos: z.boolean().refine(val => val === true, {
+    message: 'Debe aceptar los Términos de Voluntariado y el Descargo de Responsabilidad.',
+  }),
   captchaToken: z.string().optional(),
 });
+
+export const PatchVoluntariadoSchema = z.object({
+  estado: z.enum(['pendiente', 'activo', 'pausado', 'completado']),
+});
+
 
 export const CreateAlertaSchema = z.object({
   nivel: z.enum(['critica', 'alerta_naranja', 'informativa']).default('critica'),
@@ -85,3 +97,18 @@ export const VerifyMagicLinkSchema = z.object({
   email: z.string().email('Debe proporcionar un correo electrónico válido'),
   token: z.string().min(10, 'Token de verificación no válido'),
 });
+
+export const RegisterSupervisorSchema = z.object({
+  nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres').max(100),
+  email: z.string().email('Debe ser un correo electrónico válido'),
+  organizacion: z.string().max(150).optional().nullable(),
+  motivacion: z.string().min(10, 'Por favor comparte una breve justificación o experiencia (mínimo 10 caracteres)').max(1000),
+  captchaToken: z.string().optional(),
+});
+
+export const UpdateUsuarioSchema = z.object({
+  activo: z.boolean().optional(),
+  rol: z.enum(['admin', 'supervisor']).optional(),
+  nombre: z.string().max(100).optional().nullable(),
+});
+

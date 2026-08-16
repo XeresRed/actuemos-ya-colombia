@@ -5,6 +5,60 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.0.1-beta-5] - 2026-08-15
+
+### Agregado
+- **Banco de Ideas, Debate Comunitario y Neutralidad Cívica (REQ-01, REQ-02, REQ-03, REQ-04):**
+  - Banner institucional en `/ideas` con Declaración de Neutralidad Cívica y Apolitismo (plataforma 100% comunitaria, humanitaria e independiente).
+  - Conexión del frontend a base de datos en `/ideas`, `/ideas/nueva` y `/ideas/[id]`.
+  - Filtros dinámicos por estado (`Todas`, `En Acción 🔥`, `Promovidas ⭐`, `Ideas 💡`, `Soluciones Existentes 🔗`), selector por categoría y buscador en tiempo real.
+  - Formulario de publicación (`/ideas/nueva`) con selector de modo:
+    - **Envío Anónimo Rápido (Recomendado):** Resuelve Captcha anti-bot de humano, 0 correos consumidos, pasa a moderación como `borrador`.
+    - **Envío Verificado con Correo:** Código OTP de 6 dígitos con publicación instantánea tras validación.
+  - Nuevo campo opcional: *"Organización, Iniciativa o Enlace Existente Relacionado"* para vincular esfuerzos existentes y evitar la duplicación.
+  - Vista de detalle `/ideas/[id]` con visualizador dinámico del pipeline de vida, renderizado Markdown, bloque destacado de iniciativa vinculada, árbol de comentarios y respuestas anidadas con captcha, y botón Web Share API para WhatsApp y redes sociales.
+  - Soporte multi-proveedor en `EmailService` para SendGrid API (`https://api.sendgrid.com/v3/mail/send`), MailerSend, Resend y SMTP genérico con rate limit estricto y logger local en desarrollo.
+
+---
+
+## [0.0.1-beta-4] - 2026-08-15
+
+### Agregado
+- **Módulo de Voluntariado y Talento Técnico (REQ-01, REQ-02, REQ-03):**
+  - Catálogo ampliado de áreas técnicas de respuesta inmediata (Drones/Sensores Térmicos, Maquinaria Pesada/Remoción, Ingeniería Estructural, Medicina de Urgencias, Psicología de Crisis, Telecomunicaciones/Radioaficionados, Logística/Cadena de Frío, Búsqueda y Rescate Canino, Software/GIS, Otros).
+  - Formulario interactivo en `/voluntarios` con validaciones estrictas:
+    - Verificación obligatoria de mayoría de edad (`esMayorDeEdad: true`, +18 años).
+    - Aceptación obligatoria del Descargo de Responsabilidad Legal (`aceptaTerminos: true`).
+    - Protección anti-bot con `CaptchaService`.
+  - Moderación previa obligatoria: Todas las ofertas y demandas inician en estado `pendiente` y se validan en `/admin` antes de publicarse en el muro público.
+  - Endpoints RESTful completos: `GET /api/voluntarios`, `POST /api/voluntarios`, `PATCH /api/voluntarios/[id]` (aprobación/cambio de estado), `DELETE /api/voluntarios/[id]` y `GET /api/voluntarios/match`.
+  - Migración incremental `003_update_voluntariado_estado.sql` para actualizar la restricción CHECK de estados (`pendiente`, `activo`, `cubierto`, `pausado`, `completado`).
+  - Protección de datos de contacto contra scrapers y bots mediante botón interactivo de revelación segura (`mailto:` y `tel:`).
+  - Pestaña de moderación "Talento y Voluntariado" integrada en `/admin` con aprobación y descarte en 1 clic.
+
+---
+
+## [0.0.1-beta-3] - 2026-08-15
+
+### Agregado
+- **Módulo de Postulación y Registro de Supervisores (REQ-01):**
+  - Página accesible en `/admin/registro` con formulario para aspirantes a moderadores/voluntarios calificados (nombre, email, organización, justificación y captcha anti-bot).
+  - Endpoint `POST /api/auth/register-supervisor` con esquema Zod `RegisterSupervisorSchema` para registrar usuarios en estado inactivo (`activo: 0`) a la espera de revisión.
+- **Panel de Gestión y Activación por el Administrador (REQ-02):**
+  - Pestaña "Postulantes y Supervisores" en `/admin` con visualización de candidatos pendientes y equipo activo.
+  - Endpoint `GET /api/usuarios` y `PATCH /api/usuarios/[id]` protegidos con rol de Administrador.
+  - Flujo de activación inmediata con generación y envío automático de Magic Link de bienvenida al supervisor aprobado.
+- **Estrategia Multi-Capa de Ahorro de Cuota de Correo (REQ-03):**
+  - Ampliación de la vigencia de sesión administrativa en cookie HttpOnly `auth_session` a 30 días (`AuthService.createSessionToken(payload, 30)`), minimizando el consumo de Magic Links a <1-2 correos por mes por moderador.
+  - Cooldown anti-spam de 5 minutos por correo en solicitudes de Magic Link para prevenir saturación de proveedores SMTP y ataques de inundación.
+  - Soporte multi-proveedor en `EmailService` para MailerSend API (`https://api.mailersend.com/v1/email`), Resend API (`https://api.resend.com/emails`), SMTP estándar y fallback a Console Logger.
+  - Formulario de ideas ciudadanas (`/ideas/nueva`) optimizado para resaltar el envío anónimo directo (0 correos consumidos).
+- **Semilla Configurable y Acceso Rápido en Desarrollo (REQ-04):**
+  - Soporte de variable `ADMIN_DEFAULT_EMAIL` en `.env` y `src/db/seed.ts`.
+  - Botón "⚡ Acceso Rápido de Desarrollo" en `/admin/login` (`POST /api/auth/dev-login`) para inicio de sesión en 1 clic en entorno local sin consumir cuotas de correo.
+
+---
+
 ## [0.0.1-beta-2] - 2026-08-15
 
 ### Agregado

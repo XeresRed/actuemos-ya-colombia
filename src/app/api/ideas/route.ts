@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
         categoria: validatedData.categoria,
         alcanceTipo: validatedData.alcanceTipo,
         alcanceDetalle: validatedData.alcanceDetalle,
+        iniciativaExistenteUrl: validatedData.iniciativaExistenteUrl,
         esAnonimo: validatedData.esAnonimo,
         emailCreador: validatedData.emailCreador,
       },

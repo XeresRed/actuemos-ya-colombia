@@ -1,15 +1,21 @@
 # ==============================================================================
-# Caddyfile: Gateway de Entrada y Proxy Seguro para ActuemosYaColombia (Staging)
+# Caddyfile: Gateway de Entrada y Proxy Seguro para ActuemosYaColombia
 # ==============================================================================
 
 {
-    # Configuración global
-    email {$ACME_EMAIL:admin@actuemosya.org}
+    # Configuración global y contacto para renovación automática de certificados SSL Let's Encrypt
+    email {$ACME_EMAIL:cam960210@gmail.com}
     admin off
 }
 
-{$APP_DOMAIN:localhost} {
-    # Compresión dinámica para optimización de ancho de banda y velocidad
+# Redirección canónica de www hacia el dominio raíz
+www.actuemosyacolombia.org {
+    redir https://actuemosyacolombia.org{uri} permanent
+}
+
+# Dominio principal de producción y staging
+{$APP_DOMAIN:actuemosyacolombia.org} {
+    # Compresión dinámica para optimización de ancho de banda y velocidad (gzip & zstd)
     encode gzip zstd
 
     # Inyección de cabeceras HTTP de seguridad (Defense in Depth)

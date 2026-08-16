@@ -103,7 +103,7 @@ export const VoluntariadoRepository = {
 
   create(dto: CreateVoluntariadoDTO, db: Database.Database = getDb()): Voluntariado {
     const id = dto.id || randomUUID();
-    const estado: EstadoVoluntariado = dto.estado || 'activo';
+    const estado: EstadoVoluntariado = dto.estado || 'pendiente';
 
     const stmt = db.prepare(`
       INSERT INTO voluntariado_profesional (

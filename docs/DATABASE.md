@@ -157,7 +157,7 @@ CREATE TABLE voluntariado_profesional (
     email_contacto TEXT NOT NULL,
     telefono_contacto TEXT,
     ubicacion TEXT,
-    estado TEXT CHECK(estado IN ('activo', 'cubierto', 'pausado')) DEFAULT 'activo',
+    estado TEXT CHECK(estado IN ('pendiente', 'activo', 'cubierto', 'pausado', 'completado')) DEFAULT 'pendiente',
     creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -1,14 +1,14 @@
 {
   "name": "actuemos-ya-colombia",
-  "version": "0.0.1-beta-2",
+  "version": "0.0.1-beta-5",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:migrate": "node --loader ts-node/esm src/db/migrate.ts || tsx src/db/migrate.ts || node -r esbuild-register src/db/migrate.ts",
-    "db:seed": "node --loader ts-node/esm src/db/seed.ts || tsx src/db/seed.ts || node -r esbuild-register src/db/seed.ts",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:seed": "tsx src/db/seed.ts",
     "test": "tsx scripts/test-dal.ts && tsx scripts/test-services.ts && tsx scripts/test-api.ts"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
     "next": "^14.2.24",
+    "nodemailer": "^9.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.6.0",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^20.17.19",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
