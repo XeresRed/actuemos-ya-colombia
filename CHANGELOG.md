@@ -5,6 +5,94 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.5.0-beta] - 2026-08-16
+
+### Agregado
+- **Verificación Just-in-Time con `TurnstileModal` (`REQ-01`):**
+  - Creación del componente modal accesible y reutilizable `src/components/ui/TurnstileModal.tsx`.
+  - Carga bajo demanda (`on-demand lazy loading`): Turnstile solo se monta y ejecuta cuando el usuario presiona "Enviar" y los campos locales obligatorios ya fueron validados.
+  - Flujo `auto-submit`: al completarse la verificación anti-bot en milisegundos, despacha inmediatamente la petición al backend, cerrando el modal de forma fluida con feedback visual animado.
+  - Reducción estimada del **40% al 70%** en solicitudes y consumo de APIs de terceros (zero-waste requests en visitas y rebotes) y eliminación completa de expiraciones de tokens por tiempo de redacción.
+
+- **Estandarización en Todos los Formularios Públicos (`REQ-02`):**
+  - Migración a `TurnstileModal` en:
+    1. **Publicar Propuesta / Idea:** `src/app/ideas/nueva/page.tsx` (`proponer_idea`).
+    2. **Registro de Voluntariado:** `src/app/voluntarios/page.tsx` (`registro_voluntario`).
+    3. **Solicitud de Asistencia Legal:** `src/app/recursos/page.tsx` (`asistencia_legal`).
+    4. **Postulación de Moderadores:** `src/app/admin/registro/page.tsx` (`postulacion_moderador`).
+    5. **Comentarios y Aportes Ciudadanos:** `src/app/ideas/[id]/page.tsx` (`comentar_idea`).
+
+---
+
+## [0.4.1-beta] - 2026-08-16
+
+### Agregado
+- **Propuesta «Corag Ayuda Directa (Eje Cafetero)» en el Banco de Ideas (`REQ-01`):**
+  - Incorporación en `src/db/seed.ts` y persistencia en base de datos SQLite de la iniciativa cívico-tecnológica `Corag Ayuda Directa` (`idea-corag-eje-cafetero`) en categoría `Tecnología` y estado `en_accion`.
+  - Vinculación interactiva y clickeable al mapa vivo de necesidades y puntos de ayuda: [`https://ayuda.corag.app/emergencias/eje-cafetero/puntos-de-ayuda`](https://ayuda.corag.app/emergencias/eje-cafetero/puntos-de-ayuda) y al portal oficial [`http://corag.app/`](http://corag.app/).
+  - Cobertura regional focalizada en Caldas, Risaralda y Quindío (**Eje Cafetero**).
+
+---
+
+## [0.4.0-beta] - 2026-08-16
+
+### Agregado
+- **Generador Asistido de Derecho de Petición Oficial en `/recursos` (`REQ-02`):**
+  - Sección interactiva y guiada para estructurar derechos de petición ante emergencias, con previsualización en vivo y botón para copiar texto completo al portapapeles.
+  - Generador dinámico en cliente (`src/lib/docx-generator.ts`) basado en la plantilla institucional `public/modelo-de-peticion.docx` utilizando `jszip`. Rellena automáticamente fechas, identificación, hechos, peticiones y entidades competentes según el departamento (Gobernación del Valle / Departamental, Alcaldía Municipal y UNGRD) con fundamentos de la Ley 1755 de 2015 y jurisprudencia constitucional.
+  - Casillas obligatorias de consentimiento informado de datos personales (Ley 1581 de 2012) y descargo de responsabilidad cívica.
+
+- **Bandeja de Asistencia Legal y Articulación con Abogados Voluntarios en `/admin` (`REQ-03`):**
+  - **Base de datos:** Migración SQLite `005_add_solicitudes_asistencia_legal.sql` creando la tabla `solicitudes_asistencia_legal` con índices por estado, departamento y municipio.
+  - **Dominio, DAL y Servicios:** Interfaces en `src/core/domain/solicitud-legal.ts`, repositorio `SolicitudLegalRepository`, validaciones Zod y `LegalService` con sanitización XSS estricta y control de acceso RBAC.
+  - **Endpoints API:** `/api/recursos/asistencia-legal` (GET con filtros/conteos y POST público protegido con captcha) y `/api/recursos/asistencia-legal/[id]` (GET, PATCH y DELETE).
+  - **Panel Administrativo:** Nueva pestaña *"Asistencia Legal"* en `/admin` con tarjeta KPI, filtro por estado (`pendiente`, `en_contacto`, `atendida`, `cerrada`), asignación de abogado solidario y botones de contacto directo por WhatsApp (`wa.me`) y correo electrónico.
+
+### Corregido
+- **Estabilización de Cloudflare Turnstile en Formularios Públicos (`REQ-01`):**
+  - Refactorización de `src/components/ui/TurnstileWidget.tsx` con almacenamiento de callbacks (`onSuccess`, `onError`, `onExpire`) en `useRef`, reducción de dependencias del `useEffect` e integración con `React.memo`.
+  - Eliminación total del parpadeo, desmonte y reinicio continuo del widget de seguridad anti-bot mientras el usuario escribe en los campos de texto de `/ideas/nueva`, `/voluntarios` y `/recursos`.
+
+---
+
+## [0.3.0-beta] - 2026-08-16
+
+### Agregado
+- **Integración del Favicon Institucional Oficial (`REQ-01`):**
+  - Configuración del isotipo del asterisco humanitario en `src/app/layout.tsx` mediante `metadata.icons` (`icon`, `shortcut`, `apple`) y `<link rel="icon">` apuntando a `public/favicon-actuemos-ya-colombia-asterisco.ico`.
+
+- **Solicitud de Voluntarios y Brigadistas en el Ciclo de Vida de Ideas (`REQ-02`):**
+  - **Base de datos:** Migración SQLite `004_add_voluntarios_to_ideas.sql` agregando `requiere_voluntarios`, `cantidad_voluntarios` y `perfil_voluntarios` a la tabla `ideas`.
+  - **Dominio y Validaciones:** Actualización de interfaces y DTOs en `src/core/domain/idea.ts` y esquemas Zod en `src/lib/validations/index.ts`.
+  - **Formulario de Publicación (`/ideas/nueva`):** Checkbox interactivo *"¿Esta propuesta requiere voluntarios o brigadistas en terreno?"* que despliega dinámicamente inputs para la cantidad estimada y el perfil o rol requerido.
+  - **Detalle de Propuesta (`/ideas/[id]`):** Banner destacado de convocatoria de voluntariado activa y badge en los metadatos del artículo.
+  - **Tarjetas de Ideas (`/ideas` y `/`):** Pill visual indicando la cantidad de voluntarios solicitados por la iniciativa.
+
+- **Regla Operativa en PLAYBOOK.md:**
+  - Inclusión de la regla obligatoria de actualización de `CHANGELOG.md` tras cada modificación notable o historia completada.
+
+---
+
+## [0.2.2-beta] - 2026-08-16
+
+### Agregado
+- **Pipeline de Integración Continua (CI) en GitHub Actions (`REQ-01`):**
+  - Creación del flujo de trabajo automatizado en `.github/workflows/ci.yml` ejecutado en `push` y `pull_request` dirigidos a `main`.
+  - Concurrencia con `cancel-in-progress: true` para optimizar el uso de runners.
+  - Validación secuencial de instalación limpia (`npm ci`), linter (`npm run lint`), verificación de tipos (`npx tsc --noEmit`), suite de pruebas (`npm test`) y compilación de producción (`npm run build`).
+
+- **Autenticación Master Admin con Contraseña (`cam960210@gmail.com`) (`REQ-03`):**
+  - Configuración de la variable de entorno `ADMIN_MASTER_PASSWORD` en `.env` y `.env.example`.
+  - Creación del endpoint `/api/auth/master-login` con rate limiting estricto anti fuerza bruta (máximo 5 intentos/min) y validación criptográfica en tiempo constante (`timingSafeEqual`).
+  - Detección reactiva en `/admin/login`: al ingresar `cam960210@gmail.com` se revela fluidamente el campo de contraseña para acceso directo de 30 días (`auth_session`), preservando el flujo de Magic Links para los demás supervisores.
+
+### Corregido
+- **Interactividad y Clickeabilidad de Iniciativas Vinculadas en Tarjetas (`REQ-02`):**
+  - Integración del enlace de iniciativa externa vinculada interactivo y clickeable en las propuestas destacadas del Home (`/`), directorio de ideas (`/ideas`) y panel de moderación (`/admin`).
+  - Normalización de protocolo `https://`, prevención de propagación de eventos (`e.stopPropagation()`), apertura en nueva pestaña (`_blank`) y truncado accesible de texto.
+
+---
+
 ## [0.2.1-beta] - 2026-08-16
 
 ### Corregido

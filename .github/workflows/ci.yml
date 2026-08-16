@@ -1,0 +1,49 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, Typecheck, Test & Build
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
+      SESSION_SECRET: ci-test-secret-key-minimum-32-characters-required
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+      TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+      ADMIN_DEFAULT_EMAIL: cam960210@gmail.com
+      ADMIN_MASTER_PASSWORD: ci_test_master_password_123
+      EMAIL_FROM: no-reply@actuemosya.org
+      DATABASE_URL: ./data/database.sqlite
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint check
+        run: npm run lint
+
+      - name: TypeScript typecheck
+        run: npx tsc --noEmit
+
+      - name: Run test suites (DAL, Services, API, Pagination)
+        run: npm test
+
+      - name: Next.js production build
+        run: npm run build

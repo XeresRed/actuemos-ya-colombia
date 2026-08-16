@@ -6,3 +6,4 @@ export * from './iniciativa.repository';
 export * from './busqueda.repository';
 export * from './voluntariado.repository';
 export * from './alerta.repository';
+export * from './solicitud-legal.repository';

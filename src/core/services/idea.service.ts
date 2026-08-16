@@ -51,6 +51,9 @@ export const IdeaService = {
     const requiresOtp = !esAnonimo && Boolean(emailCreador);
 
     const cleanIniciativaUrl = dto.iniciativaExistenteUrl ? SanitizeService.sanitizePlainText(dto.iniciativaExistenteUrl) : null;
+    const requiereVoluntarios = Boolean(dto.requiereVoluntarios);
+    const cantidadVoluntarios = requiereVoluntarios && dto.cantidadVoluntarios ? Number(dto.cantidadVoluntarios) : null;
+    const cleanPerfilVoluntarios = requiereVoluntarios && dto.perfilVoluntarios ? SanitizeService.sanitizePlainText(dto.perfilVoluntarios) : null;
 
     const createdIdea = IdeaRepository.create({
       titulo: cleanTitle,
@@ -59,6 +62,9 @@ export const IdeaService = {
       alcanceTipo: dto.alcanceTipo || 'general',
       alcanceDetalle: cleanDetalle,
       iniciativaExistenteUrl: cleanIniciativaUrl,
+      requiereVoluntarios,
+      cantidadVoluntarios,
+      perfilVoluntarios: cleanPerfilVoluntarios,
       estado: 'borrador',
       esAnonimo,
       emailCreador,

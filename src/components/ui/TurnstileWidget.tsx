@@ -35,7 +35,7 @@ export interface TurnstileWidgetProps {
 
 const CANONICAL_SITE_KEY = '0x4AAAAAAERMwI1eCPwFzmgW';
 
-export function TurnstileWidget({
+export const TurnstileWidget = React.memo(function TurnstileWidget({
   onSuccess,
   onError,
   onExpire,
@@ -48,6 +48,17 @@ export function TurnstileWidget({
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || CANONICAL_SITE_KEY;
   const [isClient, setIsClient] = useState(false);
 
+  // Almacenar referencias mutables para evitar re-montaje cuando cambian las props de función
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+  const onExpireRef = useRef(onExpire);
+
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+    onErrorRef.current = onError;
+    onExpireRef.current = onExpire;
+  });
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -57,7 +68,7 @@ export function TurnstileWidget({
 
     // Si explícitamente se configuró una llave de bypass o test en desarrollo
     if (siteKey.includes('tu_site_key') || siteKey.includes('test_')) {
-      onSuccess('dev-token');
+      onSuccessRef.current?.('dev-token');
       return;
     }
 
@@ -71,13 +82,13 @@ export function TurnstileWidget({
           sitekey: siteKey,
           action: action || undefined,
           callback: (token: string) => {
-            if (isMounted) onSuccess(token);
+            if (isMounted) onSuccessRef.current?.(token);
           },
           'error-callback': (err) => {
-            if (isMounted && onError) onError(err);
+            if (isMounted && onErrorRef.current) onErrorRef.current(err);
           },
           'expired-callback': () => {
-            if (isMounted && onExpire) onExpire();
+            if (isMounted && onExpireRef.current) onExpireRef.current();
           },
           theme,
         });
@@ -135,7 +146,7 @@ export function TurnstileWidget({
         }
       }
     };
-  }, [isClient, siteKey, action, onSuccess, onError, onExpire, theme]);
+  }, [isClient, siteKey, action, theme]);
 
   if (!isClient) {
     return null;
@@ -158,4 +169,4 @@ export function TurnstileWidget({
       <div ref={containerRef} className="min-h-[65px]" />
     </div>
   );
-}
+});

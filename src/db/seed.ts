@@ -221,6 +221,29 @@ export function runSeed() {
     1
   );
 
+  insertIdea.run(
+    'idea-corag-eje-cafetero',
+    'Corag Ayuda Directa — Puntos de Ayuda y Recursos en el Eje Cafetero',
+    `Plataforma y ecosistema tecnológico de impacto social que conecta directamente a quienes necesitan ayuda ante emergencias en el **Eje Cafetero** con donantes y organizaciones que pueden aportarla, garantizando trazabilidad y evidencia pública de cada entrega.
+
+### 📍 Puntos de Ayuda y Mapa Vivo:
+- **Puntos de Ayuda Eje Cafetero:** [ayuda.corag.app/emergencias/eje-cafetero/puntos-de-ayuda](https://ayuda.corag.app/emergencias/eje-cafetero/puntos-de-ayuda)
+- **Portal Principal:** [corag.app](http://corag.app/)
+
+### 🚀 Funcionalidades Clave:
+1. **Mapa de Necesidades en Tiempo Real:** Visualización georreferenciada de solicitudes de víveres, albergue y elementos de primera necesidad en Caldas, Risaralda y Quindío.
+2. **Ayuda Directa:** Canalización sin intermediarios de recursos hacia familias y comunidades afectadas.
+3. **Evidencia y Destino Visible:** Publicación transparente de pruebas de entrega para cada aporte solidario.`,
+    'Tecnología',
+    'region',
+    'Eje Cafetero (Risaralda, Caldas, Quindío)',
+    'en_accion',
+    'https://ayuda.corag.app/emergencias/eje-cafetero/puntos-de-ayuda',
+    0,
+    defaultAdminEmail,
+    1
+  );
+
   // 4. Alertas Preventivas Institucionales
   const insertAlert = db.prepare(`
     INSERT OR REPLACE INTO alertas_sistema (

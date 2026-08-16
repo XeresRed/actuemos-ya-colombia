@@ -14,8 +14,10 @@ import { GET as getAlertas, POST as postAlerta } from '../src/app/api/alertas/ro
 import { PATCH as patchAlerta, DELETE as deleteAlerta } from '../src/app/api/alertas/[id]/route';
 import { DELETE as deleteIniciativa } from '../src/app/api/iniciativas/[id]/route';
 import { POST as requestMagicLink } from '../src/app/api/auth/magic-link/request/route';
-import { POST as verifyMagicLink } from '../src/app/api/auth/magic-link/verify/route';
 import { GET as getSessionRoute } from '../src/app/api/auth/session/route';
+import { POST as masterLogin } from '../src/app/api/auth/master-login/route';
+import { GET as getLegalRequests, POST as postLegalRequest } from '../src/app/api/recursos/asistencia-legal/route';
+import { GET as getLegalRequestById, PATCH as patchLegalRequestById, DELETE as deleteLegalRequestById } from '../src/app/api/recursos/asistencia-legal/[id]/route';
 import { AuthService } from '../src/core/services';
 import { UsuarioRepository } from '../src/db/repositories';
 
@@ -85,6 +87,9 @@ async function runApiTests() {
       categoria: 'Tecnología',
       alcanceTipo: 'general',
       iniciativaExistenteUrl: 'https://starlink.com/response',
+      requiereVoluntarios: true,
+      cantidadVoluntarios: 10,
+      perfilVoluntarios: 'Técnicos en telecomunicaciones',
       esAnonimo: true,
       captchaToken: 'test-token',
     }),
@@ -93,6 +98,9 @@ async function runApiTests() {
   const createIdeaJson = await createIdeaRes.json() as any;
   assert(createIdeaRes.status === 201 && createIdeaJson.ok === true, 'Crea propuesta ciudadana con HTTP 201');
   assert(createIdeaJson.data.idea.iniciativaExistenteUrl === 'https://starlink.com/response', 'Guarda iniciativa existente vinculada');
+  assert(createIdeaJson.data.idea.requiereVoluntarios === true, 'Guarda requiereVoluntarios en API');
+  assert(createIdeaJson.data.idea.cantidadVoluntarios === 10, 'Guarda cantidadVoluntarios en API');
+  assert(createIdeaJson.data.idea.perfilVoluntarios === 'Técnicos en telecomunicaciones', 'Guarda perfilVoluntarios en API');
   const ideaId = createIdeaJson.data.idea.id;
 
   // GET /api/ideas (Listado)
@@ -342,6 +350,122 @@ async function runApiTests() {
   const devLoginRes = await devLogin(devLoginReq);
   const devLoginJson = await devLoginRes.json() as any;
   assert(devLoginRes.status === 200 && devLoginJson.data.sessionToken !== undefined, 'Acceso rápido de desarrollo genera sesión de 30 días');
+
+  // 11. Tests /api/auth/master-login (Autenticación Master Admin con Contraseña)
+  console.log('\n🔹 Probando /api/auth/master-login (Autenticación Master Admin)...');
+  process.env.ADMIN_MASTER_PASSWORD = process.env.ADMIN_MASTER_PASSWORD || '801269';
+  process.env.ADMIN_DEFAULT_EMAIL = 'cam960210@gmail.com';
+  const { POST: masterLogin } = await import('../src/app/api/auth/master-login/route');
+
+  // Intento con correo no autorizado
+  const unauthorizedEmailReq = new NextRequest('http://localhost:3000/api/auth/master-login', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: 'otro_usuario@correo.com',
+      password: 'wrong_password',
+    }),
+  });
+  const unauthRes = await masterLogin(unauthorizedEmailReq);
+  const unauthJson = await unauthRes.json() as any;
+  assert(unauthRes.status === 401 && unauthJson.ok === false, 'Rechaza login master para correo no autorizado');
+
+  // Intento con contraseña incorrecta
+  const wrongPassReq = new NextRequest('http://localhost:3000/api/auth/master-login', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: 'cam960210@gmail.com',
+      password: 'wrong_master_password',
+    }),
+  });
+  const wrongPassRes = await masterLogin(wrongPassReq);
+  const wrongPassJson = await wrongPassRes.json() as any;
+  assert(wrongPassRes.status === 401 && wrongPassJson.ok === false, 'Rechaza login master con contraseña errónea');
+
+  // Intento exitoso con credenciales correctas
+  const validMasterReq = new NextRequest('http://localhost:3000/api/auth/master-login', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: 'cam960210@gmail.com',
+      password: process.env.ADMIN_MASTER_PASSWORD,
+    }),
+  });
+  const validMasterRes = await masterLogin(validMasterReq);
+  const validMasterJson = await validMasterRes.json() as any;
+  assert(validMasterRes.status === 200 && validMasterJson.ok === true, 'Autentica exitosamente al master admin cam960210@gmail.com');
+  assert(validMasterJson.data.user.email === 'cam960210@gmail.com' && validMasterJson.data.user.rol === 'admin', 'Master admin posee rol admin y sesión activa');
+  assert(Boolean(validMasterRes.headers.get('set-cookie')?.includes('auth_session=')), 'Emite cookie HttpOnly auth_session');
+
+  // 10. Tests Asistencia Legal Routes (/api/recursos/asistencia-legal)
+  console.log('\n🔹 Probando Endpoints de Asistencia Legal y Derechos de Petición...');
+
+  // POST público con consentimiento
+  const createLegalReq = new NextRequest('http://localhost:3000/api/recursos/asistencia-legal', {
+    method: 'POST',
+    body: JSON.stringify({
+      nombreCiudadano: 'Mariana Caicedo',
+      tipoDocumento: 'CC',
+      cedulaCiudadano: '1144556677',
+      emailContacto: 'mariana.caicedo@correo.com',
+      telefonoContacto: '3187766554',
+      departamento: 'Valle del Cauca',
+      municipio: 'Cali',
+      asunto: 'Inclusión en Censo RUD y Asignación de Albergue Temporal',
+      hechos: '1. Deslizamiento de tierra en el sector Altos de Menga. 2. Afectación estructural de la vivienda.',
+      peticiones: 'Se incluya formalmente al núcleo familiar en el RUD y se provea albergue digno.',
+      aceptaConsentimiento: true,
+      captchaToken: 'dev-token',
+    }),
+  });
+  const createLegalRes = await postLegalRequest(createLegalReq);
+  const createLegalJson = await createLegalRes.json() as any;
+  assert(createLegalRes.status === 201 && createLegalJson.ok === true, 'POST /api/recursos/asistencia-legal crea solicitud exitosamente');
+  const legalId = createLegalJson.data.id;
+  assert(createLegalJson.data.estado === 'pendiente', 'Estado inicial es pendiente');
+
+  // GET por Admin/Supervisor con cookie
+  const getLegalListReq = new NextRequest('http://localhost:3000/api/recursos/asistencia-legal?estado=pendiente', {
+    headers: { cookie: `auth_session=${adminToken}` },
+  });
+  const getLegalListRes = await getLegalRequests(getLegalListReq);
+  const getLegalListJson = await getLegalListRes.json() as any;
+  assert(getLegalListRes.status === 200 && getLegalListJson.ok === true, 'GET /api/recursos/asistencia-legal lista solicitudes para admin');
+  assert(getLegalListJson.data.solicitudes.length >= 1, 'Encuentra al menos 1 solicitud pendiente');
+  assert(getLegalListJson.data.counts.pendiente >= 1, 'Retorna conteos agrupados por estado');
+
+  // GET por ID
+  const getLegalByIdReq = new NextRequest(`http://localhost:3000/api/recursos/asistencia-legal/${legalId}`, {
+    headers: { cookie: `auth_session=${adminToken}` },
+  });
+  const getLegalByIdRes = await getLegalRequestById(getLegalByIdReq, { params: { id: legalId } });
+  const getLegalByIdJson = await getLegalByIdRes.json() as any;
+  assert(getLegalByIdRes.status === 200 && getLegalByIdJson.data.id === legalId, 'GET /api/recursos/asistencia-legal/[id] retorna datos completos');
+
+  // PATCH actualización de estado
+  const patchLegalReq = new NextRequest(`http://localhost:3000/api/recursos/asistencia-legal/${legalId}`, {
+    method: 'PATCH',
+    headers: {
+      cookie: `auth_session=${adminToken}`,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      estado: 'en_contacto',
+      abogadoAsignado: 'Dr. Roberto Vallejo',
+      notasSeguimiento: 'Contactada por WhatsApp. Se revisan fotos de la vivienda.',
+    }),
+  });
+  const patchLegalRes = await patchLegalRequestById(patchLegalReq, { params: { id: legalId } });
+  const patchLegalJson = await patchLegalRes.json() as any;
+  assert(patchLegalRes.status === 200 && patchLegalJson.data.estado === 'en_contacto', 'PATCH /api/recursos/asistencia-legal/[id] actualiza estado a en_contacto');
+  assert(patchLegalJson.data.abogadoAsignado === 'Dr. Roberto Vallejo', 'Guarda abogado asignado');
+
+  // DELETE por Admin
+  const deleteLegalReq = new NextRequest(`http://localhost:3000/api/recursos/asistencia-legal/${legalId}`, {
+    method: 'DELETE',
+    headers: { cookie: `auth_session=${adminToken}` },
+  });
+  const deleteLegalRes = await deleteLegalRequestById(deleteLegalReq, { params: { id: legalId } });
+  const deleteLegalJson = await deleteLegalRes.json() as any;
+  assert(deleteLegalRes.status === 200 && deleteLegalJson.ok === true, 'DELETE /api/recursos/asistencia-legal/[id] elimina solicitud');
 
   console.log('\n✨ ¡Todas las pruebas de integración de la API (Fase 3) pasaron exitosamente (100% OK)!');
 }

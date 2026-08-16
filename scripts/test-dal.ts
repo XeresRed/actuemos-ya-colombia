@@ -10,6 +10,7 @@ import {
   BusquedaRepository,
   VoluntariadoRepository,
   AlertaRepository,
+  SolicitudLegalRepository,
 } from '../src/db/repositories';
 import { ConflictError, NotFoundError } from '../src/core/errors';
 
@@ -49,23 +50,30 @@ async function runTests() {
     categoria: 'Salud',
     alcanceTipo: 'region',
     alcanceDetalle: 'Cauca',
+    requiereVoluntarios: true,
+    cantidadVoluntarios: 8,
+    perfilVoluntarios: 'Paramédicos y rescatistas',
     emailCreador: 'creador@example.com',
     esAnonimo: false,
   }, db);
 
   assert(idea1.id !== undefined, 'Idea creada tiene ID UUID');
   assert(idea1.estado === 'borrador', 'Estado inicial es borrador');
+  assert(idea1.requiereVoluntarios === true, 'requiereVoluntarios es booleano true');
+  assert(idea1.cantidadVoluntarios === 8, 'cantidadVoluntarios coincide con 8');
+  assert(idea1.perfilVoluntarios === 'Paramédicos y rescatistas', 'perfilVoluntarios coincide');
   assert(idea1.esAnonimo === false, 'esAnonimo es booleano falso');
   assert(idea1.emailCreador === 'creador@example.com', 'emailCreador coincide');
 
   const fetchedIdea = IdeaRepository.findById(idea1.id, db);
   assert(fetchedIdea !== null && fetchedIdea.titulo === 'Red de Filtros de Agua', 'findById recupera la idea');
+  assert(fetchedIdea !== null && fetchedIdea.requiereVoluntarios === true && fetchedIdea.cantidadVoluntarios === 8, 'findById recupera campos de voluntarios');
 
   const updatedIdea = IdeaRepository.updateStatus(idea1.id, 'idea', null, db);
   assert(updatedIdea.estado === 'idea', 'updateStatus cambia a idea pública');
 
-  const listResult = IdeaRepository.findMany({ estado: 'idea' }, db);
-  assert(listResult.total === 1 && listResult.ideas.length === 1, 'findMany filtra por estado');
+  const listResult = IdeaRepository.findMany({ estado: 'idea', requiereVoluntarios: true }, db);
+  assert(listResult.total === 1 && listResult.ideas.length === 1, 'findMany filtra por estado y requiereVoluntarios');
 
   const counts = IdeaRepository.countByEstado(db);
   assert(counts.idea === 1 && counts.borrador === 0, 'countByEstado calcula totales');
@@ -236,7 +244,47 @@ async function runTests() {
   AlertaRepository.deactivateAll(db);
   assert(AlertaRepository.getActive(db) === null, 'deactivateAll desactiva todas las alertas');
 
-  console.log('\n✨ ¡Todas las pruebas unitarias de los 8 repositorios DAL pasaron exitosamente (100% OK)!');
+  // 9. Tests SolicitudLegalRepository
+  console.log('\n🔹 Probando SolicitudLegalRepository...');
+  const legal1 = SolicitudLegalRepository.create({
+    nombreCiudadano: 'Carlos Gómez',
+    tipoDocumento: 'CC',
+    cedulaCiudadano: '1144001122',
+    emailContacto: 'carlos.gomez@correo.com',
+    telefonoContacto: '3159988776',
+    departamento: 'Valle del Cauca',
+    municipio: 'Jamundí',
+    direccionFisica: 'Vereda San Antonio',
+    asunto: 'Inclusión en RUD por desbordamiento de río',
+    hechos: 'El día 10 de agosto la creciente súbita arrasó con el muro de contención...',
+    peticiones: 'Se realice censo e inclusión prioritaria en el RUD municipal.',
+    anexos: 'Fotografías del predio y certificado de bomberos.',
+  }, db);
+
+  assert(legal1.id !== undefined, 'Solicitud legal creada con UUID');
+  assert(legal1.estado === 'pendiente', 'Estado inicial es pendiente');
+  assert(legal1.departamento === 'Valle del Cauca' && legal1.municipio === 'Jamundí', 'Ubicación guardada correctamente');
+
+  const foundLegal = SolicitudLegalRepository.findById(legal1.id, db);
+  assert(foundLegal !== null && foundLegal.nombreCiudadano === 'Carlos Gómez', 'findById recupera la solicitud legal');
+
+  const updatedLegal = SolicitudLegalRepository.update(legal1.id, {
+    estado: 'en_contacto',
+    abogadoAsignado: 'Dra. María Abogada',
+    notasSeguimiento: 'Contactado vía WhatsApp para revisar anexos.',
+  }, db);
+  assert(updatedLegal.estado === 'en_contacto' && updatedLegal.abogadoAsignado === 'Dra. María Abogada', 'update actualiza estado y abogado');
+
+  const listLegal = SolicitudLegalRepository.findMany({ estado: 'en_contacto' }, db);
+  assert(listLegal.total === 1 && listLegal.solicitudes.length === 1, 'findMany filtra por estado');
+
+  const countsLegal = SolicitudLegalRepository.countByEstado(db);
+  assert(countsLegal.en_contacto === 1 && countsLegal.pendiente === 0, 'countByEstado calcula totales de solicitudes');
+
+  SolicitudLegalRepository.delete(legal1.id, db);
+  assert(SolicitudLegalRepository.findById(legal1.id, db) === null, 'delete elimina solicitud legal');
+
+  console.log('\n✨ ¡Todas las pruebas unitarias de los 9 repositorios DAL pasaron exitosamente (100% OK)!');
 }
 
 runTests().catch((err) => {

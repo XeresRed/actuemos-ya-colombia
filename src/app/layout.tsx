@@ -13,6 +13,11 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_CO",
   },
+  icons: {
+    icon: "/favicon-actuemos-ya-colombia-asterisco.ico",
+    shortcut: "/favicon-actuemos-ya-colombia-asterisco.ico",
+    apple: "/favicon-actuemos-ya-colombia-asterisco.ico",
+  },
 };
 
 export default function RootLayout({
@@ -23,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="es" className="light">
       <head>
+        <link rel="icon" href="/favicon-actuemos-ya-colombia-asterisco.ico" sizes="any" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

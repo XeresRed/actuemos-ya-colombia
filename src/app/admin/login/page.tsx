@@ -7,10 +7,15 @@ import { useRouter } from 'next/navigation';
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [devLoading, setDevLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const cleanEmail = email.trim().toLowerCase();
+  const isMasterAdmin = cleanEmail === 'cam960210@gmail.com';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,18 +25,39 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/magic-link/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
+      if (isMasterAdmin) {
+        // Flujo de autenticación directa por contraseña para el usuario master
+        if (!password) {
+          throw new Error('Por favor ingresa la contraseña maestra.');
+        }
 
-      const json = await res.json();
-      if (!res.ok || !json.ok) {
-        throw new Error(json.error?.message || 'Error al solicitar el enlace de acceso.');
+        const res = await fetch('/api/auth/master-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail, password }),
+        });
+
+        const json = await res.json();
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error?.message || 'Error en la autenticación maestra.');
+        }
+
+        router.push('/admin');
+      } else {
+        // Flujo estándar Passwordless / Magic Link para moderadores y supervisores
+        const res = await fetch('/api/auth/magic-link/request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const json = await res.json();
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error?.message || 'Error al solicitar el enlace de acceso.');
+        }
+
+        setSent(true);
       }
-
-      setSent(true);
     } catch (err: any) {
       setErrorMsg(err.message || 'Error al procesar la solicitud.');
     } finally {
@@ -87,17 +113,31 @@ export default function AdminLoginPage() {
             </div>
           ) : null}
 
-          <div className="bg-surface-container-low border border-secondary-fixed rounded-lg p-3 flex items-start gap-2 text-xs">
-            <span className="material-symbols-outlined text-secondary text-base mt-0.5 shrink-0">
-              info
-            </span>
-            <div>
-              <h2 className="font-label-md font-bold text-on-surface">Autenticación Passwordless</h2>
-              <p className="text-on-surface-variant mt-0.5">
-                Ingresa tu correo institucional o registrado. Enviaremos un Magic Link válido por 15 minutos. Tu sesión se mantendrá activa por 30 días.
-              </p>
+          {isMasterAdmin ? (
+            <div className="bg-amber-50 border border-amber-300 rounded-lg p-3 flex items-start gap-2 text-xs text-amber-950 animate-in fade-in duration-200">
+              <span className="material-symbols-outlined text-amber-700 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+                verified_user
+              </span>
+              <div>
+                <h2 className="font-label-md font-bold">Cuenta Master Admin Detectada</h2>
+                <p className="text-amber-900 mt-0.5">
+                  Ingresa la contraseña maestra configurada en el servidor para acceder inmediatamente.
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-surface-container-low border border-secondary-fixed rounded-lg p-3 flex items-start gap-2 text-xs">
+              <span className="material-symbols-outlined text-secondary text-base mt-0.5 shrink-0">
+                info
+              </span>
+              <div>
+                <h2 className="font-label-md font-bold text-on-surface">Autenticación Passwordless</h2>
+                <p className="text-on-surface-variant mt-0.5">
+                  Ingresa tu correo institucional o registrado. Enviaremos un Magic Link válido por 15 minutos. Tu sesión se mantendrá activa por 30 días.
+                </p>
+              </div>
+            </div>
+          )}
 
           {!sent ? (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -121,13 +161,56 @@ export default function AdminLoginPage() {
                 </div>
               </div>
 
+              {/* Campo dinámico de contraseña exclusivo para usuario master */}
+              {isMasterAdmin && (
+                <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                  <label className="font-label-md text-xs font-bold text-on-surface block mb-1" htmlFor="admin-password">
+                    Contraseña Maestra
+                  </label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">
+                      lock
+                    </span>
+                    <input
+                      id="admin-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full bg-surface border border-outline-variant rounded py-2.5 pl-9 pr-10 text-sm focus:border-secondary outline-none"
+                      placeholder="••••••••••••"
+                      required
+                      type={showPassword ? 'text' : 'password'}
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface text-xs"
+                      tabIndex={-1}
+                    >
+                      <span className="material-symbols-outlined text-sm">
+                        {showPassword ? 'visibility_off' : 'visibility'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase tracking-wider py-3 rounded hover:bg-secondary-container transition-colors flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
               >
-                <span>{loading ? 'Enviando Enlace...' : 'Enviar Enlace Mágico'}</span>
-                <span className="material-symbols-outlined text-base">send</span>
+                {isMasterAdmin ? (
+                  <>
+                    <span>{loading ? 'Verificando Contraseña...' : 'Iniciar Sesión Master'}</span>
+                    <span className="material-symbols-outlined text-base">login</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{loading ? 'Enviando Enlace...' : 'Enviar Enlace Mágico'}</span>
+                    <span className="material-symbols-outlined text-base">send</span>
+                  </>
+                )}
               </button>
 
               {/* Botón de Acceso Rápido de Desarrollo (Solo en Local / Dev) */}

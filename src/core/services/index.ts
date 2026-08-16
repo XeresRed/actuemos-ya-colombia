@@ -7,3 +7,4 @@ export * from './iniciativa.service';
 export * from './busqueda.service';
 export * from './voluntariado.service';
 export * from './alerta.service';
+export * from './legal.service';

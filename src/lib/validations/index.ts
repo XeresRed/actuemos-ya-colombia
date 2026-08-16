@@ -7,6 +7,9 @@ export const CreateIdeaSchema = z.object({
   alcanceTipo: z.enum(['general', 'region', 'ciudad', 'grupo_especifico']).optional().default('general'),
   alcanceDetalle: z.string().max(150).optional().nullable(),
   iniciativaExistenteUrl: z.string().max(500).optional().nullable(),
+  requiereVoluntarios: z.boolean().optional().default(false),
+  cantidadVoluntarios: z.number().int().positive('La cantidad de voluntarios debe ser mayor a 0').max(1000).optional().nullable(),
+  perfilVoluntarios: z.string().max(200, 'El perfil de voluntarios no puede superar 200 caracteres').optional().nullable(),
   esAnonimo: z.boolean().optional().default(false),
   emailCreador: z.string().email('Debe ser un correo electrónico válido').optional().nullable(),
   captchaToken: z.string().optional(),
@@ -119,4 +122,35 @@ export const UpdateUsuarioSchema = z.object({
   rol: z.enum(['admin', 'supervisor']).optional(),
   nombre: z.string().max(100).optional().nullable(),
 });
+
+export const MasterLoginSchema = z.object({
+  email: z.string().email('Debe proporcionar un correo electrónico válido'),
+  password: z.string().min(1, 'La contraseña es requerida'),
+});
+
+export const CreateSolicitudLegalSchema = z.object({
+  nombreCiudadano: z.string().min(3, 'El nombre debe tener al menos 3 caracteres').max(150),
+  tipoDocumento: z.enum(['CC', 'TI', 'CE', 'PTP', 'Pasaporte']).optional().default('CC'),
+  cedulaCiudadano: z.string().min(4, 'El documento debe tener al menos 4 caracteres').max(30),
+  emailContacto: z.string().email('Debe ser un correo electrónico válido'),
+  telefonoContacto: z.string().min(7, 'El teléfono debe tener al menos 7 dígitos').max(20),
+  departamento: z.string().min(2, 'El departamento es requerido').max(100),
+  municipio: z.string().min(2, 'El municipio o ciudad es requerido').max(100),
+  direccionFisica: z.string().max(200).optional().nullable(),
+  asunto: z.string().min(5, 'El asunto debe tener al menos 5 caracteres').max(200),
+  hechos: z.string().min(15, 'Los hechos deben tener al menos 15 caracteres').max(5000),
+  peticiones: z.string().min(10, 'Las peticiones deben tener al menos 10 caracteres').max(5000),
+  anexos: z.string().max(1000).optional().nullable(),
+  aceptaConsentimiento: z.boolean().refine((val) => val === true, {
+    message: 'Debe aceptar el consentimiento de tratamiento de datos y el descargo legal',
+  }),
+  captchaToken: z.string().optional(),
+});
+
+export const PatchSolicitudLegalSchema = z.object({
+  estado: z.enum(['pendiente', 'en_contacto', 'atendida', 'cerrada']).optional(),
+  abogadoAsignado: z.string().max(150).optional().nullable(),
+  notasSeguimiento: z.string().max(2000).optional().nullable(),
+});
+
 

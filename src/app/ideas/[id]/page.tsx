@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Idea, IdeaEstado } from '../../../core/domain/idea';
 import type { ComentarioConRespuestas } from '../../../core/domain/comentario';
-import { TurnstileWidget } from '../../../components/ui/TurnstileWidget';
+import { TurnstileModal } from '../../../components/ui/TurnstileModal';
 import { MarkdownRenderer } from '../../../components/ui/MarkdownRenderer';
 
 interface IdeaDetailPageProps {
@@ -24,7 +24,7 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
   const [autorEmail, setAutorEmail] = useState('');
   const [isAnonimo, setIsAnonimo] = useState(true);
   const [replyToId, setReplyToId] = useState<string | null>(null);
-  const [captchaToken, setCaptchaToken] = useState<string>('dev-token');
+  const [showCaptchaModal, setShowCaptchaModal] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -64,10 +64,19 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
     }
   };
 
-  const handlePostComment = async (e: React.FormEvent) => {
+  const handlePostComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) return;
 
+    if (!isAnonimo && (!autorEmail || !autorEmail.includes('@'))) {
+      alert('Por favor ingresa un correo electrónico válido para tu comentario verificado.');
+      return;
+    }
+
+    setShowCaptchaModal(true);
+  };
+
+  const handleVerifiedPostComment = async (token: string) => {
     setSubmittingComment(true);
 
     try {
@@ -80,7 +89,7 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
           contenidoMarkdown: commentText,
           esAnonimo: isAnonimo,
           autorEmail: !isAnonimo && autorEmail ? autorEmail : null,
-          captchaToken,
+          captchaToken: token,
         }),
       });
 
@@ -100,6 +109,7 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
       setReplyToId(null);
     } catch (err: any) {
       alert(err.message || 'Error al enviar comentario.');
+      throw err;
     } finally {
       setSubmittingComment(false);
     }
@@ -179,6 +189,33 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
               <span>Ver Initiative / Canal Oficial ({idea.iniciativaExistenteUrl})</span>
               <span className="material-symbols-outlined text-xs">open_in_new</span>
             </a>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Volunteer Request Callout Banner */}
+      {idea.requiereVoluntarios ? (
+        <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl mb-stack-lg flex items-start gap-3.5 shadow-sm text-xs">
+          <span className="material-symbols-outlined text-amber-700 mt-0.5 shrink-0 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+            handshake
+          </span>
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center gap-2 mb-0.5">
+              <h3 className="font-label-md font-bold text-amber-950 text-sm">
+                Convocatoria de Voluntarios / Brigadistas Activa
+              </h3>
+              <span className="bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full text-[11px]">
+                {idea.cantidadVoluntarios ? `${idea.cantidadVoluntarios} voluntarios requeridos` : 'Voluntarios requeridos'}
+              </span>
+            </div>
+            <p className="text-amber-900 leading-relaxed">
+              Esta propuesta ciudadana requiere apoyo y manos en terreno para su ejecución.
+              {idea.perfilVoluntarios ? (
+                <span className="block mt-1 font-semibold text-amber-950">
+                  🎯 Perfil solicitado: <span className="font-normal">{idea.perfilVoluntarios}</span>
+                </span>
+              ) : null}
+            </p>
           </div>
         </div>
       ) : null}
@@ -276,6 +313,12 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
               <span className="material-symbols-outlined text-xs">verified_user</span>
               <span>Autor: {idea.esAnonimo ? 'Ciudadano Anónimo' : `${idea.emailCreador} (Verificado)`}</span>
             </div>
+            {idea.requiereVoluntarios ? (
+              <div className="flex items-center gap-1 bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded">
+                <span className="material-symbols-outlined text-xs text-amber-700" style={{ fontVariationSettings: "'FILL' 1" }}>handshake</span>
+                <span>{idea.cantidadVoluntarios ? `${idea.cantidadVoluntarios} ` : ''}Voluntarios solicitados</span>
+              </div>
+            ) : null}
           </div>
         </header>
 
@@ -347,17 +390,25 @@ export default function IdeaDetailPage({ params }: IdeaDetailPageProps) {
               ) : null}
             </div>
 
-            {/* Cloudflare Turnstile Verification */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-              <TurnstileWidget action="comentar_idea" onSuccess={(token) => setCaptchaToken(token)} className="my-0" />
+            <div className="flex items-center justify-end pt-1">
               <button
                 type="submit"
                 disabled={submittingComment}
-                className="bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase px-5 py-2.5 rounded-lg hover:bg-secondary-container transition-colors active:scale-95 disabled:opacity-50 shrink-0 ml-auto"
+                className="bg-secondary text-on-secondary font-label-md text-xs font-bold uppercase px-5 py-2.5 rounded-lg hover:bg-secondary-container transition-colors active:scale-95 disabled:opacity-50 shrink-0"
               >
                 {submittingComment ? 'Publicando...' : 'Publicar Comentario'}
               </button>
             </div>
+
+            {/* Just-in-Time Security Verification Modal */}
+            <TurnstileModal
+              isOpen={showCaptchaModal}
+              onClose={() => setShowCaptchaModal(false)}
+              onVerified={handleVerifiedPostComment}
+              action="comentar_idea"
+              title="Verificación de Comentario"
+              description="Verificamos tu aporte para proteger la conversación cívica comunitaria contra spam."
+            />
           </div>
         </form>
 

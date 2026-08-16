@@ -362,6 +362,32 @@ export default function EmergencyHubPage() {
                     <p className="font-body-md text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
                       {idea.descripcionMarkdown.replace(/[#*`_\[\]]/g, '')}
                     </p>
+
+                    {/* Linked Initiative clickable pill */}
+                    {idea.iniciativaExistenteUrl ? (
+                      <a
+                        href={idea.iniciativaExistenteUrl.startsWith('http') ? idea.iniciativaExistenteUrl : `https://${idea.iniciativaExistenteUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-2 bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/50 p-1.5 rounded text-[11px] text-secondary hover:text-primary transition-colors flex items-center justify-between gap-1 font-semibold truncate group/link z-10"
+                        title={`Abrir iniciativa externa vinculada: ${idea.iniciativaExistenteUrl}`}
+                      >
+                        <div className="flex items-center gap-1 truncate">
+                          <span className="material-symbols-outlined text-xs shrink-0">link</span>
+                          <span className="truncate">Iniciativa vinculada: {idea.iniciativaExistenteUrl.replace(/^https?:\/\//, '')}</span>
+                        </div>
+                        <span className="material-symbols-outlined text-[12px] opacity-70 group-hover/link:opacity-100 shrink-0">open_in_new</span>
+                      </a>
+                    ) : null}
+
+                    {/* Volunteer Request Indicator */}
+                    {idea.requiereVoluntarios ? (
+                      <div className="mt-2 inline-flex items-center gap-1 bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-semibold w-fit">
+                        <span className="material-symbols-outlined text-xs text-amber-700" style={{ fontVariationSettings: "'FILL' 1" }}>handshake</span>
+                        <span>{idea.cantidadVoluntarios ? `${idea.cantidadVoluntarios} ` : ''}voluntarios solicitados</span>
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="pt-2 border-t border-outline-variant/60 flex justify-between items-center text-xs">

@@ -11,6 +11,7 @@ import {
   BusquedaService,
   VoluntariadoService,
   AlertaService,
+  LegalService,
 } from '../src/core/services';
 import {
   IdeaRepository,
@@ -146,12 +147,18 @@ async function runTests() {
     categoria: 'Rescate',
     emailCreador: 'drones@rescate.org',
     iniciativaExistenteUrl: 'https://cruzroja.org.co/drones',
+    requiereVoluntarios: true,
+    cantidadVoluntarios: 12,
+    perfilVoluntarios: 'Pilotos de drones y rescatistas',
     esAnonimo: false,
   });
 
   assert(emailIdeaRes.requiresOtp === true, 'Idea con email requiere verificación OTP');
   assert(emailIdeaRes.idea.estado === 'borrador', 'Comienza en borrador antes de validar OTP');
   assert(emailIdeaRes.idea.iniciativaExistenteUrl === 'https://cruzroja.org.co/drones', 'Iniciativa existente vinculada guardada');
+  assert(emailIdeaRes.idea.requiereVoluntarios === true, 'requiereVoluntarios guardado en IdeaService');
+  assert(emailIdeaRes.idea.cantidadVoluntarios === 12, 'cantidadVoluntarios guardado en IdeaService');
+  assert(emailIdeaRes.idea.perfilVoluntarios === 'Pilotos de drones y rescatistas', 'perfilVoluntarios guardado en IdeaService');
 
   // C. Transiciones del Pipeline
   const promoted = await IdeaService.promoteIdea(approvedIdea.id, 'admin');
@@ -279,6 +286,57 @@ async function runTests() {
 
   // Eliminación de iniciativa
   IniciativaService.deleteInitiative(officialInit.id, 'admin');
+
+  // 9. LegalService Tests
+  console.log('\n🔹 Probando LegalService (Derecho de Petición y Asistencia Legal)...');
+  const legalReq = await LegalService.createSolicitud(
+    {
+      nombreCiudadano: 'Elena Restrepo <script>alert("xss")</script>',
+      tipoDocumento: 'CC',
+      cedulaCiudadano: '31223344',
+      emailContacto: 'elena@ejemplo.com',
+      telefonoContacto: '3101234567',
+      departamento: 'Valle del Cauca',
+      municipio: 'Cali',
+      asunto: 'Subsidio de Arrendamiento Temporal y Caracterización RUD',
+      hechos: '1. Mi vivienda en Siloé sufrió agrietamiento severo. 2. No he recibido subsidio.',
+      peticiones: 'Se asigne subsidio de arriendo y se certifique la condición de damnificada.',
+      aceptaConsentimiento: true,
+    },
+    'dev-token'
+  );
+
+  assert(legalReq.id !== undefined, 'LegalService crea solicitud con ID');
+  assert(!legalReq.nombreCiudadano.includes('<script>'), 'LegalService sanitiza XSS en nombre');
+  assert(legalReq.estado === 'pendiente', 'Estado inicial es pendiente');
+
+  const supervisorLegalList = await LegalService.listSolicitudes({ estado: 'pendiente' }, 'supervisor');
+  assert(supervisorLegalList.solicitudes.length >= 1, 'Supervisor puede listar solicitudes');
+
+  const updatedReq = await LegalService.updateSolicitud(
+    legalReq.id,
+    {
+      estado: 'en_contacto',
+      abogadoAsignado: 'Dr. Alejandro Legal',
+      notasSeguimiento: 'Llamada realizada y agendada revisión de documentos.',
+    },
+    'supervisor'
+  );
+  assert(updatedReq.estado === 'en_contacto', 'Actualiza estado a en_contacto');
+  assert(updatedReq.abogadoAsignado === 'Dr. Alejandro Legal', 'Asigna abogado');
+
+  const retrievedReq = await LegalService.getSolicitudById(legalReq.id, 'supervisor');
+  assert(retrievedReq.id === legalReq.id, 'getSolicitudById retorna la solicitud');
+
+  // Solo admin puede eliminar
+  try {
+    await LegalService.deleteSolicitud(legalReq.id, 'supervisor');
+    assert(false, 'Supervisor no debería poder eliminar solicitudes');
+  } catch (err: any) {
+    assert(err.statusCode === 403 || err instanceof ForbiddenError, 'Supervisor recibe ForbiddenError al intentar eliminar');
+  }
+
+  await LegalService.deleteSolicitud(legalReq.id, 'admin');
 
   console.log('\n✨ ¡Todas las pruebas unitarias de los Servicios de Negocio (Core Services) pasaron exitosamente (100% OK)!');
 }

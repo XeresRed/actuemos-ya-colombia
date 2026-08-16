@@ -21,6 +21,9 @@ export interface Idea {
   alcanceDetalle: string | null;
   estado: IdeaEstado;
   iniciativaExistenteUrl: string | null;
+  requiereVoluntarios: boolean;
+  cantidadVoluntarios: number | null;
+  perfilVoluntarios: string | null;
   esAnonimo: boolean;
   emailCreador: string | null;
   verificado: boolean;
@@ -37,6 +40,9 @@ export interface CreateIdeaDTO {
   alcanceDetalle?: string | null;
   estado?: IdeaEstado;
   iniciativaExistenteUrl?: string | null;
+  requiereVoluntarios?: boolean;
+  cantidadVoluntarios?: number | null;
+  perfilVoluntarios?: string | null;
   esAnonimo?: boolean;
   emailCreador?: string | null;
   verificado?: boolean;
@@ -50,6 +56,9 @@ export interface UpdateIdeaDTO {
   alcanceDetalle?: string | null;
   estado?: IdeaEstado;
   iniciativaExistenteUrl?: string | null;
+  requiereVoluntarios?: boolean;
+  cantidadVoluntarios?: number | null;
+  perfilVoluntarios?: string | null;
   verificado?: boolean;
 }
 
@@ -57,6 +66,7 @@ export interface IdeaFilter {
   estado?: IdeaEstado | IdeaEstado[];
   categoria?: string;
   alcanceTipo?: AlcanceTipo;
+  requiereVoluntarios?: boolean;
   search?: string;
   limit?: number;
   offset?: number;

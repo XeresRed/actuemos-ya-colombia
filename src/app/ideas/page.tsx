@@ -349,14 +349,22 @@ export default function IdeasDirectoryPage() {
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="mb-3 bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/50 p-2 rounded text-[11px] text-secondary hover:text-primary transition-colors flex items-center justify-between gap-1 font-semibold truncate group/link z-10"
-                    title={`Abrir iniciativa externa: ${idea.iniciativaExistenteUrl}`}
+                    title={`Abrir iniciativa externa vinculada: ${idea.iniciativaExistenteUrl}`}
                   >
-                    <div className="flex items-center gap-1 truncate">
+                    <div className="flex items-center gap-1.5 truncate">
                       <span className="material-symbols-outlined text-xs shrink-0">link</span>
-                      <span className="truncate">Iniciativa: {idea.iniciativaExistenteUrl.replace(/^https?:\/\//, '')}</span>
+                      <span className="truncate">Iniciativa vinculada: {idea.iniciativaExistenteUrl.replace(/^https?:\/\//, '')}</span>
                     </div>
                     <span className="material-symbols-outlined text-[12px] opacity-70 group-hover/link:opacity-100 shrink-0">open_in_new</span>
                   </a>
+                ) : null}
+
+                {/* Volunteer Request Indicator */}
+                {idea.requiereVoluntarios ? (
+                  <div className="mb-3 inline-flex items-center gap-1 bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded text-[11px] font-semibold w-fit">
+                    <span className="material-symbols-outlined text-xs text-amber-700" style={{ fontVariationSettings: "'FILL' 1" }}>handshake</span>
+                    <span>{idea.cantidadVoluntarios ? `${idea.cantidadVoluntarios} ` : ''}voluntarios solicitados</span>
+                  </div>
                 ) : null}
 
                 <div className="pt-3 border-t border-outline-variant flex justify-between items-center text-xs">

@@ -14,6 +14,7 @@ Este documento es el manual operativo y técnico del proyecto **ActuemosYaColomb
   - **Passwordless:** Sin contraseñas guardadas. Acceso administrativo únicamente con Magic Links temporales.
   - **Protección Anti-Bot:** Captcha (reCAPTCHA v3 / Cloudflare Turnstile) obligatorio en todos los formularios públicos.
 * **Validación Empírica:** Nunca se declara una tarea o bug como resuelto sin ejecutar comandos de verificación (build, lints o pruebas).
+* **Actualización Obligatoria del Changelog:** Todo cambio notable, nueva funcionalidad, corrección de errores o refinamiento completado DEBE ser registrado inmediatamente en `CHANGELOG.md` documentando la versión, la fecha y los requerimientos abordados bajo el estándar Keep a Changelog.
 
 ### 1.2. Guía Concreta de Commits y Comentarios de Código
 
@@ -107,6 +108,7 @@ Capa de Acceso a Datos / DAL (src/db/repositories)
 - [ ] ¿Todas las consultas SQL son Prepared Statements parametrizados?
 - [ ] ¿Los mensajes de commit siguen la especificación de `PLAYBOOK.md`?
 - [ ] ¿Se ejecutaron las pruebas o el comando de build exitosamente?
+- [ ] ¿Se actualizó `CHANGELOG.md` documentando la versión y los cambios realizados?
 
 ## 5. Ejemplos practicos 
 

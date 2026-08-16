@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Voluntariado, TipoVoluntariado } from '../../core/domain/voluntariado';
-import { TurnstileWidget } from '../../components/ui/TurnstileWidget';
+import { TurnstileModal } from '../../components/ui/TurnstileModal';
 
 const AREAS_PROFESIONALES = [
   'Operario de Drones / Sensores Térmicos',
@@ -44,7 +44,7 @@ export default function VoluntariosMatchingPage() {
   const [ubicacion, setUbicacion] = useState('');
   const [esMayorDeEdad, setEsMayorDeEdad] = useState(false);
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string>('dev-token');
+  const [showCaptchaModal, setShowCaptchaModal] = useState(false);
 
   const [formLoading, setFormLoading] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
@@ -146,7 +146,7 @@ export default function VoluntariosMatchingPage() {
     setRevealedContacts((prev) => ({ ...prev, [id]: true }));
   };
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
 
@@ -160,7 +160,17 @@ export default function VoluntariosMatchingPage() {
       return;
     }
 
+    if (!tituloNecesidad.trim() || !descripcion.trim() || !nombreContacto.trim() || !emailContacto.trim()) {
+      setFormError('Por favor completa todos los campos obligatorios.');
+      return;
+    }
+
+    setShowCaptchaModal(true);
+  };
+
+  const handleVerifiedSubmit = async (token: string) => {
     setFormLoading(true);
+    setFormError(null);
 
     const finalArea = areaProfesional === 'Otros' && otraArea.trim() ? `Otros: ${otraArea.trim()}` : areaProfesional;
 
@@ -179,7 +189,7 @@ export default function VoluntariosMatchingPage() {
           ubicacion: ubicacion || null,
           esMayorDeEdad: true,
           aceptaTerminos: true,
-          captchaToken,
+          captchaToken: token,
         }),
       });
 
@@ -191,6 +201,7 @@ export default function VoluntariosMatchingPage() {
       setFormSuccess(true);
     } catch (err: any) {
       setFormError(err.message || 'Error al procesar el registro.');
+      throw err;
     } finally {
       setFormLoading(false);
     }
@@ -454,9 +465,6 @@ export default function VoluntariosMatchingPage() {
                 </div>
               </div>
 
-              {/* Cloudflare Turnstile Verification */}
-              <TurnstileWidget action="registro_voluntario" onSuccess={(token) => setCaptchaToken(token)} />
-
               <button
                 type="submit"
                 disabled={formLoading}
@@ -467,6 +475,16 @@ export default function VoluntariosMatchingPage() {
                 <span>{formLoading ? 'Enviando Registro...' : 'Registrar para Revisión'}</span>
                 <span className="material-symbols-outlined text-sm">send</span>
               </button>
+
+              {/* Just-in-Time Security Verification Modal */}
+              <TurnstileModal
+                isOpen={showCaptchaModal}
+                onClose={() => setShowCaptchaModal(false)}
+                onVerified={handleVerifiedSubmit}
+                action="registro_voluntario"
+                title="Verificación de Voluntariado"
+                description="Protegemos la red de voluntarios contra registros falsos y envíos automatizados."
+              />
             </form>
           )}
         </div>

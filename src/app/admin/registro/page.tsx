@@ -2,22 +2,33 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { TurnstileWidget } from '../../../components/ui/TurnstileWidget';
+import { TurnstileModal } from '../../../components/ui/TurnstileModal';
 
 export default function SupervisorRegisterPage() {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [organizacion, setOrganizacion] = useState('');
   const [motivacion, setMotivacion] = useState('');
-  const [captchaToken, setCaptchaToken] = useState<string>('dev-token');
+  const [showCaptchaModal, setShowCaptchaModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    if (!nombre.trim() || !email.trim() || !motivacion.trim()) {
+      setErrorMsg('Por favor completa todos los campos requeridos.');
+      return;
+    }
+
+    setShowCaptchaModal(true);
+  };
+
+  const handleVerifiedSubmit = async (token: string) => {
     setLoading(true);
+    setErrorMsg(null);
 
     try {
       const res = await fetch('/api/auth/register-supervisor', {
@@ -28,7 +39,7 @@ export default function SupervisorRegisterPage() {
           email,
           organizacion: organizacion || null,
           motivacion,
-          captchaToken,
+          captchaToken: token,
         }),
       });
 
@@ -40,6 +51,7 @@ export default function SupervisorRegisterPage() {
       setSubmitted(true);
     } catch (err: any) {
       setErrorMsg(err.message || 'Error al procesar la solicitud.');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -158,9 +170,6 @@ export default function SupervisorRegisterPage() {
               />
             </div>
 
-            {/* Cloudflare Turnstile Anti-bot Protection */}
-            <TurnstileWidget action="postulacion_moderador" onSuccess={(token) => setCaptchaToken(token)} />
-
             <button
               type="submit"
               disabled={loading}
@@ -169,6 +178,16 @@ export default function SupervisorRegisterPage() {
               <span>{loading ? 'Enviando Postulación...' : 'Enviar Postulación como Moderador'}</span>
               <span className="material-symbols-outlined text-base">how_to_reg</span>
             </button>
+
+            {/* Just-in-Time Security Verification Modal */}
+            <TurnstileModal
+              isOpen={showCaptchaModal}
+              onClose={() => setShowCaptchaModal(false)}
+              onVerified={handleVerifiedSubmit}
+              action="postulacion_moderador"
+              title="Verificación de Moderador"
+              description="Verificamos tu postulación para proteger el equipo cívico contra spam y accesos automatizados."
+            />
 
             <footer className="border-t border-outline-variant pt-3 flex items-center justify-between text-xs">
               <Link href="/admin/login" className="text-secondary hover:underline flex items-center gap-1">

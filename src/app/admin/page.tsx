@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import type { Voluntariado } from '../../core/domain/voluntariado';
 import type { AlertaSistema, NivelAlerta } from '../../core/domain/alerta';
 import type { Iniciativa } from '../../core/domain/iniciativa';
+import type { SolicitudAsistenciaLegal, SolicitudLegalEstado } from '../../core/domain/solicitud-legal';
 
 interface UsuarioAdmin {
   id: string;
@@ -26,6 +27,7 @@ interface IdeaBorrador {
   estado: string;
   esAnonimo: boolean;
   emailCreador: string | null;
+  iniciativaExistenteUrl?: string | null;
   creadoEn: string;
 }
 
@@ -105,12 +107,13 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<UsuarioAdmin | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'borradores' | 'voluntarios' | 'iniciativas' | 'alertas' | 'usuarios'>('borradores');
+  const [activeTab, setActiveTab] = useState<'borradores' | 'voluntarios' | 'legal' | 'iniciativas' | 'alertas' | 'usuarios'>('borradores');
 
   // Estados de datos
   const [borradores, setBorradores] = useState<IdeaBorrador[]>([]);
   const [usuarios, setUsuarios] = useState<UsuarioAdmin[]>([]);
   const [voluntariosPendientes, setVoluntariosPendientes] = useState<Voluntariado[]>([]);
+  const [solicitudesLegales, setSolicitudesLegales] = useState<SolicitudAsistenciaLegal[]>([]);
   const [iniciativas, setIniciativas] = useState<Iniciativa[]>([]);
   const [alertas, setAlertas] = useState<AlertaSistema[]>([]);
 
@@ -120,6 +123,11 @@ export default function AdminDashboardPage() {
 
   const [voluntariosPage, setVoluntariosPage] = useState(1);
   const [voluntariosOrder, setVoluntariosOrder] = useState<'desc' | 'asc'>('desc');
+
+  const [legalPage, setLegalPage] = useState(1);
+  const [legalOrder, setLegalOrder] = useState<'desc' | 'asc'>('desc');
+  const [filtroEstadoLegal, setFiltroEstadoLegal] = useState<string>('todos');
+  const [searchLegal, setSearchLegal] = useState('');
 
   const [iniciativasPage, setIniciativasPage] = useState(1);
   const [iniciativasOrder, setIniciativasOrder] = useState<'desc' | 'asc'>('desc');
@@ -175,14 +183,21 @@ export default function AdminDashboardPage() {
           setVoluntariosPendientes(volJson.data.voluntariados);
         }
 
-        // 3. Cargar iniciativas activas
+        // 3. Cargar solicitudes de asistencia legal
+        const legalRes = await fetch('/api/recursos/asistencia-legal?limit=100&order=desc');
+        const legalJson = await legalRes.json();
+        if (legalJson.ok && legalJson.data.solicitudes) {
+          setSolicitudesLegales(legalJson.data.solicitudes);
+        }
+
+        // 4. Cargar iniciativas activas
         const iniRes = await fetch('/api/iniciativas?limit=100');
         const iniJson = await iniRes.json();
         if (iniJson.ok && iniJson.data.iniciativas) {
           setIniciativas(iniJson.data.iniciativas);
         }
 
-        // 4. Si es admin, cargar alertas completas y usuarios
+        // 5. Si es admin, cargar alertas completas y usuarios
         if (sessionJson.data.user.rol === 'admin') {
           const alertRes = await fetch('/api/alertas?all=true');
           const alertJson = await alertRes.json();
@@ -502,6 +517,57 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Acciones de Asistencia Legal
+  const handleUpdateLegalStatus = async (
+    id: string,
+    newEstado: SolicitudLegalEstado,
+    abogadoAsignado?: string,
+    notasSeguimiento?: string
+  ) => {
+    setActionLoading(`legal-${id}`);
+    try {
+      const res = await fetch(`/api/recursos/asistencia-legal/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          estado: newEstado,
+          abogadoAsignado,
+          notasSeguimiento,
+        }),
+      });
+      const json = await res.json();
+      if (json.ok && json.data) {
+        setSolicitudesLegales(prev => prev.map(s => s.id === id ? json.data : s));
+        showToast(`Solicitud legal actualizada a estado "${newEstado}".`);
+      } else {
+        alert(json.error?.message || 'Error al actualizar solicitud legal.');
+      }
+    } catch {
+      alert('Error al actualizar solicitud legal.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteLegal = async (id: string) => {
+    if (!confirm('¿Estás seguro de eliminar esta solicitud de asistencia legal?')) return;
+    setActionLoading(`legal-del-${id}`);
+    try {
+      const res = await fetch(`/api/recursos/asistencia-legal/${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.ok) {
+        setSolicitudesLegales(prev => prev.filter(s => s.id !== id));
+        showToast('Solicitud legal eliminada exitosamente.');
+      } else {
+        alert(json.error?.message || 'Error al eliminar solicitud legal.');
+      }
+    } catch {
+      alert('Error al eliminar solicitud legal.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   // Helper de ordenamiento
   const sortItems = <T extends { creadoEn?: string; actualizadoEn?: string }>(items: T[], order: 'desc' | 'asc'): T[] => {
     return [...items].sort((a, b) => {
@@ -526,6 +592,29 @@ export default function AdminDashboardPage() {
     [sortedVoluntarios, voluntariosPage]
   );
 
+  const filteredSolicitudesLegales = useMemo(() => {
+    return solicitudesLegales.filter((sol) => {
+      if (filtroEstadoLegal !== 'todos' && sol.estado !== filtroEstadoLegal) {
+        return false;
+      }
+      if (searchLegal.trim()) {
+        const q = searchLegal.toLowerCase();
+        const matchNom = sol.nombreCiudadano.toLowerCase().includes(q);
+        const matchCed = sol.cedulaCiudadano.toLowerCase().includes(q);
+        const matchAsu = sol.asunto.toLowerCase().includes(q);
+        const matchMun = sol.municipio.toLowerCase().includes(q);
+        if (!matchNom && !matchCed && !matchAsu && !matchMun) return false;
+      }
+      return true;
+    });
+  }, [solicitudesLegales, filtroEstadoLegal, searchLegal]);
+
+  const sortedLegal = useMemo(() => sortItems(filteredSolicitudesLegales, legalOrder), [filteredSolicitudesLegales, legalOrder]);
+  const pagedLegal = useMemo(
+    () => sortedLegal.slice((legalPage - 1) * PAGE_SIZE, legalPage * PAGE_SIZE),
+    [sortedLegal, legalPage]
+  );
+
   const sortedIniciativas = useMemo(() => sortItems(iniciativas, iniciativasOrder), [iniciativas, iniciativasOrder]);
   const pagedIniciativas = useMemo(
     () => sortedIniciativas.slice((iniciativasPage - 1) * PAGE_SIZE, iniciativasPage * PAGE_SIZE),
@@ -546,6 +635,7 @@ export default function AdminDashboardPage() {
   );
 
   const activeAlertsCount = useMemo(() => alertas.filter((a) => a.activa).length, [alertas]);
+  const pendingLegalCount = useMemo(() => solicitudesLegales.filter((s) => s.estado === 'pendiente').length, [solicitudesLegales]);
 
   if (loading) {
     return (
@@ -606,23 +696,32 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter mb-stack-lg">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-gutter mb-stack-lg">
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-primary">
           <div className="flex justify-between items-start mb-2">
-            <span className="font-label-md text-xs text-on-surface-variant">Borradores de Ideas</span>
+            <span className="font-label-md text-xs text-on-surface-variant">Borradores</span>
             <span className="material-symbols-outlined text-primary p-1 rounded-full text-xs">lightbulb</span>
           </div>
           <div className="font-headline-lg text-3xl font-bold text-on-surface">{borradores.length}</div>
-          <div className="font-label-sm text-xs text-on-surface-variant mt-1">Pendientes de revisión</div>
+          <div className="font-label-sm text-xs text-on-surface-variant mt-1">Por revisar</div>
         </div>
 
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-secondary">
           <div className="flex justify-between items-start mb-2">
-            <span className="font-label-md text-xs text-on-surface-variant">Voluntariados Pendientes</span>
+            <span className="font-label-md text-xs text-on-surface-variant">Voluntariados</span>
             <span className="material-symbols-outlined text-secondary p-1 rounded-full text-xs">engineering</span>
           </div>
           <div className="font-headline-lg text-3xl font-bold text-on-surface">{voluntariosPendientes.length}</div>
-          <div className="font-label-sm text-xs text-on-surface-variant mt-1">Por validar</div>
+          <div className="font-label-sm text-xs text-on-surface-variant mt-1">Pendientes</div>
+        </div>
+
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-emerald-600">
+          <div className="flex justify-between items-start mb-2">
+            <span className="font-label-md text-xs text-on-surface-variant">Asistencia Legal</span>
+            <span className="material-symbols-outlined text-emerald-600 p-1 rounded-full text-xs">balance</span>
+          </div>
+          <div className="font-headline-lg text-3xl font-bold text-on-surface">{pendingLegalCount}</div>
+          <div className="font-label-sm text-xs text-on-surface-variant mt-1">Casos pendientes</div>
         </div>
 
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-amber-600">
@@ -631,16 +730,16 @@ export default function AdminDashboardPage() {
             <span className="material-symbols-outlined text-amber-600 p-1 rounded-full text-xs">warning</span>
           </div>
           <div className="font-headline-lg text-3xl font-bold text-on-surface">{activeAlertsCount}</div>
-          <div className="font-label-sm text-xs text-on-surface-variant mt-1">En el carrusel global</div>
+          <div className="font-label-sm text-xs text-on-surface-variant mt-1">En el carrusel</div>
         </div>
 
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm border-t-4 border-t-outline">
           <div className="flex justify-between items-start mb-2">
-            <span className="font-label-md text-xs text-on-surface-variant">Iniciativas Activas</span>
+            <span className="font-label-md text-xs text-on-surface-variant">Iniciativas</span>
             <span className="material-symbols-outlined text-outline p-1 rounded-full text-xs">corporate_fare</span>
           </div>
           <div className="font-headline-lg text-3xl font-bold text-on-surface">{iniciativas.length}</div>
-          <div className="font-label-sm text-xs text-on-surface-variant mt-1">En directorio público</div>
+          <div className="font-label-sm text-xs text-on-surface-variant mt-1">Directorio público</div>
         </div>
       </div>
 
@@ -670,6 +769,19 @@ export default function AdminDashboardPage() {
         >
           <span className="material-symbols-outlined text-sm">engineering</span>
           <span>Talento ({voluntariosPendientes.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('legal')}
+          className={`px-4 py-2.5 font-label-md text-xs font-bold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'legal'
+              ? 'border-emerald-600 text-emerald-700'
+              : 'border-transparent text-on-surface-variant hover:text-on-surface'
+          }`}
+        >
+          <span className="material-symbols-outlined text-sm">balance</span>
+          <span>Asistencia Legal ({pendingLegalCount})</span>
         </button>
 
         <button
@@ -755,6 +867,21 @@ export default function AdminDashboardPage() {
                       <p className="font-body-md text-xs text-on-surface-variant line-clamp-2">
                         {item.descripcionMarkdown}
                       </p>
+
+                      {item.iniciativaExistenteUrl ? (
+                        <a
+                          href={item.iniciativaExistenteUrl.startsWith('http') ? item.iniciativaExistenteUrl : `https://${item.iniciativaExistenteUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-2 inline-flex items-center gap-1 bg-surface-container-high border border-outline-variant/60 px-2 py-1 rounded text-[11px] text-secondary hover:text-primary font-semibold truncate group/link"
+                          title={`Abrir iniciativa externa vinculada: ${item.iniciativaExistenteUrl}`}
+                        >
+                          <span className="material-symbols-outlined text-xs shrink-0">link</span>
+                          <span className="truncate">Iniciativa vinculada: {item.iniciativaExistenteUrl.replace(/^https?:\/\//, '')}</span>
+                          <span className="material-symbols-outlined text-[12px] opacity-70 group-hover/link:opacity-100 shrink-0">open_in_new</span>
+                        </a>
+                      ) : null}
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
@@ -883,6 +1010,210 @@ export default function AdminDashboardPage() {
                 }}
               />
             </>
+          )}
+        </section>
+      ) : null}
+
+      {/* Tab: Asistencia Legal (Admin & Supervisor) */}
+      {activeTab === 'legal' ? (
+        <section className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant pb-4">
+            <div>
+              <h2 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary">balance</span>
+                <span>Solicitudes de Asistencia Legal y Derechos de Petición</span>
+              </h2>
+              <p className="font-body-md text-xs text-on-surface-variant mt-0.5">
+                Canaliza las solicitudes ciudadanas de orientación jurídica y articulación con abogados voluntarios.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-2.5 top-2 text-on-surface-variant text-sm">search</span>
+                <input
+                  type="text"
+                  value={searchLegal}
+                  onChange={(e) => {
+                    setSearchLegal(e.target.value);
+                    setLegalPage(1);
+                  }}
+                  placeholder="Buscar por nombre, cédula o asunto..."
+                  className="pl-8 pr-3 py-1.5 bg-surface border border-outline-variant rounded text-xs text-on-surface focus:border-secondary outline-none min-w-[220px]"
+                />
+              </div>
+
+              <select
+                value={filtroEstadoLegal}
+                onChange={(e) => {
+                  setFiltroEstadoLegal(e.target.value);
+                  setLegalPage(1);
+                }}
+                className="bg-surface border border-outline-variant rounded px-3 py-1.5 text-xs text-on-surface font-semibold outline-none cursor-pointer"
+              >
+                <option value="todos">Todos los Estados ({solicitudesLegales.length})</option>
+                <option value="pendiente">Pendientes ({solicitudesLegales.filter(s => s.estado === 'pendiente').length})</option>
+                <option value="en_contacto">En Contacto ({solicitudesLegales.filter(s => s.estado === 'en_contacto').length})</option>
+                <option value="atendida">Atendidas ({solicitudesLegales.filter(s => s.estado === 'atendida').length})</option>
+                <option value="cerrada">Cerradas ({solicitudesLegales.filter(s => s.estado === 'cerrada').length})</option>
+              </select>
+            </div>
+          </div>
+
+          {pagedLegal.length === 0 ? (
+            <div className="text-center py-12 text-on-surface-variant">
+              <span className="material-symbols-outlined text-4xl mb-2 text-outline">fact_check</span>
+              <p className="font-semibold text-sm text-on-surface">No hay solicitudes en este filtro</p>
+              <p className="text-xs mt-1">Actualmente no se registran peticiones legales con los criterios seleccionados.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {pagedLegal.map((sol) => {
+                const whatsappUrl = `https://wa.me/57${sol.telefonoContacto.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${sol.nombreCiudadano}, te contactamos desde la red de asistencia legal de ActuemosYaColombia respecto a tu solicitud sobre "${sol.asunto}".`)}`;
+                const mailtoUrl = `mailto:${sol.emailContacto}?subject=${encodeURIComponent(`Asistencia Legal ActuemosYaColombia — ${sol.asunto}`)}`;
+
+                return (
+                  <div
+                    key={sol.id}
+                    className="border border-outline-variant rounded-xl p-5 bg-surface hover:border-secondary/40 transition-colors shadow-sm space-y-3 text-xs"
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-outline-variant/60 pb-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${
+                            sol.estado === 'pendiente'
+                              ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                              : sol.estado === 'en_contacto'
+                              ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                              : sol.estado === 'atendida'
+                              ? 'bg-green-100 text-green-900 border border-green-300'
+                              : 'bg-gray-100 text-gray-800 border border-gray-300'
+                          }`}
+                        >
+                          Estado: {sol.estado.replace('_', ' ')}
+                        </span>
+                        <span className="font-semibold text-on-surface">
+                          {sol.municipio} ({sol.departamento})
+                        </span>
+                        <span className="text-on-surface-variant text-[11px]">
+                          • Radicado: {new Date(sol.creadoEn).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={whatsappUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold text-xs rounded transition-colors inline-flex items-center gap-1 shadow-sm"
+                          title="Contactar vía WhatsApp"
+                        >
+                          <span className="material-symbols-outlined text-xs">chat</span>
+                          <span>WhatsApp</span>
+                        </a>
+                        <a
+                          href={mailtoUrl}
+                          className="px-3 py-1.5 bg-surface border border-outline hover:bg-surface-variant text-on-surface font-semibold text-xs rounded transition-colors inline-flex items-center gap-1"
+                          title="Enviar correo electrónico"
+                        >
+                          <span className="material-symbols-outlined text-xs">mail</span>
+                          <span>Correo</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-headline-md text-sm font-bold text-on-surface mb-1">
+                        {sol.asunto}
+                      </h3>
+                      <div className="text-on-surface-variant font-medium flex flex-wrap gap-x-4 gap-y-1 mb-2">
+                        <span><strong>Ciudadano:</strong> {sol.nombreCiudadano} ({sol.tipoDocumento} {sol.cedulaCiudadano})</span>
+                        <span><strong>Tel:</strong> {sol.telefonoContacto}</span>
+                        <span><strong>Email:</strong> {sol.emailContacto}</span>
+                        {sol.direccionFisica && <span><strong>Dir:</strong> {sol.direccionFisica}</span>}
+                      </div>
+
+                      <div className="bg-surface-container-low p-3 rounded-lg border border-outline-variant/60 space-y-2">
+                        <div>
+                          <strong className="text-on-surface block mb-0.5">Hechos relatados:</strong>
+                          <p className="text-on-surface-variant whitespace-pre-wrap leading-relaxed">{sol.hechos}</p>
+                        </div>
+                        <div>
+                          <strong className="text-on-surface block mb-0.5">Peticiones concretas:</strong>
+                          <p className="text-on-surface-variant whitespace-pre-wrap leading-relaxed">{sol.peticiones}</p>
+                        </div>
+                        {sol.anexos && (
+                          <div>
+                            <strong className="text-on-surface block mb-0.5">Anexos:</strong>
+                            <p className="text-on-surface-variant">{sol.anexos}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Gestión de Estado y Asignación */}
+                    <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-outline-variant/60">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-bold text-on-surface-variant">Cambiar Estado:</span>
+                        <button
+                          type="button"
+                          disabled={actionLoading === `legal-${sol.id}`}
+                          onClick={() => handleUpdateLegalStatus(sol.id, 'en_contacto')}
+                          className={`px-2.5 py-1 rounded text-[11px] font-bold border transition-colors ${
+                            sol.estado === 'en_contacto' ? 'bg-blue-600 text-white border-blue-600' : 'bg-surface text-on-surface border-outline hover:bg-blue-50'
+                          }`}
+                        >
+                          En Contacto
+                        </button>
+                        <button
+                          type="button"
+                          disabled={actionLoading === `legal-${sol.id}`}
+                          onClick={() => handleUpdateLegalStatus(sol.id, 'atendida')}
+                          className={`px-2.5 py-1 rounded text-[11px] font-bold border transition-colors ${
+                            sol.estado === 'atendida' ? 'bg-green-600 text-white border-green-600' : 'bg-surface text-on-surface border-outline hover:bg-green-50'
+                          }`}
+                        >
+                          Atendida / Asignada
+                        </button>
+                        <button
+                          type="button"
+                          disabled={actionLoading === `legal-${sol.id}`}
+                          onClick={() => handleUpdateLegalStatus(sol.id, 'cerrada')}
+                          className={`px-2.5 py-1 rounded text-[11px] font-bold border transition-colors ${
+                            sol.estado === 'cerrada' ? 'bg-gray-700 text-white border-gray-700' : 'bg-surface text-on-surface border-outline hover:bg-gray-100'
+                          }`}
+                        >
+                          Cerrar Caso
+                        </button>
+                      </div>
+
+                      {currentUser?.rol === 'admin' && (
+                        <button
+                          type="button"
+                          disabled={actionLoading === `legal-del-${sol.id}`}
+                          onClick={() => handleDeleteLegal(sol.id)}
+                          className="text-error font-bold hover:underline self-end sm:self-center"
+                        >
+                          Eliminar Solicitud
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              <AdminPagination
+                currentPage={legalPage}
+                totalItems={filteredSolicitudesLegales.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setLegalPage}
+                order={legalOrder}
+                onOrderChange={(newOrder) => {
+                  setLegalOrder(newOrder);
+                  setLegalPage(1);
+                }}
+              />
+            </div>
           )}
         </section>
       ) : null}

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { TurnstileWidget } from '../../../components/ui/TurnstileWidget';
+import { TurnstileModal } from '../../../components/ui/TurnstileModal';
 
 export default function PublicarNuevaIdeaPage() {
   const router = useRouter();
@@ -14,8 +14,11 @@ export default function PublicarNuevaIdeaPage() {
   const [alcanceTipo, setAlcanceTipo] = useState('general');
   const [alcanceDetalle, setAlcanceDetalle] = useState('');
   const [iniciativaExistenteUrl, setIniciativaExistenteUrl] = useState('');
+  const [requiereVoluntarios, setRequiereVoluntarios] = useState(false);
+  const [cantidadVoluntarios, setCantidadVoluntarios] = useState<number | ''>('');
+  const [perfilVoluntarios, setPerfilVoluntarios] = useState('');
   const [descripcionMarkdown, setDescripcionMarkdown] = useState('');
-  const [captchaToken, setCaptchaToken] = useState<string>('dev-token');
+  const [showCaptchaModal, setShowCaptchaModal] = useState(false);
 
   // Estados de proceso
   const [loading, setLoading] = useState(false);
@@ -24,10 +27,26 @@ export default function PublicarNuevaIdeaPage() {
   const [otpCode, setOtpCode] = useState('');
   const [verifyingOtp, setVerifyingOtp] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    if (!titulo.trim() || !categoria || !descripcionMarkdown.trim()) {
+      setErrorMsg('Por favor completa los campos obligatorios antes de continuar.');
+      return;
+    }
+
+    if (authorship === 'verified' && (!email || !email.includes('@'))) {
+      setErrorMsg('Por favor ingresa un correo electrónico válido para verificar tu propuesta.');
+      return;
+    }
+
+    setShowCaptchaModal(true);
+  };
+
+  const handleVerifiedSubmit = async (token: string) => {
     setLoading(true);
+    setErrorMsg(null);
 
     try {
       const res = await fetch('/api/ideas', {
@@ -40,9 +59,12 @@ export default function PublicarNuevaIdeaPage() {
           alcanceTipo,
           alcanceDetalle: alcanceDetalle || null,
           iniciativaExistenteUrl: iniciativaExistenteUrl || null,
+          requiereVoluntarios,
+          cantidadVoluntarios: requiereVoluntarios && cantidadVoluntarios ? Number(cantidadVoluntarios) : null,
+          perfilVoluntarios: requiereVoluntarios && perfilVoluntarios ? perfilVoluntarios : null,
           esAnonimo: authorship === 'anonymous',
           emailCreador: authorship === 'verified' ? email : null,
-          captchaToken,
+          captchaToken: token,
         }),
       });
 
@@ -57,6 +79,7 @@ export default function PublicarNuevaIdeaPage() {
       });
     } catch (err: any) {
       setErrorMsg(err.message || 'Error al procesar la propuesta.');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -364,6 +387,64 @@ export default function PublicarNuevaIdeaPage() {
               </p>
             </div>
 
+            {/* Solicitud de Voluntarios / Brigadistas */}
+            <div className="bg-surface-container-low border border-outline-variant rounded-xl p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="requiere-voluntarios-checkbox"
+                  checked={requiereVoluntarios}
+                  onChange={(e) => setRequiereVoluntarios(e.target.checked)}
+                  className="mt-1 w-4 h-4 rounded border-outline text-secondary focus:ring-secondary cursor-pointer"
+                />
+                <label htmlFor="requiere-voluntarios-checkbox" className="cursor-pointer">
+                  <span className="font-label-md font-bold text-on-surface text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-secondary text-lg">handshake</span>
+                    ¿Esta propuesta u operación requiere brigadistas o voluntarios en terreno?
+                  </span>
+                  <p className="font-body-md text-xs text-on-surface-variant mt-0.5">
+                    Activa esta opción si necesitas convocar apoyo ciudadano, brigadistas o perfiles técnicos específicos para ejecutar la solución.
+                  </p>
+                </label>
+              </div>
+
+              {requiereVoluntarios && (
+                <div className="pt-3 border-t border-outline-variant/60 grid grid-cols-1 sm:grid-cols-12 gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="sm:col-span-4">
+                    <label className="block font-label-sm text-xs font-bold text-on-surface mb-1" htmlFor="cantidad-voluntarios-input">
+                      Cantidad estimada <span className="text-error">*</span>
+                    </label>
+                    <input
+                      id="cantidad-voluntarios-input"
+                      type="number"
+                      min={1}
+                      max={1000}
+                      value={cantidadVoluntarios}
+                      onChange={(e) => setCantidadVoluntarios(e.target.value ? Math.max(1, parseInt(e.target.value, 10)) : '')}
+                      className="w-full rounded border border-outline-variant bg-surface px-3 py-2 text-sm focus:border-secondary outline-none"
+                      placeholder="Ej. 5"
+                      required={requiereVoluntarios}
+                    />
+                  </div>
+
+                  <div className="sm:col-span-8">
+                    <label className="block font-label-sm text-xs font-bold text-on-surface mb-1" htmlFor="perfil-voluntarios-input">
+                      Perfil o rol requerido (Opcional)
+                    </label>
+                    <input
+                      id="perfil-voluntarios-input"
+                      type="text"
+                      maxLength={200}
+                      value={perfilVoluntarios}
+                      onChange={(e) => setPerfilVoluntarios(e.target.value)}
+                      className="w-full rounded border border-outline-variant bg-surface px-3 py-2 text-sm focus:border-secondary outline-none"
+                      placeholder="Ej. Médicos de urgencia, rescatistas, operarios de drones, logística"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="block font-label-sm text-xs font-bold text-on-surface mb-1" htmlFor="idea-description">
                 Descripción Detallada (Soporta Markdown) <span className="text-error">*</span>
@@ -382,9 +463,6 @@ export default function PublicarNuevaIdeaPage() {
                 Puedes usar formato Markdown: **negrita**, *cursiva*, listas (#, -, 1.) y enlaces.
               </p>
             </div>
-
-            {/* Cloudflare Turnstile Verification */}
-            <TurnstileWidget action="proponer_idea" onSuccess={(token) => setCaptchaToken(token)} />
           </section>
 
           {/* Action buttons */}
@@ -403,6 +481,16 @@ export default function PublicarNuevaIdeaPage() {
               {loading ? 'Enviando Propuesta...' : 'Enviar Propuesta'}
             </button>
           </div>
+
+          {/* Just-in-Time Security Verification Modal */}
+          <TurnstileModal
+            isOpen={showCaptchaModal}
+            onClose={() => setShowCaptchaModal(false)}
+            onVerified={handleVerifiedSubmit}
+            action="proponer_idea"
+            title="Verificación de Propuesta"
+            description="Verificamos tu solicitud para proteger el muro de iniciativas cívicas contra spam y envíos automatizados."
+          />
         </form>
       )}
     </div>

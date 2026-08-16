@@ -13,6 +13,9 @@ interface IdeaRow {
   alcance_detalle: string | null;
   estado: IdeaEstado;
   iniciativa_existente_url: string | null;
+  requiere_voluntarios?: number;
+  cantidad_voluntarios?: number | null;
+  perfil_voluntarios?: string | null;
   es_anonimo: number;
   email_creador: string | null;
   verificado: number;
@@ -30,6 +33,9 @@ function mapRowToIdea(row: IdeaRow): Idea {
     alcanceDetalle: row.alcance_detalle,
     estado: row.estado,
     iniciativaExistenteUrl: row.iniciativa_existente_url,
+    requiereVoluntarios: Boolean(row.requiere_voluntarios),
+    cantidadVoluntarios: row.cantidad_voluntarios !== null && row.cantidad_voluntarios !== undefined ? Number(row.cantidad_voluntarios) : null,
+    perfilVoluntarios: row.perfil_voluntarios ?? null,
     esAnonimo: Boolean(row.es_anonimo),
     emailCreador: row.email_creador,
     verificado: Boolean(row.verificado),
@@ -70,6 +76,11 @@ export const IdeaRepository = {
       params.push(filters.alcanceTipo);
     }
 
+    if (filters.requiereVoluntarios !== undefined) {
+      conditions.push('requiere_voluntarios = ?');
+      params.push(filters.requiereVoluntarios ? 1 : 0);
+    }
+
     if (filters.search) {
       conditions.push('(titulo LIKE ? OR descripcion_markdown LIKE ? OR alcance_detalle LIKE ?)');
       const searchParam = `%${filters.search}%`;
@@ -106,12 +117,16 @@ export const IdeaRepository = {
     const verificado = dto.verificado ?? false;
     const estado: IdeaEstado = dto.estado || (esAnonimo ? 'borrador' : 'borrador');
     const alcanceTipo: AlcanceTipo = dto.alcanceTipo || 'general';
+    const requiereVoluntarios = dto.requiereVoluntarios ? 1 : 0;
+    const cantidadVoluntarios = dto.cantidadVoluntarios ?? null;
+    const perfilVoluntarios = dto.perfilVoluntarios ?? null;
 
     const stmt = db.prepare(`
       INSERT INTO ideas (
         id, titulo, descripcion_markdown, categoria, alcance_tipo, alcance_detalle,
-        estado, iniciativa_existente_url, es_anonimo, email_creador, verificado
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        estado, iniciativa_existente_url, requiere_voluntarios, cantidad_voluntarios,
+        perfil_voluntarios, es_anonimo, email_creador, verificado
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
@@ -123,6 +138,9 @@ export const IdeaRepository = {
       dto.alcanceDetalle ?? null,
       estado,
       dto.iniciativaExistenteUrl ?? null,
+      requiereVoluntarios,
+      cantidadVoluntarios,
+      perfilVoluntarios,
       esAnonimo ? 1 : 0,
       dto.emailCreador ?? null,
       verificado ? 1 : 0
@@ -171,6 +189,18 @@ export const IdeaRepository = {
     if (dto.iniciativaExistenteUrl !== undefined) {
       fields.push('iniciativa_existente_url = ?');
       params.push(dto.iniciativaExistenteUrl);
+    }
+    if (dto.requiereVoluntarios !== undefined) {
+      fields.push('requiere_voluntarios = ?');
+      params.push(dto.requiereVoluntarios ? 1 : 0);
+    }
+    if (dto.cantidadVoluntarios !== undefined) {
+      fields.push('cantidad_voluntarios = ?');
+      params.push(dto.cantidadVoluntarios);
+    }
+    if (dto.perfilVoluntarios !== undefined) {
+      fields.push('perfil_voluntarios = ?');
+      params.push(dto.perfilVoluntarios);
     }
     if (dto.verificado !== undefined) {
       fields.push('verificado = ?');
