@@ -82,6 +82,7 @@ async function runApiTests() {
       descripcionMarkdown: 'Instalación de antenas Starlink portátiles para comunicación en zonas de desastre.',
       categoria: 'Tecnología',
       alcanceTipo: 'general',
+      iniciativaExistenteUrl: 'https://starlink.com/response',
       esAnonimo: true,
       captchaToken: 'test-token',
     }),
@@ -89,6 +90,7 @@ async function runApiTests() {
   const createIdeaRes = await postIdeas(validIdeaReq);
   const createIdeaJson = await createIdeaRes.json() as any;
   assert(createIdeaRes.status === 201 && createIdeaJson.ok === true, 'Crea propuesta ciudadana con HTTP 201');
+  assert(createIdeaJson.data.idea.iniciativaExistenteUrl === 'https://starlink.com/response', 'Guarda iniciativa existente vinculada');
   const ideaId = createIdeaJson.data.idea.id;
 
   // GET /api/ideas (Listado)
@@ -179,25 +181,43 @@ async function runApiTests() {
   const postBusquedaRes = await postBusqueda(postBusquedaReq);
   assert(postBusquedaRes.status === 201, 'Crea reporte humanitario con HTTP 201');
 
-  // 6. Tests /api/voluntarios & /api/voluntarios/match
-  console.log('\n🔹 Probando /api/voluntarios y matching...');
+  // 6. Tests /api/voluntarios & /api/voluntarios/[id]
+  console.log('\n🔹 Probando /api/voluntarios (Registro con Términos, Mayoría de Edad y Moderación)...');
   const postVolReq = new NextRequest('http://localhost:3000/api/voluntarios', {
     method: 'POST',
     body: JSON.stringify({
       tipo: 'ofrezco_habilidad',
-      areaProfesional: 'Ingeniería Civil',
+      areaProfesional: 'Ingeniería Civil / Estructural',
       tituloNecesidad: 'Evaluación Estructural de Edificaciones',
       descripcion: 'Ingeniero calculista disponible para peritaje de viviendas afectadas.',
       nombreContacto: 'Ing. Morales',
       emailContacto: 'morales@ingenieria.co',
       ubicacion: 'Cali',
+      esMayorDeEdad: true,
+      aceptaTerminos: true,
       captchaToken: 'test-token',
     }),
   });
   const postVolRes = await postVoluntario(postVolReq);
-  assert(postVolRes.status === 201, 'Registra oferta de voluntariado profesional con HTTP 201');
+  const postVolJson = await postVolRes.json() as any;
+  assert(postVolRes.status === 201 && postVolJson.data.voluntariado.estado === 'pendiente', 'Registra voluntariado con HTTP 201 en estado pendiente');
 
-  const matchReq = new NextRequest('http://localhost:3000/api/voluntarios/match?area=Ingenier%C3%ADa%20Civil');
+  const volId = postVolJson.data.voluntariado.id;
+
+  // Moderación PATCH /api/voluntarios/[id]
+  const { PATCH: patchVoluntario, DELETE: deleteVoluntario } = await import('../src/app/api/voluntarios/[id]/route');
+  const patchVolReq = new NextRequest(`http://localhost:3000/api/voluntarios/${volId}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${adminToken}`,
+    },
+    body: JSON.stringify({ estado: 'activo' }),
+  });
+  const patchVolRes = await patchVoluntario(patchVolReq, { params: { id: volId } });
+  const patchVolJson = await patchVolRes.json() as any;
+  assert(patchVolRes.status === 200 && patchVolJson.data.estado === 'activo', 'Supervisor aprueba voluntariado a estado "activo"');
+
+  const matchReq = new NextRequest('http://localhost:3000/api/voluntarios/match?area=Ingenier%C3%ADa%20Civil%20%2F%20Estructural');
   const matchRes = await matchVoluntarios(matchReq);
   const matchJson = await matchRes.json() as any;
   assert(matchRes.status === 200 && matchJson.data.ofertas.length >= 1, 'Endpoint de matching retorna ofertas');
@@ -234,6 +254,60 @@ async function runApiTests() {
   const authSessionRes = await getSessionRoute(authSessionReq);
   const authSessionJson = await authSessionRes.json() as any;
   assert(authSessionJson.data.authenticated === true && authSessionJson.data.user.email === 'admin@actuemosya.org', 'Valida sesión administrativa');
+
+  // 9. Tests /api/auth/register-supervisor & /api/usuarios
+  console.log('\n🔹 Probando Postulación y Aprobación de Supervisores (/api/auth/register-supervisor y /api/usuarios)...');
+  const testSupEmail = `alejandro.${Date.now()}@salud.org`;
+  const regReq = new NextRequest('http://localhost:3000/api/auth/register-supervisor', {
+    method: 'POST',
+    body: JSON.stringify({
+      nombre: 'Dr. Alejandro Gaviria',
+      email: testSupEmail,
+      organizacion: 'Epidemiología Comunitaria',
+      motivacion: 'Apoyo en vigilancia epidemiológica post-desastre en albergues.',
+      captchaToken: 'test-token',
+    }),
+  });
+  const { POST: registerSupervisor } = await import('../src/app/api/auth/register-supervisor/route');
+  const regRes = await registerSupervisor(regReq);
+  const regJson = await regRes.json() as any;
+  assert(regRes.status === 201 && regJson.data.user.activo === false, 'Registra supervisor en estado inactivo (pendiente de aprobación)');
+
+  const supervisorId = regJson.data.user.id;
+
+  // GET /api/usuarios (Admin only)
+  const { GET: getUsuarios } = await import('../src/app/api/usuarios/route');
+  const getUsuariosReq = new NextRequest('http://localhost:3000/api/usuarios', {
+    headers: {
+      'Authorization': `Bearer ${adminToken}`,
+    },
+  });
+  const getUsuariosRes = await getUsuarios(getUsuariosReq);
+  const getUsuariosJson = await getUsuariosRes.json() as any;
+  assert(getUsuariosRes.status === 200 && Array.isArray(getUsuariosJson.data), 'GET /api/usuarios lista usuarios para admin');
+
+  // PATCH /api/usuarios/[id] (Aprobar y activar)
+  const { PATCH: patchUsuario } = await import('../src/app/api/usuarios/[id]/route');
+  const patchUserReq = new NextRequest(`http://localhost:3000/api/usuarios/${supervisorId}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${adminToken}`,
+    },
+    body: JSON.stringify({ activo: true }),
+  });
+  const patchUserRes = await patchUsuario(patchUserReq, { params: { id: supervisorId } });
+  const patchUserJson = await patchUserRes.json() as any;
+  assert(patchUserRes.status === 200 && patchUserJson.data.activo === true, 'Admin activa a supervisor y dispara Magic Link');
+
+  // 10. Tests /api/auth/dev-login (Acceso Rápido de Desarrollo)
+  console.log('\n🔹 Probando /api/auth/dev-login (Acceso Rápido de Desarrollo)...');
+  const { POST: devLogin } = await import('../src/app/api/auth/dev-login/route');
+  const devLoginReq = new NextRequest('http://localhost:3000/api/auth/dev-login', {
+    method: 'POST',
+  });
+  const devLoginRes = await devLogin(devLoginReq);
+  const devLoginJson = await devLoginRes.json() as any;
+  assert(devLoginRes.status === 200 && devLoginJson.data.sessionToken !== undefined, 'Acceso rápido de desarrollo genera sesión de 30 días');
 
   console.log('\n✨ ¡Todas las pruebas de integración de la API (Fase 3) pasaron exitosamente (100% OK)!');
 }

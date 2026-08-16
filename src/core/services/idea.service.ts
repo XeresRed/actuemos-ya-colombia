@@ -50,12 +50,15 @@ export const IdeaService = {
     // Si tiene correo, requiere validación OTP antes de pasar a estado público 'idea'
     const requiresOtp = !esAnonimo && Boolean(emailCreador);
 
+    const cleanIniciativaUrl = dto.iniciativaExistenteUrl ? SanitizeService.sanitizePlainText(dto.iniciativaExistenteUrl) : null;
+
     const createdIdea = IdeaRepository.create({
       titulo: cleanTitle,
       descripcionMarkdown: cleanDescription,
       categoria: dto.categoria || 'General',
       alcanceTipo: dto.alcanceTipo || 'general',
       alcanceDetalle: cleanDetalle,
+      iniciativaExistenteUrl: cleanIniciativaUrl,
       estado: 'borrador',
       esAnonimo,
       emailCreador,

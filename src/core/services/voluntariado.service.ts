@@ -17,7 +17,7 @@ import type { UsuarioRol } from '../domain/usuario';
 
 export const VoluntariadoService = {
   /**
-   * Registra una oferta de habilidad o una solicitud de profesional técnico.
+   * Registra una oferta de habilidad o una solicitud de profesional técnico en estado 'pendiente'.
    */
   async createVolunteering(dto: CreateVoluntariadoDTO, captchaToken?: string): Promise<Voluntariado> {
     const isCaptchaValid = await CaptchaService.verifyToken(captchaToken);
@@ -61,7 +61,7 @@ export const VoluntariadoService = {
       emailContacto: dto.emailContacto.trim().toLowerCase(),
       telefonoContacto: cleanTelefono,
       ubicacion: cleanUbicacion,
-      estado: 'activo',
+      estado: dto.estado || 'pendiente',
     });
   },
 
@@ -84,7 +84,7 @@ export const VoluntariadoService = {
   },
 
   /**
-   * Matching bidireccional entre ofertas de habilidades y solicitudes de ONGs/brigadas.
+   * Matching bidireccional entre ofertas de habilidades y solicitudes de ONGs/brigadas activas.
    */
   matchSkills(areaProfesional: string, ubicacion?: string): {
     ofertas: Voluntariado[];
@@ -111,9 +111,29 @@ export const VoluntariadoService = {
   },
 
   /**
-   * Actualiza el estado de un voluntariado (ej. cubierto, pausado).
+   * Aprueba una oferta o solicitud de voluntariado pasando de 'pendiente' a 'activo'.
+   */
+  approveVolunteering(id: string, userRole?: UsuarioRol): Voluntariado {
+    if (!userRole || (userRole !== 'admin' && userRole !== 'supervisor')) {
+      throw new ForbiddenError('Solo moderadores autorizados pueden aprobar voluntariados.');
+    }
+
+    const item = VoluntariadoRepository.findById(id);
+    if (!item) {
+      throw new NotFoundError(`Registro con ID '${id}' no encontrado.`);
+    }
+
+    return VoluntariadoRepository.updateStatus(id, 'activo');
+  },
+
+  /**
+   * Actualiza el estado de un voluntariado (ej. activo, cubierto, pausado).
    */
   updateStatus(id: string, estado: EstadoVoluntariado, userRole?: UsuarioRol): Voluntariado {
+    if (!userRole || (userRole !== 'admin' && userRole !== 'supervisor')) {
+      throw new ForbiddenError('Solo moderadores autorizados pueden cambiar el estado del registro.');
+    }
+
     const item = VoluntariadoRepository.findById(id);
     if (!item) {
       throw new NotFoundError(`Registro con ID '${id}' no encontrado.`);
@@ -128,6 +148,11 @@ export const VoluntariadoService = {
   deleteVolunteering(id: string, userRole?: UsuarioRol): boolean {
     if (!userRole || (userRole !== 'admin' && userRole !== 'supervisor')) {
       throw new ForbiddenError('Solo moderadores autorizados pueden eliminar solicitudes de voluntariado.');
+    }
+
+    const existing = VoluntariadoRepository.findById(id);
+    if (!existing) {
+      throw new NotFoundError(`Registro con ID '${id}' no encontrado.`);
     }
 
     return VoluntariadoRepository.delete(id);

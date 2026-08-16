@@ -7,13 +7,15 @@ export function runSeed() {
   const db = getDb();
 
   // 1. Usuarios
+  const defaultAdminEmail = (process.env.ADMIN_DEFAULT_EMAIL || 'admin@actuemosya.org').trim().toLowerCase();
   const insertUser = db.prepare(`
     INSERT OR REPLACE INTO usuarios (id, email, nombre, rol, activo)
     VALUES (?, ?, ?, ?, ?)
   `);
 
-  insertUser.run('usr-1', 'admin@actuemosya.org', 'Super Administrador', 'admin', 1);
+  insertUser.run('usr-1', defaultAdminEmail, 'Super Administrador', 'admin', 1);
   insertUser.run('usr-2', 'supervisor@actuemosya.org', 'Supervisor General', 'supervisor', 1);
+  insertUser.run('usr-3-pending', 'postulante@voluntarios.org', 'Carlos Postulante', 'supervisor', 0);
 
   // 2. Ideas
   const insertIdea = db.prepare(`
@@ -300,7 +302,7 @@ export function runSeed() {
   insertVolunteer.run(
     'vol-3',
     'ofrezco_habilidad',
-    'Psicología Clínica y de Crisis',
+    'Psicología de Crisis / Primeros Auxilios Psicológicos',
     'Atención psicológica remota y presencial para primeros auxilios psicológicos',
     'Especialista en duelo y trauma comunitario. Disponibilidad de 20 horas semanales.',
     'David Valencia',
@@ -308,6 +310,19 @@ export function runSeed() {
     '+57 320 8899776',
     'Remoto / Popayán',
     'activo'
+  );
+
+  insertVolunteer.run(
+    'vol-4-pending',
+    'ofrezco_habilidad',
+    'Operario de Drones / Sensores Térmicos',
+    'Piloto de drones con cámara termográfica para búsqueda de personas',
+    'Equipo DJI Matrice 300 con sensor térmico y autonomía de 4 baterías para rastreo nocturno.',
+    'Andrés Barreto',
+    'andres.drones@aereo.co',
+    '+57 318 7766554',
+    'Valle del Cauca y Cauca',
+    'pendiente'
   );
 
   // 7. Alertas de Emergencia del Sistema

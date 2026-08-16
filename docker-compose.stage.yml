@@ -19,15 +19,15 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DATABASE_URL=/data/database.sqlite
-      - APP_DOMAIN=${APP_DOMAIN:-stage.actuemosya.org}
+      - APP_DOMAIN=${APP_DOMAIN:-actuemosyacolombia.org}
       - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}
       - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY:-}
-      - SMTP_HOST=${SMTP_HOST:-smtp.resend.com}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - SMTP_HOST=${SMTP_HOST:-}
       - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_USER=${SMTP_USER:-resend}
+      - SMTP_USER=${SMTP_USER:-}
       - SMTP_PASS=${SMTP_PASS:-}
-      - EMAIL_FROM=${EMAIL_FROM:-no-reply@actuemosya.org}
+      - EMAIL_FROM=${EMAIL_FROM:-onboarding@resend.dev}
     volumes:
       # Persistencia de la base de datos SQLite en disco del host
       - ./data:/data
@@ -56,8 +56,8 @@ services:
       - "443:443"
       - "443:443/udp" # Soporte para HTTP/3 (QUIC)
     environment:
-      - APP_DOMAIN=${APP_DOMAIN:-stage.actuemosya.org}
-      - ACME_EMAIL=${ACME_EMAIL:-admin@actuemosya.org}
+      - APP_DOMAIN=${APP_DOMAIN:-actuemosyacolombia.org}
+      - ACME_EMAIL=${ACME_EMAIL:-cam960210@gmail.com}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

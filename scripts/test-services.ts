@@ -106,6 +106,21 @@ async function runTests() {
   const magicLinkReq = await AuthService.requestMagicLink('admin@actuemosya.org');
   assert(magicLinkReq.sent === true, 'Solicita Magic Link exitosamente');
 
+  // Supervisor Registration & Approval Flow
+  const testEmail = `laura.${Date.now()}@medicos.org`;
+  const regSupervisor = await AuthService.registerSupervisor({
+    nombre: 'Dra. Laura Voluntaria',
+    email: testEmail,
+    organizacion: 'Médicos Sin Fronteras',
+    motivacion: 'Atención prehospitalaria en zonas de difícil acceso',
+  }, 'test-token');
+
+  assert(regSupervisor.isNew === true, 'Registra postulación de nuevo supervisor');
+  assert(regSupervisor.user.activo === false, 'Supervisor queda inactivo (activo = false)');
+
+  const approvedSupervisor = await AuthService.approveSupervisor(regSupervisor.user.id, 'http://localhost:3000', 'admin');
+  assert(approvedSupervisor.activo === true, 'Admin aprueba y activa al supervisor');
+
   // 4. IdeaService Tests (Pipeline de Estados & OTP)
   console.log('\n🔹 Probando IdeaService (Pipeline de Estados y OTP)...');
   
@@ -124,17 +139,19 @@ async function runTests() {
   const approvedIdea = await IdeaService.approveDraft(anonIdeaRes.idea.id, 'supervisor');
   assert(approvedIdea.estado === 'idea', 'Moderador aprueba borrador -> pasa a idea');
 
-  // B. Creación con correo y OTP
+  // B. Creación con correo y OTP e iniciativa vinculada
   const emailIdeaRes = await IdeaService.createIdea({
     titulo: 'Brigada de Rescate con Drones Térmicos',
     descripcionMarkdown: 'Drones con sensores infrarrojos para ubicar sobrevivientes en zonas aisladas.',
     categoria: 'Rescate',
     emailCreador: 'drones@rescate.org',
+    iniciativaExistenteUrl: 'https://cruzroja.org.co/drones',
     esAnonimo: false,
   });
 
   assert(emailIdeaRes.requiresOtp === true, 'Idea con email requiere verificación OTP');
   assert(emailIdeaRes.idea.estado === 'borrador', 'Comienza en borrador antes de validar OTP');
+  assert(emailIdeaRes.idea.iniciativaExistenteUrl === 'https://cruzroja.org.co/drones', 'Iniciativa existente vinculada guardada');
 
   // C. Transiciones del Pipeline
   const promoted = await IdeaService.promoteIdea(approvedIdea.id, 'admin');
@@ -200,9 +217,9 @@ async function runTests() {
   const verifiedReport = await BusquedaService.verifyReport(report.id, 'supervisor');
   assert(verifiedReport.verificadoPorSupervisor === true, 'Moderador verifica reporte');
 
-  // 7. VoluntariadoService Tests (Matching)
-  console.log('\n🔹 Probando VoluntariadoService (Matching de Habilidades)...');
-  await VoluntariadoService.createVolunteering({
+  // 7. VoluntariadoService Tests (Moderación y Matching)
+  console.log('\n🔹 Probando VoluntariadoService (Moderación y Matching de Habilidades)...');
+  const createdOffer = await VoluntariadoService.createVolunteering({
     tipo: 'ofrezco_habilidad',
     areaProfesional: 'Psicología',
     tituloNecesidad: 'Psicólogo Clínico de Emergencias',
@@ -210,9 +227,14 @@ async function runTests() {
     nombreContacto: 'Dr. Mendoza',
     emailContacto: 'mendoza@psi.co',
     ubicacion: 'Pasto',
-  });
+  }, 'test-token');
 
-  await VoluntariadoService.createVolunteering({
+  assert(createdOffer.estado === 'pendiente', 'Voluntariado creado queda en estado pendiente');
+
+  const approvedOffer = VoluntariadoService.approveVolunteering(createdOffer.id, 'supervisor');
+  assert(approvedOffer.estado === 'activo', 'Supervisor aprueba voluntariado a estado activo');
+
+  const createdDemand = await VoluntariadoService.createVolunteering({
     tipo: 'busco_profesional',
     areaProfesional: 'Psicología',
     tituloNecesidad: 'Se requieren psicólogos para albergues',
@@ -220,11 +242,13 @@ async function runTests() {
     nombreContacto: 'Albergue Pasto',
     emailContacto: 'albergue@pasto.gov.co',
     ubicacion: 'Pasto',
-  });
+  }, 'test-token');
+
+  VoluntariadoService.approveVolunteering(createdDemand.id, 'admin');
 
   const matches = VoluntariadoService.matchSkills('Psicología');
-  assert(matches.ofertas.length >= 1, 'Matching encuentra ofertas de psicología');
-  assert(matches.demandas.length >= 1, 'Matching encuentra demandas de psicología');
+  assert(matches.ofertas.length >= 1, 'Matching encuentra ofertas de psicología activas');
+  assert(matches.demandas.length >= 1, 'Matching encuentra demandas de psicología activas');
 
   // 8. AlertaService Tests
   console.log('\n🔹 Probando AlertaService (Banner de Crisis)...');
