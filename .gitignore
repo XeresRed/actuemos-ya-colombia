@@ -23,6 +23,8 @@ yarn-error.log*
 .env
 .env.stage
 .env*.stage
+.env.production
+.env*.production
 
 # SQLite local databases (WAL files)
 data/*.sqlite*

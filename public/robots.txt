@@ -1,0 +1,9 @@
+# ==============================================================================
+# robots.txt: Control de indexación para motores de búsqueda
+# ==============================================================================
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://actuemosyacolombia.org/sitemap.xml

@@ -32,6 +32,9 @@ ENV NEXT_PUBLIC_RECAPTCHA_SITE_KEY=$NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+# Asegurar que el directorio de assets estáticos públicos exista
+RUN mkdir -p /app/public
+
 RUN npm run build
 
 # ------------------------------------------------------------------------------
@@ -58,7 +61,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 RUN mkdir -p /data && chown -R nextjs:nodejs /data
 
 # Copiar artefactos optimizados de Next.js Standalone
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
