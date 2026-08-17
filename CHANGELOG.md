@@ -5,7 +5,18 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.11.0-beta] - 2026-08-17
+
+### Corregido
+- **Eliminación de Desbordamiento Horizontal en Header Móvil (`REQ-01`):**
+  - Ocultamiento del botón popover `LanguageSelector` en la barra superior en pantallas móviles (`hidden lg:inline-block`), dejando únicamente el logo de la marca y el botón de menú hamburguesa para prevenir el desbordamiento de ancho (*horizontal scroll*).
+  - Integración de un conmutador táctil de idioma `🇨🇴 Español | 🇺🇸 English` en la parte inferior del menú drawer desplegable móvil.
+  - Adición de `flex-wrap` y contención responsiva en los botones de acción del `EmergencyBanner` para pantallas ultra-angostas.
+
+---
+
 ## [0.10.0-beta] - 2026-08-17
+
 
 ### Agregado
 - **Caja de Difusión Cívica y Mensaje Oficial de Introducción (`REQ-01`):**

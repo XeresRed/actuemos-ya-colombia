@@ -132,7 +132,7 @@ export function EmergencyBanner() {
         </div>
 
         {/* Elementos Fijos: Acción opcional + Canal UNGRD + Líneas de Emergencia */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center justify-center md:justify-end gap-1.5 sm:gap-2 shrink-0 max-w-full">
           {currentAlert.enlaceAccionUrl ? (
             <a
               href={currentAlert.enlaceAccionUrl.startsWith('http') ? currentAlert.enlaceAccionUrl : `https://${currentAlert.enlaceAccionUrl}`}
