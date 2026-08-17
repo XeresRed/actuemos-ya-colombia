@@ -5,7 +5,23 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.10.0-beta] - 2026-08-17
+
+### Agregado
+- **Caja de Difusión Cívica y Mensaje Oficial de Introducción (`REQ-01`):**
+  - Implementación de la sección destacada de difusión comunitaria en `/sobre-nosotros` con un mensaje oficial estructurado y empático listo para compartir en canales de mensajería y redes sociales.
+  - Botón directo para **Compartir en WhatsApp** con texto y enlace precargados.
+  - Botón **Copiar Mensaje** con portapapeles nativo y retroalimentación visual de copiado.
+  - Botón **Compartir Nativo** mediante `navigator.share` para dispositivos móviles.
+
+- **Internacionalización Completa de «Sobre Nosotros» (`REQ-02`):**
+  - Creación del namespace `sobreNosotros` en los diccionarios bilingües (`es.ts` y `en.ts`).
+  - Conexión de todos los títulos, tarjetas informativas, declaración de neutralidad, perfiles de los fundadores y sección de código abierto al hook `useTranslation()`.
+
+---
+
 ## [0.9.0-beta] - 2026-08-17
+
 
 ### Modificado
 - **Flexibilización de Solicitudes de Voluntariado para Particulares y Terceros (`REQ-01`):**
