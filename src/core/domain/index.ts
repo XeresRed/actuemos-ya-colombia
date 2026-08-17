@@ -6,3 +6,5 @@ export * from './iniciativa';
 export * from './busqueda';
 export * from './voluntariado';
 export * from './alerta';
+export * from './solicitud-legal';
+export * from './analytics';

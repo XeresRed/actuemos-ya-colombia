@@ -3,23 +3,35 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 export function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   const navItems = [
-    { label: 'Hub', href: '/' },
-    { label: 'Ideas', href: '/ideas' },
-    { label: 'Iniciativas', href: '/iniciativas' },
-    { label: 'Búsqueda', href: '/busqueda' },
-    { label: 'Voluntarios', href: '/voluntarios' },
-    { label: 'Recursos', href: '/recursos' },
+    { label: t.nav.hub, href: '/' },
+    { label: t.nav.ideas, href: '/ideas' },
+    { label: t.nav.iniciativas, href: '/iniciativas' },
+    { label: t.nav.busqueda, href: '/busqueda' },
+    { label: t.nav.voluntarios, href: '/voluntarios' },
+    { label: t.nav.recursos, href: '/recursos' },
+    { label: t.nav.acerca, href: '/sobre-nosotros' },
   ];
+
+  // Desduplicación contextual del FAB: se oculta en el Hub '/', Banco de Ideas '/ideas', formulario '/ideas/nueva' y '/admin'
+  const isHiddenOnRoute =
+    pathname === '/' ||
+    pathname === '/ideas' ||
+    pathname === '/ideas/nueva' ||
+    pathname.startsWith('/admin');
+  const shouldShowFab = !isHiddenOnRoute;
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-surface dark:bg-surface-dim border-b border-outline-variant py-base w-full shadow-sm">
+      <header className="sticky top-0 z-40 bg-surface dark:bg-surface-dim border-b border-outline-variant py-2.5 md:py-base w-full shadow-sm">
         <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop flex justify-between items-center">
           {/* Brand Logo */}
           <div className="flex items-center gap-stack-md">
@@ -32,17 +44,17 @@ export function Navbar() {
               </h1>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex gap-gutter items-center ml-4" aria-label="Navegación principal">
+            {/* Desktop Navigation - Clean single line */}
+            <nav className="hidden lg:flex gap-1 xl:gap-2 items-center ml-4" aria-label="Navegación principal">
               {navItems.map((item) => {
                 const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`font-body-md text-body-md transition-colors px-base py-1 rounded active:scale-95 duration-200 ${
+                    className={`font-body-md text-xs xl:text-sm transition-colors px-2.5 py-1.5 rounded active:scale-95 duration-200 ${
                       isActive
-                        ? 'text-primary font-bold border-b-2 border-primary'
+                        ? 'text-primary font-bold bg-primary/10 border-b-2 border-primary'
                         : 'text-on-surface-variant hover:text-primary hover:bg-surface-container-low'
                     }`}
                   >
@@ -53,21 +65,23 @@ export function Navbar() {
             </nav>
           </div>
 
-          {/* Action button & Mobile Toggle */}
-          <div className="flex items-center gap-stack-sm md:gap-stack-md">
+          {/* Actions & Language Popover & Mobile Toggle */}
+          <div className="flex items-center gap-2 md:gap-stack-md">
+            <LanguageSelector />
+
             <Link
               href="/ideas/nueva"
-              className="hidden md:inline-flex bg-primary text-on-primary font-label-md text-label-md font-bold uppercase px-4 py-2 rounded hover:bg-primary-container transition-colors shadow-sm active:scale-95"
+              className="hidden sm:inline-flex bg-primary text-on-primary font-label-md text-xs md:text-label-md font-bold uppercase px-3.5 md:px-4 py-2 rounded hover:bg-primary-container transition-colors shadow-sm active:scale-95"
             >
-              Proponer Idea
+              {t.nav.proponerIdea}
             </Link>
 
             {/* Mobile menu hamburger */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded text-on-surface-variant hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Abrir menú de navegación"
+              className="lg:hidden p-2 rounded text-on-surface-variant hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label={mobileMenuOpen ? t.nav.cerrarMenu : t.nav.menu}
               aria-expanded={mobileMenuOpen}
             >
               <span className="material-symbols-outlined">
@@ -79,8 +93,8 @@ export function Navbar() {
 
         {/* Mobile Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-surface-container-low border-b border-outline-variant px-margin-mobile py-4 animate-in fade-in slide-in-from-top-2">
-            <nav className="flex flex-col gap-2">
+          <div className="lg:hidden bg-surface-container-low border-b border-outline-variant px-margin-mobile py-4 animate-in fade-in slide-in-from-top-2">
+            <nav className="flex flex-col gap-1.5">
               {navItems.map((item) => {
                 const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                 return (
@@ -88,30 +102,39 @@ export function Navbar() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`px-4 py-2.5 rounded font-body-md text-body-md transition-colors ${
+                    className={`px-4 py-2.5 rounded font-body-md text-body-md transition-colors flex items-center justify-between ${
                       isActive
-                        ? 'bg-primary-fixed text-on-primary-fixed font-bold'
+                        ? 'bg-primary text-white font-bold'
                         : 'text-on-surface hover:bg-surface-container'
                     }`}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    {isActive && <span className="material-symbols-outlined text-sm">check</span>}
                   </Link>
                 );
               })}
+
+              <Link
+                href="/ideas/nueva"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-2 text-center bg-primary text-on-primary font-label-md text-sm font-bold uppercase py-2.5 rounded hover:bg-primary-container transition-colors shadow-sm"
+              >
+                {t.nav.proponerIdea}
+              </Link>
             </nav>
           </div>
         )}
       </header>
 
-      {/* Mobile Floating Action Button (FAB) */}
-      {pathname !== '/ideas/nueva' && (
+      {/* Mobile Floating Action Button (FAB) con desduplicación inteligente */}
+      {shouldShowFab && (
         <Link
           href="/ideas/nueva"
           className="md:hidden fixed bottom-6 right-6 z-40 bg-primary text-on-primary font-label-md text-xs font-bold uppercase px-4 py-3 rounded-full shadow-xl hover:bg-primary-container transition-all active:scale-95 flex items-center gap-2 border border-primary/20"
-          aria-label="Proponer nueva idea"
+          aria-label={t.nav.proponerIdea}
         >
           <span className="material-symbols-outlined text-base font-bold">add</span>
-          <span>Proponer Idea</span>
+          <span>{t.nav.proponerIdea}</span>
         </Link>
       )}
     </>

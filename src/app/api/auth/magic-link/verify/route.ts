@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60, // 7 días
+      maxAge: 30 * 24 * 60 * 60, // 30 días
     });
 
     return response;
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: 30 * 24 * 60 * 60, // 30 días
     });
 
     return response;

@@ -18,6 +18,8 @@ interface IniciativaRow {
   url_oficial: string;
   contacto: string | null;
   cobertura_geografica: string | null;
+  direccion: string | null;
+  fecha_evento: string | null;
   estado_operacion: IniciativaEstado;
   creado_en: string;
 }
@@ -31,6 +33,8 @@ function mapRowToIniciativa(row: IniciativaRow): Iniciativa {
     urlOficial: row.url_oficial,
     contacto: row.contacto,
     coberturaGeografica: row.cobertura_geografica,
+    direccion: row.direccion || null,
+    fechaEvento: row.fecha_evento || null,
     estadoOperacion: row.estado_operacion,
     creadoEn: row.creado_en,
   };
@@ -69,9 +73,9 @@ export const IniciativaRepository = {
     }
 
     if (filters.search) {
-      conditions.push('(nombre LIKE ? OR descripcion LIKE ? OR categoria LIKE ? OR cobertura_geografica LIKE ?)');
+      conditions.push('(nombre LIKE ? OR descripcion LIKE ? OR categoria LIKE ? OR cobertura_geografica LIKE ? OR direccion LIKE ?)');
       const searchParam = `%${filters.search}%`;
-      params.push(searchParam, searchParam, searchParam, searchParam);
+      params.push(searchParam, searchParam, searchParam, searchParam, searchParam);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -114,8 +118,8 @@ export const IniciativaRepository = {
 
     const stmt = db.prepare(`
       INSERT INTO iniciativas_activas (
-        id, nombre, descripcion, categoria, url_oficial, contacto, cobertura_geografica, estado_operacion
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        id, nombre, descripcion, categoria, url_oficial, contacto, cobertura_geografica, direccion, fecha_evento, estado_operacion
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
@@ -126,6 +130,8 @@ export const IniciativaRepository = {
       dto.urlOficial,
       dto.contacto ?? null,
       dto.coberturaGeografica ?? null,
+      dto.direccion ?? null,
+      dto.fechaEvento ?? null,
       estado
     );
 
@@ -168,6 +174,14 @@ export const IniciativaRepository = {
     if (dto.coberturaGeografica !== undefined) {
       fields.push('cobertura_geografica = ?');
       params.push(dto.coberturaGeografica);
+    }
+    if (dto.direccion !== undefined) {
+      fields.push('direccion = ?');
+      params.push(dto.direccion);
+    }
+    if (dto.fechaEvento !== undefined) {
+      fields.push('fecha_evento = ?');
+      params.push(dto.fechaEvento);
     }
     if (dto.estadoOperacion !== undefined) {
       fields.push('estado_operacion = ?');

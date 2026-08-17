@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
         tituloNecesidad: validatedData.tituloNecesidad,
         descripcion: validatedData.descripcion,
         nombreContacto: validatedData.nombreContacto,
+        organizacion: validatedData.organizacion,
         emailContacto: validatedData.emailContacto,
         telefonoContacto: validatedData.telefonoContacto,
         ubicacion: validatedData.ubicacion,

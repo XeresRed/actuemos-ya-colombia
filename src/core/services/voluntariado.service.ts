@@ -49,6 +49,7 @@ export const VoluntariadoService = {
     const cleanTitulo = SanitizeService.sanitizePlainText(dto.tituloNecesidad);
     const cleanDescripcion = SanitizeService.sanitizePlainText(dto.descripcion);
     const cleanNombre = SanitizeService.sanitizePlainText(dto.nombreContacto);
+    const cleanOrganizacion = dto.organizacion ? SanitizeService.sanitizePlainText(dto.organizacion) : null;
     const cleanTelefono = dto.telefonoContacto ? SanitizeService.sanitizePlainText(dto.telefonoContacto) : null;
     const cleanUbicacion = dto.ubicacion ? SanitizeService.sanitizePlainText(dto.ubicacion) : null;
 
@@ -58,6 +59,7 @@ export const VoluntariadoService = {
       tituloNecesidad: cleanTitulo,
       descripcion: cleanDescripcion,
       nombreContacto: cleanNombre,
+      organizacion: cleanOrganizacion,
       emailContacto: dto.emailContacto.trim().toLowerCase(),
       telefonoContacto: cleanTelefono,
       ubicacion: cleanUbicacion,

@@ -1,7 +1,12 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 export function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-surface-container-high border-t border-outline-variant py-8 mt-auto">
       <div className="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop">
@@ -16,42 +21,45 @@ export function Footer() {
               </h3>
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
-              Plataforma tecnológica comunitaria y neutral de respuesta rápida ante emergencias y desastres naturales en Colombia.
+              {t.footer.descripcion}
+            </p>
+            <p className="font-body-md text-xs text-on-surface-variant/80 mt-2">
+              {t.footer.iniciativaCivica}
             </p>
           </div>
 
           <div>
             <h4 className="font-label-md text-label-md font-bold text-on-surface mb-3 uppercase tracking-wider">
-              Navegación
+              {t.nav.menu}
             </h4>
             <ul className="space-y-2 font-body-md text-sm text-on-surface-variant">
               <li>
-                <Link href="/" className="hover:text-primary transition-colors">Hub de Emergencia</Link>
+                <Link href="/" className="hover:text-primary transition-colors">{t.nav.hub}</Link>
               </li>
               <li>
-                <Link href="/ideas" className="hover:text-primary transition-colors">Banco de Ideas</Link>
+                <Link href="/ideas" className="hover:text-primary transition-colors">{t.nav.ideas}</Link>
               </li>
               <li>
-                <Link href="/iniciativas" className="hover:text-primary transition-colors">Iniciativas Activas</Link>
+                <Link href="/iniciativas" className="hover:text-primary transition-colors">{t.nav.iniciativas}</Link>
               </li>
               <li>
-                <Link href="/busqueda" className="hover:text-primary transition-colors">Búsqueda Humanitaria</Link>
+                <Link href="/busqueda" className="hover:text-primary transition-colors">{t.nav.busqueda}</Link>
               </li>
               <li>
-                <Link href="/voluntarios" className="hover:text-primary transition-colors">Voluntariado Técnico</Link>
+                <Link href="/voluntarios" className="hover:text-primary transition-colors">{t.nav.voluntarios}</Link>
               </li>
               <li>
-                <Link href="/recursos" className="hover:text-primary transition-colors font-medium">Recursos y Trámites</Link>
+                <Link href="/recursos" className="hover:text-primary transition-colors font-medium">{t.nav.recursos}</Link>
               </li>
               <li>
-                <Link href="/sobre-nosotros" className="hover:text-primary transition-colors font-semibold text-secondary">Sobre Nosotros</Link>
+                <Link href="/sobre-nosotros" className="hover:text-primary transition-colors font-semibold text-secondary">{t.nav.acerca}</Link>
               </li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-label-md text-label-md font-bold text-on-surface mb-3 uppercase tracking-wider">
-              Canales Oficiales
+              {t.common.oficial}
             </h4>
             <ul className="space-y-2 font-body-md text-sm text-on-surface-variant">
               <li>
@@ -81,7 +89,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/admin/login" className="hover:text-primary transition-colors inline-block text-xs opacity-75">
-                  Acceso Administrativo
+                  {t.nav.admin}
                 </Link>
               </li>
             </ul>
@@ -89,7 +97,7 @@ export function Footer() {
         </div>
 
         <div className="pt-6 border-t border-outline-variant/60 flex flex-col sm:flex-row justify-between items-center text-xs text-on-surface-variant gap-4">
-          <p>© {new Date().getFullYear()} ActuemosYaColombia. Plataforma de código abierto bajo licencia MIT.</p>
+          <p>© {new Date().getFullYear()} {t.footer.derechosReservados}</p>
           <p className="flex items-center gap-1 text-tertiary font-medium">
             <span className="material-symbols-outlined text-sm">bolt</span>
             Optimizado para bajo consumo de datos y alta resiliencia

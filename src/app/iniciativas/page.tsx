@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Iniciativa } from '../../core/domain/iniciativa';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
+import { IniciativaDetailModal } from '@/components/iniciativas/IniciativaDetailModal';
 
 export default function IniciativasPage() {
+  const { t } = useTranslation();
   const [iniciativas, setIniciativas] = useState<Iniciativa[]>([]);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
@@ -16,6 +18,10 @@ export default function IniciativasPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [order, setOrder] = useState<'desc' | 'asc'>('desc');
+
+  // Modal de detalles
+  const [selectedIniciativa, setSelectedIniciativa] = useState<Iniciativa | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Debounce search input (350ms)
   useEffect(() => {
@@ -99,36 +105,41 @@ export default function IniciativasPage() {
     }
   };
 
+  const handleOpenDetail = (item: Iniciativa) => {
+    setSelectedIniciativa(item);
+    setIsModalOpen(true);
+  };
+
   const getCategoryBadge = (categoria: string) => {
-    switch (categoria) {
+    switch (categoria.toLowerCase()) {
       case 'organismo_oficial':
         return (
           <span className="bg-primary-fixed text-on-primary-fixed font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs">verified</span> Organismo Oficial
+            <span className="material-symbols-outlined text-xs">verified</span> Oficial
           </span>
         );
       case 'ong':
         return (
           <span className="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs">public</span> ONG / Fundación
+            <span className="material-symbols-outlined text-xs">public</span> ONG
           </span>
         );
       case 'colectivo':
         return (
           <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs text-emerald-700">groups</span> Colectivo / Brigada
+            <span className="material-symbols-outlined text-xs text-emerald-700">groups</span> Colectivo
           </span>
         );
       case 'campaña':
         return (
           <span className="bg-amber-100 text-amber-900 border border-amber-300 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs text-amber-700">campaign</span> Campaña de Acopio
+            <span className="material-symbols-outlined text-xs text-amber-700">campaign</span> Campaña
           </span>
         );
       default:
         return (
-          <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs text-emerald-700">groups</span> Colectivo / Brigada
+          <span className="bg-slate-100 text-slate-900 font-label-sm text-[11px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
+            {categoria}
           </span>
         );
     }
@@ -141,16 +152,16 @@ export default function IniciativasPage() {
         <div>
           <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background flex items-center gap-2">
             <span className="material-symbols-outlined text-secondary text-3xl">corporate_fare</span>
-            Directorio de Iniciativas Activas
+            {t.iniciativas.titulo}
           </h1>
           <p className="font-body-md text-body-md text-on-surface-variant mt-2 max-w-2xl">
-            Tablero público anti-duplicación. Conoce las campañas, brigadas, ONGs y organismos de socorro que ya están operando sobre el terreno para coordinar esfuerzos.
+            {t.iniciativas.descripcion}
           </p>
         </div>
       </div>
 
       {/* Category Tabs */}
-      <div className="flex border-b border-outline-variant mb-6 overflow-x-auto gap-2 pb-1">
+      <div className="flex border-b border-outline-variant mb-6 overflow-x-auto gap-2 pb-1 no-scrollbar">
         {[
           { id: 'todas', label: 'Todas las Iniciativas', icon: 'grid_view' },
           { id: 'organismo_oficial', label: 'Organismos Oficiales 🏛️', icon: 'verified' },
@@ -181,7 +192,7 @@ export default function IniciativasPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-surface border border-outline-variant rounded-lg pl-9 pr-4 py-2 text-xs focus:border-secondary outline-none"
-            placeholder="Buscar por nombre de ONG, entidad oficial, insumos, Cruz Roja, Defensa Civil, Popayán, Pasto..."
+            placeholder={t.iniciativas.buscarPlaceholder}
             type="text"
           />
           {searchQuery ? (
@@ -198,7 +209,7 @@ export default function IniciativasPage() {
         {/* Sort Selector & Count */}
         <div className="flex items-center gap-3 shrink-0 justify-between sm:justify-end">
           <span className="text-xs text-on-surface-variant font-medium">
-            Mostrando <strong>{iniciativas.length}</strong> de <strong>{total}</strong>
+            {t.actions.verMas}: <strong>{iniciativas.length}</strong> / <strong>{total}</strong>
           </span>
 
           <div className="flex items-center gap-1.5 bg-surface border border-outline-variant rounded-lg px-2.5 py-1 text-xs">
@@ -208,8 +219,8 @@ export default function IniciativasPage() {
               onChange={(e) => handleOrderChange(e.target.value as 'desc' | 'asc')}
               className="bg-transparent text-on-surface text-xs font-semibold outline-none cursor-pointer"
             >
-              <option value="desc">Más recientes primero</option>
-              <option value="asc">Más antiguos primero</option>
+              <option value="desc">{t.iniciativas.masRecientes}</option>
+              <option value="asc">{t.iniciativas.masAntiguas}</option>
             </select>
           </div>
         </div>
@@ -219,15 +230,12 @@ export default function IniciativasPage() {
       {loading ? (
         <div className="text-center py-16 text-on-surface-variant">
           <span className="material-symbols-outlined text-4xl animate-spin mb-2 text-secondary">refresh</span>
-          <p className="text-sm font-medium">Cargando directorio de iniciativas...</p>
+          <p className="text-sm font-medium">{t.common.cargando}</p>
         </div>
       ) : iniciativas.length === 0 ? (
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-12 text-center text-on-surface-variant">
           <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-2">corporate_fare</span>
-          <h3 className="font-bold text-base text-on-surface">No se encontraron iniciativas con los filtros actuales</h3>
-          <p className="text-xs mt-1 max-w-md mx-auto">
-            ¿Eres parte de una ONG u organismo oficial operando en la emergencia? Contáctanos para registrar tu iniciativa.
-          </p>
+          <h3 className="font-bold text-base text-on-surface">{t.common.noResultados}</h3>
         </div>
       ) : (
         <>
@@ -235,46 +243,69 @@ export default function IniciativasPage() {
             {iniciativas.map((item) => (
               <article
                 key={item.id}
-                className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-300 relative border-t-4 border-t-secondary p-5"
+                onClick={() => handleOpenDetail(item)}
+                className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col hover:shadow-lg transition-all duration-200 relative border-t-4 border-t-secondary p-5 cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-3 gap-2">
                   {getCategoryBadge(item.categoria)}
                   <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-0.5 rounded text-[10px] font-bold shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-600 animate-ping"></span>
-                    Activa en Campo
+                    {t.iniciativas.activaEnCampo}
                   </span>
                 </div>
 
-                <h2 className="font-headline-md text-base font-bold text-on-background mb-2">
+                <h2 className="font-headline-md text-base font-bold text-on-background mb-2 group-hover:text-primary transition-colors">
                   {item.nombre}
                 </h2>
 
-                <p className="font-body-md text-xs text-on-surface-variant mb-4 flex-1 leading-relaxed line-clamp-3">
+                <p className="font-body-md text-xs text-on-surface-variant mb-3 flex-1 leading-relaxed line-clamp-3">
                   {item.descripcion}
                 </p>
 
-                <div className="flex flex-col gap-1.5 mb-4 bg-surface-container-low p-3 rounded-lg border border-outline-variant text-xs text-on-surface">
+                {/* Badges de Cobertura, Dirección y Fecha */}
+                <div className="flex flex-col gap-1.5 mb-4 bg-surface-container-low p-2.5 rounded-lg border border-outline-variant text-xs text-on-surface">
                   <div className="flex items-center gap-1.5 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-xs shrink-0">location_on</span>
-                    <span className="truncate"><strong>Cobertura:</strong> {item.coberturaGeografica || 'Nacional'}</span>
+                    <span className="material-symbols-outlined text-xs shrink-0 text-secondary">location_on</span>
+                    <span className="truncate"><strong>{t.iniciativas.cobertura}</strong> {item.coberturaGeografica || t.common.nacional}</span>
                   </div>
-                  {item.contacto ? (
+
+                  {item.direccion ? (
                     <div className="flex items-center gap-1.5 text-on-surface-variant">
-                      <span className="material-symbols-outlined text-xs shrink-0">call</span>
-                      <span className="truncate"><strong>Contacto:</strong> {item.contacto}</span>
+                      <span className="material-symbols-outlined text-xs shrink-0 text-primary">pin_drop</span>
+                      <span className="truncate"><strong>Punto:</strong> {item.direccion}</span>
+                    </div>
+                  ) : null}
+
+                  {item.fechaEvento ? (
+                    <div className="flex items-center gap-1.5 text-amber-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/50">
+                      <span className="material-symbols-outlined text-xs shrink-0 text-amber-700">event</span>
+                      <span className="truncate font-semibold">{item.fechaEvento}</span>
                     </div>
                   ) : null}
                 </div>
 
-                <div className="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant text-xs">
-                  <span className="text-[11px] text-on-surface-variant font-medium">Verificada por AYC</span>
+                {/* Footer de Tarjeta con botón de detalles y canal oficial */}
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-outline-variant text-xs gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenDetail(item);
+                    }}
+                    className="text-primary font-bold text-xs hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>{t.actions.verDetalles}</span>
+                    <span className="material-symbols-outlined text-xs">visibility</span>
+                  </button>
+
                   <a
                     href={item.urlOficial.startsWith('http') ? item.urlOficial : `https://${item.urlOficial}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-primary text-on-primary font-label-md text-xs font-bold uppercase px-3 py-1.5 rounded-lg hover:bg-primary-container transition-colors inline-flex items-center gap-1 shadow-sm"
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-primary text-on-primary font-label-md text-xs font-bold uppercase px-3 py-1.5 rounded-lg hover:bg-primary-container transition-colors inline-flex items-center gap-1 shadow-sm shrink-0"
                   >
-                    <span>Canal Oficial</span>
+                    <span>{t.iniciativas.canalOficial}</span>
                     <span className="material-symbols-outlined text-xs">open_in_new</span>
                   </a>
                 </div>
@@ -294,22 +325,26 @@ export default function IniciativasPage() {
                 {loadingMore ? (
                   <>
                     <span className="material-symbols-outlined text-sm animate-spin text-secondary">refresh</span>
-                    <span>Cargando más iniciativas...</span>
+                    <span>{t.common.cargando}</span>
                   </>
                 ) : (
                   <>
-                    <span>Cargar más iniciativas</span>
+                    <span>{t.actions.verMas}</span>
                     <span className="material-symbols-outlined text-sm">expand_more</span>
                   </>
                 )}
               </button>
-              <span className="text-[11px] text-on-surface-variant">
-                Mostrando {iniciativas.length} de {total} iniciativas registradas
-              </span>
             </div>
           ) : null}
         </>
       )}
+
+      {/* Modal de Detalle de Iniciativa */}
+      <IniciativaDetailModal
+        iniciativa={selectedIniciativa}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

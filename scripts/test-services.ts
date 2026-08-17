@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
+import { runMigrations } from '../src/db/migrate';
 import {
   SanitizeService,
   CaptchaService,
@@ -52,17 +53,20 @@ function assert(condition: boolean, message: string) {
 async function runTests() {
   console.log('🧪 Iniciando pruebas unitarias de los Servicios de Negocio (Core Services)...\n');
 
+  // Asegurar que las migraciones estén ejecutadas sobre la base de datos de servicios
+  runMigrations();
+
   // Inicializar DB en memoria y poblar usuario admin de prueba
   const db = setupTestDb();
   
   // Re-enlazar repositorios con la instancia en memoria si se ejecutan directamente
   // En Next.js client.ts usa process.env.DATABASE_URL
-  const admin = UsuarioRepository.create({
+  const admin = UsuarioRepository.findByEmail('admin@actuemosya.org') || UsuarioRepository.create({
     email: 'admin@actuemosya.org',
     nombre: 'Admin General',
     rol: 'admin',
     activo: true,
-  }, db);
+  });
 
   // 1. SanitizeService Tests
   console.log('🔹 Probando SanitizeService (Mitigación XSS)...');
@@ -199,12 +203,18 @@ async function runTests() {
 
   const officialInit = IniciativaService.createInitiative({
     nombre: 'UNGRD — Sala de Crisis',
-    descripcion: 'Punto de mando unificado nacional',
+    descripcion: '### Punto de mando unificado\n- Operaciones 24/7\n- [Portal](http://portal.gov.co)',
     categoria: 'organismo_oficial',
     urlOficial: 'http://portal.gestiondelriesgo.gov.co/',
+    direccion: 'Avenida El Dorado # 69-76, Bogotá',
+    fechaEvento: '2026-08-20T08:00',
   }, 'admin');
 
   assert(officialInit.categoria === 'organismo_oficial', 'Crea organismo oficial con rol admin');
+  assert(officialInit.direccion === 'Avenida El Dorado # 69-76, Bogotá', 'Guarda dirección de la iniciativa');
+  assert(officialInit.fechaEvento === '2026-08-20T08:00', 'Guarda fecha del evento programado');
+  assert(officialInit.descripcion.includes('### Punto de mando unificado'), 'Preserva estructura Markdown en descripción');
+
 
   // 6. BusquedaService Tests
   console.log('\n🔹 Probando BusquedaService...');
@@ -237,6 +247,7 @@ async function runTests() {
   }, 'test-token');
 
   assert(createdOffer.estado === 'pendiente', 'Voluntariado creado queda en estado pendiente');
+  assert(createdOffer.organizacion === null, 'Organización es null cuando no se especifica');
 
   const approvedOffer = VoluntariadoService.approveVolunteering(createdOffer.id, 'supervisor');
   assert(approvedOffer.estado === 'activo', 'Supervisor aprueba voluntariado a estado activo');
@@ -246,10 +257,13 @@ async function runTests() {
     areaProfesional: 'Psicología',
     tituloNecesidad: 'Se requieren psicólogos para albergues',
     descripcion: 'Atención a familias afectadas por el sismo',
-    nombreContacto: 'Albergue Pasto',
+    nombreContacto: 'Carlos Gómez (Coordinador)',
+    organizacion: 'Cruz Roja Seccional Nariño',
     emailContacto: 'albergue@pasto.gov.co',
     ubicacion: 'Pasto',
   }, 'test-token');
+
+  assert(createdDemand.organizacion === 'Cruz Roja Seccional Nariño', 'Persiste y recupera nombre de organización');
 
   VoluntariadoService.approveVolunteering(createdDemand.id, 'admin');
 

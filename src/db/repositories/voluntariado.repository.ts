@@ -18,6 +18,7 @@ interface VoluntariadoRow {
   titulo_necesidad: string;
   descripcion: string;
   nombre_contacto: string;
+  organizacion: string | null;
   email_contacto: string;
   telefono_contacto: string | null;
   ubicacion: string | null;
@@ -33,6 +34,7 @@ function mapRowToVoluntariado(row: VoluntariadoRow): Voluntariado {
     tituloNecesidad: row.titulo_necesidad,
     descripcion: row.descripcion,
     nombreContacto: row.nombre_contacto,
+    organizacion: row.organizacion || null,
     emailContacto: row.email_contacto,
     telefonoContacto: row.telefono_contacto,
     ubicacion: row.ubicacion,
@@ -73,9 +75,9 @@ export const VoluntariadoRepository = {
     }
 
     if (filters.search) {
-      conditions.push('(titulo_necesidad LIKE ? OR descripcion LIKE ? OR area_profesional LIKE ? OR ubicacion LIKE ? OR nombre_contacto LIKE ?)');
+      conditions.push('(titulo_necesidad LIKE ? OR descripcion LIKE ? OR area_profesional LIKE ? OR ubicacion LIKE ? OR nombre_contacto LIKE ? OR organizacion LIKE ?)');
       const searchParam = `%${filters.search}%`;
-      params.push(searchParam, searchParam, searchParam, searchParam, searchParam);
+      params.push(searchParam, searchParam, searchParam, searchParam, searchParam, searchParam);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -109,8 +111,8 @@ export const VoluntariadoRepository = {
     const stmt = db.prepare(`
       INSERT INTO voluntariado_profesional (
         id, tipo, area_profesional, titulo_necesidad, descripcion,
-        nombre_contacto, email_contacto, telefono_contacto, ubicacion, estado
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        nombre_contacto, organizacion, email_contacto, telefono_contacto, ubicacion, estado
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
@@ -120,6 +122,7 @@ export const VoluntariadoRepository = {
       dto.tituloNecesidad,
       dto.descripcion,
       dto.nombreContacto,
+      dto.organizacion ?? null,
       dto.emailContacto.trim().toLowerCase(),
       dto.telefonoContacto ?? null,
       dto.ubicacion ?? null,
@@ -157,6 +160,10 @@ export const VoluntariadoRepository = {
     if (dto.nombreContacto !== undefined) {
       fields.push('nombre_contacto = ?');
       params.push(dto.nombreContacto);
+    }
+    if (dto.organizacion !== undefined) {
+      fields.push('organizacion = ?');
+      params.push(dto.organizacion);
     }
     if (dto.emailContacto !== undefined) {
       fields.push('email_contacto = ?');

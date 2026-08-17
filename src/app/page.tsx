@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Idea, IdeaEstado } from '../core/domain/idea';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 export default function EmergencyHubPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [featuredIdeas, setFeaturedIdeas] = useState<Idea[]>([]);
   const [loadingIdeas, setLoadingIdeas] = useState(true);
@@ -77,14 +79,14 @@ export default function EmergencyHubPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-24 py-3 border border-outline-variant rounded-xl bg-surface focus:border-secondary focus:ring-1 focus:ring-secondary text-body-md font-body-md outline-none shadow-sm text-xs sm:text-sm"
-            placeholder="Buscar propuestas, recursos de alcaldía, iniciativas o insumos..."
+            placeholder={t.hub.searchPlaceholder}
             type="text"
           />
           <button
             type="submit"
             className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-primary text-on-primary font-bold text-xs rounded-lg hover:bg-primary-container transition-colors uppercase"
           >
-            Buscar
+            {t.actions.buscar}
           </button>
         </form>
       </div>
@@ -100,7 +102,7 @@ export default function EmergencyHubPage() {
             add_circle
           </span>
           <span className="font-label-md text-[11px] sm:text-xs font-bold uppercase tracking-wide">
-            Proponer Solución
+            {t.hub.cardProponer}
           </span>
         </Link>
 
@@ -113,7 +115,7 @@ export default function EmergencyHubPage() {
             person_search
           </span>
           <span className="font-label-md text-[11px] sm:text-xs font-bold uppercase tracking-wide">
-            Buscar Personas / Mascotas
+            {t.hub.cardBusqueda}
           </span>
         </Link>
 
@@ -126,7 +128,7 @@ export default function EmergencyHubPage() {
             menu_book
           </span>
           <span className="font-label-md text-[11px] sm:text-xs font-bold uppercase tracking-wide text-amber-950">
-            Trámites Alcaldía (RUD)
+            {t.hub.cardRecursos}
           </span>
         </Link>
 
@@ -139,7 +141,7 @@ export default function EmergencyHubPage() {
             handshake
           </span>
           <span className="font-label-md text-[11px] sm:text-xs font-bold uppercase tracking-wide">
-            Talento Técnico
+            {t.hub.cardVoluntarios}
           </span>
         </Link>
 
@@ -152,7 +154,7 @@ export default function EmergencyHubPage() {
             corporate_fare
           </span>
           <span className="font-label-md text-[11px] sm:text-xs font-bold uppercase tracking-wide">
-            Iniciativas Activas
+            {t.hub.cardIniciativas}
           </span>
         </Link>
 
@@ -165,7 +167,7 @@ export default function EmergencyHubPage() {
             forum
           </span>
           <span className="font-label-md text-[11px] sm:text-xs font-bold uppercase tracking-wide">
-            Muro Comunitario
+            {t.hub.cardIdeas}
           </span>
         </Link>
       </section>
@@ -178,59 +180,52 @@ export default function EmergencyHubPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <a href="tel:123" className="px-3 py-1.5 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition-colors inline-flex items-center gap-1 shadow-sm">
-            <span>🚨 123 (Emergencias)</span>
+            🚨 123 (Nacional)
           </a>
           <a href="tel:132" className="px-3 py-1.5 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition-colors inline-flex items-center gap-1 shadow-sm">
-            <span>🚑 132 (Cruz Roja)</span>
+            🚑 132 (Cruz Roja)
           </a>
-          <a href="tel:144" className="px-3 py-1.5 bg-orange-700 text-white font-bold rounded-lg hover:bg-orange-800 transition-colors inline-flex items-center gap-1 shadow-sm">
-            <span>🦺 144 (Defensa Civil)</span>
+          <a href="tel:144" className="px-3 py-1.5 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition-colors inline-flex items-center gap-1 shadow-sm">
+            🛡️ 144 (Defensa Civil)
           </a>
-          <a href="tel:+576014069977" className="px-3 py-1.5 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-900 transition-colors inline-flex items-center gap-1 shadow-sm">
-            <span>🏛️ Medicina Legal</span>
+          <a href="tel:119" className="px-3 py-1.5 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 transition-colors inline-flex items-center gap-1 shadow-sm">
+            🚒 119 (Bomberos)
           </a>
         </div>
       </section>
 
-      {/* Official Colombian Relief & Victim Registries */}
-      <section className="w-full bg-surface-container-low border border-outline-variant rounded-xl p-stack-md" aria-label="Canales oficiales y registro de víctimas">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-2 border-b border-outline-variant">
+      {/* Official Emergency Organizations Feed */}
+      <section className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl p-4 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant pb-3 mb-4">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-secondary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-              verified_user
-            </span>
-            <div>
-              <h2 className="font-headline-md text-base sm:text-lg font-bold text-on-surface">
-                Canales Oficiales y Registro de Víctimas / Damnificados
-              </h2>
-              <p className="font-body-md text-xs text-on-surface-variant">
-                Portales oficiales del Estado Colombiano y organismos de socorro nacional
-              </p>
-            </div>
+            <span className="material-symbols-outlined text-primary text-2xl">verified</span>
+            <h2 className="font-headline-md text-base sm:text-lg font-bold text-on-surface">
+              Organismos Oficiales y de Socorro del Estado
+            </h2>
           </div>
-          <span className="font-label-sm text-[11px] bg-secondary-fixed text-on-secondary-fixed font-bold px-2 py-0.5 rounded uppercase">
-            Fuentes Oficiales
+          <span className="text-xs text-on-surface-variant font-medium">
+            Verificación y Enlaces Directos
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* UNGRD RUND */}
+          {/* UNGRD */}
           <a
-            href="http://portal.gestiondelriesgo.gov.co/"
+            href="https://portal.gestiondelriesgo.gov.co/"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-surface hover:bg-surface-container p-3.5 rounded-lg border border-outline-variant flex flex-col justify-between gap-2 transition-colors group shadow-sm"
           >
             <div>
               <div className="flex items-center justify-between text-primary font-bold text-xs">
-                <span>UNGRD — RUND</span>
+                <span>UNGRD</span>
                 <span className="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">open_in_new</span>
               </div>
               <p className="font-label-md text-sm font-bold text-on-surface mt-1">
-                Sala de Crisis y Damnificados
+                Gestión del Riesgo
               </p>
               <p className="font-body-md text-xs text-on-surface-variant mt-0.5">
-                Censo oficial y registro único nacional de damnificados.
+                Reportes oficiales de afectación y salas de crisis nacional.
               </p>
             </div>
             <span className="text-[11px] font-semibold text-secondary">gestiondelriesgo.gov.co →</span>
@@ -311,31 +306,32 @@ export default function EmergencyHubPage() {
           <div className="flex justify-between items-center border-b border-outline-variant pb-2">
             <h2 className="font-headline-lg text-lg sm:text-xl font-bold text-on-background flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">lightbulb</span>
-              <span>Propuestas Ciudadanas Destacadas</span>
+              <span>{t.hub.propuestasRecientes}</span>
             </h2>
             <Link href="/ideas" className="text-secondary font-label-md text-xs sm:text-sm font-bold hover:underline flex items-center gap-1">
-              Ver todas <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <span>{t.actions.verMas}</span>
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </Link>
           </div>
 
           {loadingIdeas ? (
             <div className="py-12 text-center text-on-surface-variant">
               <span className="material-symbols-outlined text-3xl animate-spin text-secondary mb-2">refresh</span>
-              <p className="text-xs">Cargando propuestas recientes...</p>
+              <p className="text-xs">{t.common.cargando}</p>
             </div>
           ) : featuredIdeas.length === 0 ? (
             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 text-center text-on-surface-variant">
               <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">lightbulb</span>
-              <h3 className="font-bold text-sm text-on-surface">No hay propuestas comunitarias registradas aún</h3>
+              <h3 className="font-bold text-sm text-on-surface">{t.hub.sinPropuestas}</h3>
               <p className="text-xs mt-1 max-w-md mx-auto">
-                Sé el primero en proponer una solución tecnológica o humanitaria para la emergencia.
+                {t.hub.ctaSePrimero}
               </p>
               <Link
                 href="/ideas/nueva"
                 className="mt-3 px-4 py-2 bg-primary text-on-primary text-xs font-bold uppercase rounded-lg inline-flex items-center gap-1 hover:bg-primary-container"
               >
                 <span className="material-symbols-outlined text-sm">add</span>
-                <span>Publicar Primera Propuesta</span>
+                <span>{t.nav.proponerIdea}</span>
               </Link>
             </div>
           ) : (
@@ -375,27 +371,23 @@ export default function EmergencyHubPage() {
                       >
                         <div className="flex items-center gap-1 truncate">
                           <span className="material-symbols-outlined text-xs shrink-0">link</span>
-                          <span className="truncate">Iniciativa vinculada: {idea.iniciativaExistenteUrl.replace(/^https?:\/\//, '')}</span>
+                          <span className="truncate">Iniciativa: {idea.iniciativaExistenteUrl.replace(/^https?:\/\//, '')}</span>
                         </div>
                         <span className="material-symbols-outlined text-[12px] opacity-70 group-hover/link:opacity-100 shrink-0">open_in_new</span>
                       </a>
                     ) : null}
-
-                    {/* Volunteer Request Indicator */}
-                    {idea.requiereVoluntarios ? (
-                      <div className="mt-2 inline-flex items-center gap-1 bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-semibold w-fit">
-                        <span className="material-symbols-outlined text-xs text-amber-700" style={{ fontVariationSettings: "'FILL' 1" }}>handshake</span>
-                        <span>{idea.cantidadVoluntarios ? `${idea.cantidadVoluntarios} ` : ''}voluntarios solicitados</span>
-                      </div>
-                    ) : null}
                   </div>
 
-                  <div className="pt-2 border-t border-outline-variant/60 flex justify-between items-center text-xs">
-                    <span className="bg-surface-variant text-[10px] font-bold uppercase px-2 py-0.5 rounded text-on-surface-variant">
-                      {idea.categoria}
+                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-outline-variant/60 text-xs">
+                    <span className="text-[11px] text-on-surface-variant flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs">location_on</span>
+                      {idea.alcanceDetalle || idea.alcanceTipo}
                     </span>
-                    <Link href={`/ideas/${idea.id}`} className="text-secondary font-bold text-xs hover:underline flex items-center gap-0.5">
-                      <span>Debatir</span>
+                    <Link
+                      href={`/ideas/${idea.id}`}
+                      className="text-primary font-bold hover:underline flex items-center gap-0.5 text-xs"
+                    >
+                      <span>Ver debate</span>
                       <span className="material-symbols-outlined text-xs">arrow_forward</span>
                     </Link>
                   </div>
@@ -405,78 +397,48 @@ export default function EmergencyHubPage() {
           )}
         </section>
 
-        {/* Urgent Search Sidebar: Articulation with ColombiaTeBusca & MiGenteVe */}
-        <aside className="lg:col-span-4 flex flex-col gap-stack-md">
-          <div className="border-b border-outline-variant pb-2 flex justify-between items-center">
-            <h2 className="font-headline-lg text-lg sm:text-xl font-bold text-on-background flex items-center gap-2">
-              <span className="material-symbols-outlined text-secondary">person_search</span>
-              <span>Búsqueda Urgente</span>
-            </h2>
-            <span className="bg-red-100 text-red-900 border border-red-300 font-label-sm text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
-              Redes Oficiales
-            </span>
+        {/* Sidebar: Búsqueda rápida & Voluntariado Callout */}
+        <aside className="lg:col-span-4 flex flex-col gap-4">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+            <div className="flex items-center gap-2 text-primary font-bold text-sm">
+              <span className="material-symbols-outlined">person_search</span>
+              <span>Búsqueda Rápida</span>
+            </div>
+            <p className="text-xs text-on-surface-variant leading-relaxed">
+              ¿Buscas a un familiar o mascota reportada tras la emergencia?
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                href="/busqueda?tipo=persona"
+                className="p-3 bg-surface-container-low hover:bg-secondary hover:text-white rounded-lg text-center transition-all text-xs font-bold border border-outline-variant flex flex-col items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-2xl">person</span>
+                <span>Personas</span>
+              </Link>
+              <Link
+                href="/busqueda?tipo=animal"
+                className="p-3 bg-surface-container-low hover:bg-secondary hover:text-white rounded-lg text-center transition-all text-xs font-bold border border-outline-variant flex flex-col items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-2xl">pets</span>
+                <span>Mascotas</span>
+              </Link>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-3">
-            {/* ColombiaTeBusca Card */}
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col gap-2 shadow-sm border-l-4 border-l-secondary">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary text-2xl">person</span>
-                <div>
-                  <h4 className="font-headline-md text-sm font-bold text-on-surface">
-                    Personas No Localizadas
-                  </h4>
-                  <span className="text-[11px] text-secondary font-semibold">
-                    Vía ColombiaTeBusca + Cruz Roja RCF
-                  </span>
-                </div>
-              </div>
-              <p className="font-body-md text-xs text-on-surface-variant leading-relaxed">
-                Reporta o consulta el registro unificado nacional de personas desaparecidas o incomunicadas ante la emergencia.
-              </p>
-              <a
-                href="https://colombiatebusca.com/?tab=persons"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-1 py-1.5 px-3 bg-secondary text-on-secondary text-xs font-bold rounded-lg hover:bg-secondary-container transition-colors inline-flex items-center justify-between shadow-sm"
-              >
-                <span>Abrir ColombiaTeBusca</span>
-                <span className="material-symbols-outlined text-xs">open_in_new</span>
-              </a>
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm space-y-3">
+            <div className="flex items-center gap-2 text-secondary font-bold text-sm">
+              <span className="material-symbols-outlined">handshake</span>
+              <span>Matching de Talento</span>
             </div>
-
-            {/* MiGenteVe Colombia Card */}
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col gap-2 shadow-sm border-l-4 border-l-primary">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-2xl">pets</span>
-                <div>
-                  <h4 className="font-headline-md text-sm font-bold text-on-surface">
-                    Mascotas, Refugios y Veterinaria
-                  </h4>
-                  <span className="text-[11px] text-primary font-semibold">
-                    Vía MiGenteVe Colombia
-                  </span>
-                </div>
-              </div>
-              <p className="font-body-md text-xs text-on-surface-variant leading-relaxed">
-                Registro de animales extraviados, mapa de albergues de paso y red de urgencias médicas veterinarias.
-              </p>
-              <a
-                href="https://colombia.migenteve.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-1 py-1.5 px-3 bg-primary text-on-primary text-xs font-bold rounded-lg hover:bg-primary-container transition-colors inline-flex items-center justify-between shadow-sm"
-              >
-                <span>Abrir MiGenteVe</span>
-                <span className="material-symbols-outlined text-xs">open_in_new</span>
-              </a>
-            </div>
-
+            <p className="text-xs text-on-surface-variant leading-relaxed">
+              Conectamos profesionales en medicina, rescate, logística y desarrollo con colectivos que atienden el desastre.
+            </p>
             <Link
-              href="/busqueda"
-              className="w-full text-center py-2 bg-surface-container border border-outline text-on-surface font-label-md text-xs font-bold rounded-lg hover:bg-surface-container-high transition-colors"
+              href="/voluntarios"
+              className="w-full py-2 bg-secondary text-on-secondary text-xs font-bold uppercase rounded-lg flex items-center justify-center gap-1 hover:bg-secondary-container transition-colors shadow-sm"
             >
-              Ver Protocolo de Búsqueda Completo →
+              <span>Ver Banco de Voluntarios</span>
+              <span className="material-symbols-outlined text-xs">arrow_forward</span>
             </Link>
           </div>
         </aside>

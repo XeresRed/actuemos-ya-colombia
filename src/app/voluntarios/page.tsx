@@ -39,6 +39,7 @@ export default function VoluntariosMatchingPage() {
   const [tituloNecesidad, setTituloNecesidad] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [nombreContacto, setNombreContacto] = useState('');
+  const [organizacion, setOrganizacion] = useState('');
   const [emailContacto, setEmailContacto] = useState('');
   const [telefonoContacto, setTelefonoContacto] = useState('');
   const [ubicacion, setUbicacion] = useState('');
@@ -184,6 +185,7 @@ export default function VoluntariosMatchingPage() {
           tituloNecesidad,
           descripcion,
           nombreContacto,
+          organizacion: tipo === 'busco_profesional' ? (organizacion.trim() || null) : null,
           emailContacto,
           telefonoContacto: telefonoContacto || null,
           ubicacion: ubicacion || null,
@@ -212,6 +214,7 @@ export default function VoluntariosMatchingPage() {
     setTituloNecesidad('');
     setDescripcion('');
     setNombreContacto('');
+    setOrganizacion('');
     setEmailContacto('');
     setTelefonoContacto('');
     setUbicacion('');
@@ -305,20 +308,59 @@ export default function VoluntariosMatchingPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block font-label-sm font-bold text-on-surface mb-1" htmlFor="vol-nombre">
-                  {tipo === 'ofrezco_habilidad' ? 'Nombre Completo y Título *' : 'Nombre de la Organización / Colectivo *'}
-                </label>
-                <input
-                  id="vol-nombre"
-                  value={nombreContacto}
-                  onChange={(e) => setNombreContacto(e.target.value)}
-                  className="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-secondary outline-none"
-                  placeholder={tipo === 'ofrezco_habilidad' ? 'Ej. Ing. Juan Barreto / Dra. Sofía Gómez' : 'Ej. Brigada de Socorro Popayán / Cruz Roja'}
-                  required
-                  type="text"
-                />
-              </div>
+              {tipo === 'ofrezco_habilidad' ? (
+                <div>
+                  <label className="block font-label-sm font-bold text-on-surface mb-1" htmlFor="vol-nombre">
+                    Nombre Completo y Título / Especialidad *
+                  </label>
+                  <input
+                    id="vol-nombre"
+                    value={nombreContacto}
+                    onChange={(e) => setNombreContacto(e.target.value)}
+                    className="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-secondary outline-none"
+                    placeholder="Ej. Ing. Juan Barreto / Dra. Sofía Gómez"
+                    required
+                    type="text"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block font-label-sm font-bold text-on-surface mb-1" htmlFor="vol-nombre">
+                      Nombre del Solicitante o Contacto *
+                    </label>
+                    <input
+                      id="vol-nombre"
+                      value={nombreContacto}
+                      onChange={(e) => setNombreContacto(e.target.value)}
+                      className="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-secondary outline-none"
+                      placeholder="Ej. Carlos Gómez / Líder Comunitario"
+                      required
+                      type="text"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-label-sm font-bold text-on-surface" htmlFor="vol-organizacion">
+                        Organización, Colectivo o Brigada
+                      </label>
+                      <span className="text-[10px] text-on-surface-variant font-medium">(Opcional)</span>
+                    </div>
+                    <input
+                      id="vol-organizacion"
+                      value={organizacion}
+                      onChange={(e) => setOrganizacion(e.target.value)}
+                      className="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-secondary outline-none"
+                      placeholder="Ej. Cruz Roja / Brigada Popayán / Tercero Particular"
+                      type="text"
+                    />
+                    <p className="text-[10px] text-on-surface-variant mt-1">
+                      Si eres un particular, vecino o tercero solicitando apoyo, puedes dejar este campo vacío.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block font-label-sm font-bold text-on-surface mb-1" htmlFor="vol-area">
@@ -638,7 +680,10 @@ export default function VoluntariosMatchingPage() {
                           {item.tituloNecesidad}
                         </h4>
                         <p className={`font-label-md text-xs font-semibold mb-2 ${isOffer ? 'text-primary' : 'text-secondary'}`}>
-                          {item.nombreContacto}
+                          <span>{item.nombreContacto}</span>
+                          {item.organizacion ? (
+                            <span className="text-on-surface-variant font-normal"> • {item.organizacion}</span>
+                          ) : null}
                         </p>
 
                         <p className="font-body-md text-xs text-on-surface-variant mb-4 flex-1 leading-relaxed">

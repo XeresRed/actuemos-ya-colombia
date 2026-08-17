@@ -1,0 +1,128 @@
+export type Language = 'es' | 'en';
+
+export interface TranslationDictionary {
+  nav: {
+    hub: string;
+    ideas: string;
+    iniciativas: string;
+    busqueda: string;
+    voluntarios: string;
+    recursos: string;
+    acerca: string;
+    admin: string;
+    proponerIdea: string;
+    menu: string;
+    cerrarMenu: string;
+  };
+  emergency: {
+    lineaEmergencias: string;
+    alertaActiva: string;
+    verDetalles: string;
+    sinAlertas: string;
+    carruselInfo: string;
+  };
+  actions: {
+    buscar: string;
+    filtrar: string;
+    limpiarFiltros: string;
+    verMas: string;
+    verDetalles: string;
+    compartir: string;
+    descargar: string;
+    copiar: string;
+    enviar: string;
+    guardar: string;
+    cancelar: string;
+    cerrar: string;
+    reintentar: string;
+  };
+  common: {
+    cargando: string;
+    error: string;
+    gratuito: string;
+    oficial: string;
+    noResultados: string;
+    idioma: string;
+    seleccionarIdioma: string;
+    espanol: string;
+    ingles: string;
+    nacional: string;
+    verificadaPorAYC: string;
+  };
+  hub: {
+    searchPlaceholder: string;
+    cardProponer: string;
+    cardProponerDesc: string;
+    cardBusqueda: string;
+    cardBusquedaDesc: string;
+    cardRecursos: string;
+    cardRecursosDesc: string;
+    cardIdeas: string;
+    cardIdeasDesc: string;
+    cardIniciativas: string;
+    cardIniciativasDesc: string;
+    cardVoluntarios: string;
+    cardVoluntariosDesc: string;
+    propuestasRecientes: string;
+    verTodasPropuestas: string;
+    sinPropuestas: string;
+    ctaSePrimero: string;
+    coberturaNacional: string;
+    coberturaNacionalDesc: string;
+  };
+  recursos: {
+    tagHeader: string;
+    titulo: string;
+    descripcion: string;
+    botonCrearPeticion: string;
+    alertaGratisTitulo: string;
+    alertaGratisDesc: string;
+    generadorTitulo: string;
+    generadorTag: string;
+    generadorDesc: string;
+    descargarPlantillaBlanco: string;
+    diligenciarEnLinea: string;
+    ocultarFormulario: string;
+    catTodas: string;
+    catCancilleria: string;
+    catPeticion: string;
+    catRud: string;
+    catSubsidios: string;
+    catVictimas: string;
+    catDefuncion: string;
+    catFormatos: string;
+    dondeAcudir: string;
+    requisitos: string;
+    rutaPasos: string;
+    canalesOficiales: string;
+    verRequisitosPasos: string;
+    ocultarRequisitosPasos: string;
+  };
+  iniciativas: {
+    titulo: string;
+    descripcion: string;
+    buscarPlaceholder: string;
+    masRecientes: string;
+    masAntiguas: string;
+    activaEnCampo: string;
+    cobertura: string;
+    contacto: string;
+    direccion: string;
+    fechaEvento: string;
+    canalOficial: string;
+    modalTitulo: string;
+    modalPuntoEncuentro: string;
+    modalFechaHora: string;
+    modalDescripcion: string;
+    modalCanalOficial: string;
+  };
+  footer: {
+    descripcion: string;
+    iniciativaCivica: string;
+    terminos: string;
+    privacidad: string;
+    contacto: string;
+    codigoAbierto: string;
+    derechosReservados: string;
+  };
+}

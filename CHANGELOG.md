@@ -5,6 +5,103 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.9.0-beta] - 2026-08-17
+
+### Modificado
+- **Flexibilización de Solicitudes de Voluntariado para Particulares y Terceros (`REQ-01`):**
+  - Creación de migración SQLite `008_add_organizacion_to_voluntariado.sql` añadiendo la columna dedicada `organizacion TEXT` a la tabla `voluntariado_profesional`.
+  - Actualización de entidades de dominio (`src/core/domain/voluntariado.ts`), DAL (`src/db/repositories/voluntariado.repository.ts`), servicios de negocio (`src/core/services/voluntariado.service.ts`) y esquema de validación Zod (`src/lib/validations/index.ts`).
+  - Rediseño de campos del formulario en `/voluntarios`:
+    - En «Ofrezco Habilidad»: campo obligatorio «Nombre Completo y Título / Especialidad *».
+    - En «Busco Perfil»: campo obligatorio «Nombre del Solicitante o Contacto *» y nuevo campo opcional «Organización, Colectivo o Brigada (Opcional)» permitiendo a ciudadanos particulares, líderes vecinales o terceros no adscritos a una ONG solicitar apoyo técnico sin bloqueos.
+  - Visualización del nombre de la organización como detalle complementario en las tarjetas públicas y en la consola de moderación de `/admin`.
+
+---
+
+## [0.8.0-beta] - 2026-08-17
+
+
+### Agregado
+- **Internacionalización Completa de Common, Hub y Recursos (`REQ-01`):**
+  - Ampliación exhaustiva de los diccionarios bilingües (`es.ts` y `en.ts`) cubriendo namespaces para `nav`, `hub`, `recursos`, `iniciativas`, `emergency`, `actions` y `footer`.
+  - Conexión del Hub (`/`), Recursos (`/recursos`), Footer (`Footer.tsx`), Banner de Emergencia (`EmergencyBanner.tsx`) y Navbar (`Navbar.tsx`) al hook `useTranslation()`.
+
+- **Selector de Idioma con Botón de Ícono y Popover Flotante (`REQ-02`):**
+  - Rediseño de `LanguageSelector.tsx` con un botón compacto con ícono de globo terráqueo (`language`) que despliega un popover flotante accesible con banderas y nombres oficiales (`🇨🇴 Español (Colombia)` / `🇺🇸 English (United States)`).
+  - Indicador visual de idioma activo (`check`), cierre automático en selección, tecla `Escape` o clic fuera del popover.
+
+- **Modal de Detalle Expandible para Iniciativas con Markdown (`REQ-03`):**
+  - Componente modal interactivo `IniciativaDetailModal.tsx` con renderizado seguro de Markdown (encabezados, negrita, cursiva, listas, citas y enlaces externos).
+  - Visualización de insignias de estado, categoría, cobertura geográfica, punto de acopio / dirección y fecha/hora del evento programado.
+  - Botón de enlace a canal oficial externo y botón de compartir nativo (`navigator.share`).
+
+- **Nuevos Campos Opcionales en Iniciativas & Asistente Markdown (`REQ-04`):**
+  - Migración SQLite `007_add_direccion_fecha_to_iniciativas.sql` agregando las columnas `direccion TEXT` y `fecha_evento TEXT` a `iniciativas_activas`.
+  - Actualización de entidades de dominio, DAL (`IniciativaRepository`) y esquemas Zod (`CreateIniciativaSchema`).
+  - Formulario administrativo en `/admin` con inputs para Dirección y Fecha/Hora del Evento (`datetime-local`), barra de herramientas para inserción rápida de formato Markdown y pestaña de previsualización en vivo.
+
+### Mejorado
+- **Navegación Limpia de Una Sola Línea en Navbar (`REQ-02`):**
+  - Menú de navegación desktop optimizado con etiquetas concisas: `[Hub, Ideas, Iniciativas, Búsqueda, Voluntariado, Recursos, Acerca]` / `[Hub, Ideas, Initiatives, Search, Volunteers, Resources, About]`, eliminando quiebres de línea en resoluciones intermedias.
+
+---
+
+## [0.7.0-beta] - 2026-08-17
+
+
+### Agregado
+- **Infraestructura de Internacionalización i18n (`REQ-02`):**
+  - Creación de `LanguageContext` y hook `useTranslation()` en `src/lib/i18n/LanguageContext.tsx` con soporte para español (`es`) e inglés (`en`).
+  - Diccionarios base en `src/lib/i18n/dictionaries/es.ts` y `en.ts` estructurados por namespaces (`nav`, `emergency`, `actions`, `common`, `footer`).
+  - Componente accesible `LanguageSelector.tsx` con conmutador táctil `ES | EN` integrado en la barra de navegación desktop y en el menú drawer móvil.
+  - Persistencia de preferencia de idioma en `localStorage` (`ayc_lang`) con detección automática del navegador.
+
+- **Módulo de Recursos: Fichas de Cancillería y Trámites Consulares para Extranjeros (`REQ-03`):**
+  - Nueva categoría oficial `cancilleria` ("Extranjeros & Cancillería") en `src/app/recursos/page.tsx`.
+  - **Ficha 1:** *Asistencia Consular y Localización de Embajadas ante Desastres* (Canales 24/7 CIAC Cancillería, enlace con misiones diplomáticas acreditadas y retorno humanitario asistido).
+  - **Ficha 2:** *Salvoconductos de Emergencia (SC-2), Prórrogas y Reposición de Permisos (PPT) ante Migración Colombia* (Trámite preferencial por fuerza mayor, regularización transitoria y reposición de documentos perdidos en catástrofes).
+
+### Mejorado
+- **Optimización de UX Móvil y Divulgación Progresiva (`REQ-01`):**
+  - Barra de filtros con deslizamiento horizontal táctil (*pills*) y scrollbar oculto para evitar saturación de pantalla en móviles.
+  - Divulgación progresiva (*Progressive Disclosure*) en tarjetas de trámites con acordeones colapsables interactivos en móvil ("Ver requisitos y pasos oficiales").
+  - Reducción de márgenes y tipografías gigantes en encabezados móviles para maximizar el área visible.
+
+- **Desduplicación y Visibilidad Contextual del Botón Flotante (`REQ-04`):**
+  - Ocultamiento inteligente del FAB móvil en `/`, `/ideas`, `/ideas/nueva` y `/admin` para evitar colisión visual con botones primarios de acción (Hero CTA "Proponer Solución" y encabezado de ideas).
+  - El botón flotante permanece activo como acceso rápido únicamente en páginas de consulta e informativas (`/recursos`, `/iniciativas`, `/voluntarios`, `/busqueda`, `/sobre-nosotros`).
+
+---
+
+## [0.6.0-beta] - 2026-08-17
+
+
+### Agregado
+- **Google Analytics In-House & Telemetría de Tráfico de Red (`REQ-01`):**
+  - **Base de Datos SQLite:** Migración `006_add_in_house_analytics.sql` creando las tablas `analytics_visitas` y `analytics_eventos` con índices compuestos optimizados para consultas en milisegundos (`<2ms`).
+  - **Privacidad Estricta (Habeas Data / GDPR):** Anonimización de direcciones IP mediante hash SHA-256 truncado con sal rotativa diaria en memoria; sin cookies de terceros ni rastreadores invasivos.
+  - **Dominio y DAL:** `AnalyticsRepository` en `src/db/repositories/analytics.repository.ts` con consultas parametrizadas para KPIs, series temporales horarias/diarias, páginas principales, fuentes de referencia (WhatsApp, Google, X, etc.), desglose de dispositivos/navegadores/sistemas operativos, telemetría HTTP de red (2xx, 3xx, 4xx, 5xx, P95 y latencia promedio) y stream en vivo de tráfico.
+  - **Capa de Servicios y Validaciones:** `AnalyticsService` en `src/core/services/analytics.service.ts` con analizador de User-Agent, clasificador de referrers y esquemas Zod `TrackBeaconSchema` y `AnalyticsQuerySchema`.
+  - **Endpoints API:**
+    - `POST /api/analytics/track`: Baliza de telemetría asíncrona no bloqueante para visitas de página y eventos de conversión.
+    - `GET /api/analytics/stats`: Endpoint protegido para supervisores/administradores que entrega métricas consolidadas.
+    - `GET /api/analytics/realtime`: Pulso de visitantes activos en vivo y stream de solicitudes recientes.
+  - **Rastreador en Cliente:** `src/components/analytics/AnalyticsTracker.tsx` integrado en `src/app/layout.tsx` y utilidades en `src/lib/analytics.ts` (`trackPageView`, `trackEvent`).
+  - **Panel de Control en `/admin`:** Nueva pestaña *"Analíticas & Red"* con dashboard interactivo, gráfico de series de tiempo, KPIs en vivo, desglose de tráfico y visor de solicitudes en tiempo real.
+  - **Restricción Estricta RBAC en Analíticas (Admin Only):** Acceso a métricas de tráfico, visitantes en tiempo real y telemetría HTTP reservado exclusivamente a usuarios con rol `admin`. Se bloquea a supervisores y anónimos con error `403 Forbidden` en la capa de servicios y API, y se oculta la pestaña en la interfaz de usuario.
+  - **Rolling Sessions y Persistencia de Cookies (30 Días):** Extensión de la cookie de sesión `auth_session` a 30 días (`maxAge: 2592000s`) con mecanismo de renovación continua automática (*Sliding Expiration*) en `/api/auth/session`, evitando deslogueos imprevistos de moderadores y cuidando la cuota de envío de Magic Links.
+  - **Banner Legal de Consentimiento de Cookies (Ley 1581 de 2012 / Dec. 1074 de 2015 - SIC):** Implementación de `CookieConsentBanner.tsx` fijado en la parte inferior con opciones *«Aceptar todas»* y *«Solo esenciales»*. Condiciona dinámicamente la inyección de Google Tag Manager (`GoogleTagManager.tsx`) y el envío de eventos a `dataLayer` según la decisión libre e informada del ciudadano.
+
+
+### Corregido
+- **Fallas en Pipeline de CI/CD (GitHub Actions) y Suite de Pruebas (`REQ-02`):**
+  - **Resolución de `FatalError: TypeScript dependencies missing` en CI:** Se eliminó `NODE_ENV: production` a nivel de job en `.github/workflows/ci.yml` y se garantizó la instalación completa de dependencias de desarrollo (`npm ci --include=dev`) previo a `npm run lint` y `npx tsc --noEmit`.
+  - **Resolución de `SqliteError: no such table: usuarios` en `test-services.ts`:** Se incorporó la ejecución garantizada de migraciones `runMigrations()` y el paso `npm run db:migrate` en CI y al inicio de las suites de prueba (`scripts/test-services.ts`, `scripts/test-api.ts`), asegurando que `getDb()` y el entorno de pruebas posean el esquema DDL y usuarios inicializados en entornos limpios.
+  - **Depuración de Workflows:** Se eliminó el archivo defectuoso `.github/workflows/node.js.yml`.
+  - **Nueva Suite de Pruebas:** Creación de `scripts/test-analytics.ts` probando DAL, servicios, privacidad, parsing de User-Agent, referrers y endpoints API (100% pruebas pasando).
+
+---
+
 ## [0.5.0-beta] - 2026-08-16
 
 ### Agregado

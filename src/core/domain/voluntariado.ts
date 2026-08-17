@@ -1,7 +1,6 @@
 export type TipoVoluntariado = 'ofrezco_habilidad' | 'busco_profesional';
 export type EstadoVoluntariado = 'pendiente' | 'activo' | 'cubierto' | 'pausado' | 'completado';
 
-
 export interface Voluntariado {
   id: string;
   tipo: TipoVoluntariado;
@@ -9,6 +8,7 @@ export interface Voluntariado {
   tituloNecesidad: string;
   descripcion: string;
   nombreContacto: string;
+  organizacion: string | null;
   emailContacto: string;
   telefonoContacto: string | null;
   ubicacion: string | null;
@@ -23,6 +23,7 @@ export interface CreateVoluntariadoDTO {
   tituloNecesidad: string;
   descripcion: string;
   nombreContacto: string;
+  organizacion?: string | null;
   emailContacto: string;
   telefonoContacto?: string | null;
   ubicacion?: string | null;
@@ -34,6 +35,7 @@ export interface UpdateVoluntariadoDTO {
   tituloNecesidad?: string;
   descripcion?: string;
   nombreContacto?: string;
+  organizacion?: string | null;
   emailContacto?: string;
   telefonoContacto?: string | null;
   ubicacion?: string | null;

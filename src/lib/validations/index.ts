@@ -36,13 +36,16 @@ export const CreateComentarioSchema = z.object({
 
 export const CreateIniciativaSchema = z.object({
   nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres').max(150),
-  descripcion: z.string().min(10, 'La descripción debe tener al menos 10 caracteres').max(2000),
+  descripcion: z.string().min(10, 'La descripción debe tener al menos 10 caracteres').max(4000),
   categoria: z.string().min(2).max(50),
   urlOficial: z.string().url('Debe ser una URL oficial válida'),
   contacto: z.string().max(150).optional().nullable(),
   coberturaGeografica: z.string().max(150).optional().nullable(),
+  direccion: z.string().max(300).optional().nullable(),
+  fechaEvento: z.string().max(100).optional().nullable(),
   estadoOperacion: z.enum(['activa', 'pausada', 'completada']).optional().default('activa'),
 });
+
 
 export const CreateReporteBusquedaSchema = z.object({
   tipo: z.enum(['persona', 'animal']),
@@ -67,6 +70,7 @@ export const CreateVoluntariadoSchema = z.object({
   tituloNecesidad: z.string().min(5, 'El título debe tener al menos 5 caracteres').max(150),
   descripcion: z.string().min(15, 'La descripción debe tener al menos 15 caracteres').max(3000),
   nombreContacto: z.string().min(2, 'Nombre de contacto obligatorio').max(100),
+  organizacion: z.string().max(150).optional().nullable(),
   emailContacto: z.string().email('Debe ser un correo electrónico válido'),
   telefonoContacto: z.string().max(50).optional().nullable(),
   ubicacion: z.string().max(150).optional().nullable(),
@@ -152,5 +156,28 @@ export const PatchSolicitudLegalSchema = z.object({
   abogadoAsignado: z.string().max(150).optional().nullable(),
   notasSeguimiento: z.string().max(2000).optional().nullable(),
 });
+
+export const TrackBeaconSchema = z.object({
+  type: z.enum(['pageview', 'event']).optional().default('pageview'),
+  path: z.string().min(1).max(500),
+  sessionId: z.string().max(100).optional().nullable(),
+  metodo: z.string().max(10).optional().default('GET'),
+  codigoEstado: z.number().int().min(100).max(599).optional().default(200),
+  tiempoRespuestaMs: z.number().int().min(0).max(60000).optional().default(0),
+  referrer: z.string().max(1000).optional().nullable(),
+  esPagina: z.boolean().optional().default(true),
+  
+  // Custom event fields
+  nombreEvento: z.string().max(100).optional(),
+  categoria: z.enum(['conversion', 'interaccion', 'emergencia', 'navegacion']).optional().default('interaccion'),
+  etiqueta: z.string().max(200).optional().nullable(),
+  valorNumerico: z.number().optional().nullable(),
+  metadatos: z.record(z.any()).optional().nullable(),
+});
+
+export const AnalyticsQuerySchema = z.object({
+  timeframe: z.enum(['24h', '7d', '30d', 'all']).optional().default('24h'),
+});
+
 
 

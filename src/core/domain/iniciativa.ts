@@ -8,6 +8,8 @@ export interface Iniciativa {
   urlOficial: string;
   contacto: string | null;
   coberturaGeografica: string | null;
+  direccion: string | null;
+  fechaEvento: string | null;
   estadoOperacion: IniciativaEstado;
   creadoEn: string;
 }
@@ -20,6 +22,8 @@ export interface CreateIniciativaDTO {
   urlOficial: string;
   contacto?: string | null;
   coberturaGeografica?: string | null;
+  direccion?: string | null;
+  fechaEvento?: string | null;
   estadoOperacion?: IniciativaEstado;
 }
 
@@ -30,6 +34,8 @@ export interface UpdateIniciativaDTO {
   urlOficial?: string;
   contacto?: string | null;
   coberturaGeografica?: string | null;
+  direccion?: string | null;
+  fechaEvento?: string | null;
   estadoOperacion?: IniciativaEstado;
 }
 

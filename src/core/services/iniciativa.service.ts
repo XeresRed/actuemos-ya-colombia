@@ -15,7 +15,7 @@ import type { UsuarioRol } from '../domain/usuario';
 
 export const IniciativaService = {
   /**
-   * Registra una nueva iniciativa o campaña activa.
+   * Registra una nueva iniciativa o campaña activa con soporte Markdown.
    */
   createInitiative(dto: CreateIniciativaDTO, userRole?: UsuarioRol): Iniciativa {
     // Si se intenta registrar como organismo oficial, requiere rol de moderador
@@ -36,9 +36,11 @@ export const IniciativaService = {
     }
 
     const cleanNombre = SanitizeService.sanitizePlainText(dto.nombre);
-    const cleanDescripcion = SanitizeService.sanitizePlainText(dto.descripcion);
+    const cleanDescripcion = SanitizeService.sanitizeMarkdown(dto.descripcion);
     const cleanContacto = dto.contacto ? SanitizeService.sanitizePlainText(dto.contacto) : null;
     const cleanCobertura = dto.coberturaGeografica ? SanitizeService.sanitizePlainText(dto.coberturaGeografica) : null;
+    const cleanDireccion = dto.direccion ? SanitizeService.sanitizePlainText(dto.direccion) : null;
+    const cleanFechaEvento = dto.fechaEvento ? SanitizeService.sanitizePlainText(dto.fechaEvento) : null;
 
     return IniciativaRepository.create({
       nombre: cleanNombre,
@@ -47,6 +49,8 @@ export const IniciativaService = {
       urlOficial: dto.urlOficial.trim(),
       contacto: cleanContacto,
       coberturaGeografica: cleanCobertura,
+      direccion: cleanDireccion,
+      fechaEvento: cleanFechaEvento,
       estadoOperacion: dto.estadoOperacion || 'activa',
     });
   },
@@ -91,9 +95,11 @@ export const IniciativaService = {
 
     const cleanDTO: UpdateIniciativaDTO = { ...dto };
     if (dto.nombre) cleanDTO.nombre = SanitizeService.sanitizePlainText(dto.nombre);
-    if (dto.descripcion) cleanDTO.descripcion = SanitizeService.sanitizePlainText(dto.descripcion);
-    if (dto.contacto) cleanDTO.contacto = SanitizeService.sanitizePlainText(dto.contacto);
-    if (dto.coberturaGeografica) cleanDTO.coberturaGeografica = SanitizeService.sanitizePlainText(dto.coberturaGeografica);
+    if (dto.descripcion) cleanDTO.descripcion = SanitizeService.sanitizeMarkdown(dto.descripcion);
+    if (dto.contacto !== undefined) cleanDTO.contacto = dto.contacto ? SanitizeService.sanitizePlainText(dto.contacto) : null;
+    if (dto.coberturaGeografica !== undefined) cleanDTO.coberturaGeografica = dto.coberturaGeografica ? SanitizeService.sanitizePlainText(dto.coberturaGeografica) : null;
+    if (dto.direccion !== undefined) cleanDTO.direccion = dto.direccion ? SanitizeService.sanitizePlainText(dto.direccion) : null;
+    if (dto.fechaEvento !== undefined) cleanDTO.fechaEvento = dto.fechaEvento ? SanitizeService.sanitizePlainText(dto.fechaEvento) : null;
 
     return IniciativaRepository.update(id, cleanDTO);
   },

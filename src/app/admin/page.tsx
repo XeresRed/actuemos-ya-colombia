@@ -7,6 +7,7 @@ import type { Voluntariado } from '../../core/domain/voluntariado';
 import type { AlertaSistema, NivelAlerta } from '../../core/domain/alerta';
 import type { Iniciativa } from '../../core/domain/iniciativa';
 import type { SolicitudAsistenciaLegal, SolicitudLegalEstado } from '../../core/domain/solicitud-legal';
+import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 
 interface UsuarioAdmin {
   id: string;
@@ -107,7 +108,7 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<UsuarioAdmin | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'borradores' | 'voluntarios' | 'legal' | 'iniciativas' | 'alertas' | 'usuarios'>('borradores');
+  const [activeTab, setActiveTab] = useState<'borradores' | 'voluntarios' | 'legal' | 'iniciativas' | 'alertas' | 'usuarios' | 'analiticas'>('borradores');
 
   // Estados de datos
   const [borradores, setBorradores] = useState<IdeaBorrador[]>([]);
@@ -155,6 +156,10 @@ export default function AdminDashboardPage() {
   const [iniUrl, setIniUrl] = useState('');
   const [iniContacto, setIniContacto] = useState('');
   const [iniCobertura, setIniCobertura] = useState('');
+  const [iniDireccion, setIniDireccion] = useState('');
+  const [iniFechaEvento, setIniFechaEvento] = useState('');
+  const [iniMarkdownPreview, setIniMarkdownPreview] = useState(false);
+
 
   useEffect(() => {
     async function loadSessionAndData() {
@@ -404,6 +409,8 @@ export default function AdminDashboardPage() {
           urlOficial: iniUrl,
           contacto: iniContacto || null,
           coberturaGeografica: iniCobertura || null,
+          direccion: iniDireccion || null,
+          fechaEvento: iniFechaEvento || null,
         }),
       });
       const json = await res.json();
@@ -414,6 +421,9 @@ export default function AdminDashboardPage() {
         setIniUrl('');
         setIniContacto('');
         setIniCobertura('');
+        setIniDireccion('');
+        setIniFechaEvento('');
+        setIniMarkdownPreview(false);
         showToast('¡Iniciativa registrada y publicada en el directorio!');
       } else {
         alert(json.error?.message || 'Error al registrar iniciativa.');
@@ -824,6 +834,19 @@ export default function AdminDashboardPage() {
               <span className="material-symbols-outlined text-sm">groups</span>
               <span>Supervisores ({pendingSupervisors.length})</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('analiticas')}
+              className={`px-4 py-2.5 font-label-md text-xs font-bold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+                activeTab === 'analiticas'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <span className="material-symbols-outlined text-sm">query_stats</span>
+              <span>Analíticas & Red</span>
+            </button>
           </>
         ) : null}
       </div>
@@ -967,7 +990,7 @@ export default function AdminDashboardPage() {
                           {vol.tituloNecesidad}
                         </h3>
                         <p className="text-xs text-secondary font-semibold mb-1">
-                          Contacto: {vol.nombreContacto} ({vol.emailContacto} {vol.telefonoContacto ? `/ ${vol.telefonoContacto}` : ''})
+                          Contacto: {vol.nombreContacto} {vol.organizacion ? `[Org/Colectivo: ${vol.organizacion}]` : ''} ({vol.emailContacto} {vol.telefonoContacto ? `/ ${vol.telefonoContacto}` : ''})
                         </p>
                         <p className="font-body-md text-xs text-on-surface-variant line-clamp-2">
                           {vol.descripcion}
@@ -1257,15 +1280,96 @@ export default function AdminDashboardPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-on-surface mb-1">Descripción de Operación y Recursos *</label>
-                <textarea
-                  value={iniDescripcion}
-                  onChange={(e) => setIniDescripcion(e.target.value)}
-                  rows={3}
-                  required
-                  placeholder="Describe las labores activas, capacidades en terreno, puntos de atención o albergues desplegados..."
-                  className="w-full bg-surface border border-outline-variant rounded p-2 text-xs outline-none focus:border-secondary"
-                />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-bold text-on-surface">Descripción de Operación y Recursos * (Soporta Markdown)</label>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setIniMarkdownPreview(false)}
+                      className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
+                        !iniMarkdownPreview ? 'bg-secondary text-on-secondary' : 'bg-surface-container text-on-surface-variant'
+                      }`}
+                    >
+                      Editor
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIniMarkdownPreview(true)}
+                      className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
+                        iniMarkdownPreview ? 'bg-secondary text-on-secondary' : 'bg-surface-container text-on-surface-variant'
+                      }`}
+                    >
+                      Vista Previa
+                    </button>
+                  </div>
+                </div>
+
+                {!iniMarkdownPreview ? (
+                  <>
+                    <div className="flex items-center gap-1 mb-1.5 p-1 bg-surface-container-low border border-outline-variant rounded text-[11px]">
+                      <button
+                        type="button"
+                        onClick={() => setIniDescripcion(prev => prev + ' **texto en negrita** ')}
+                        className="px-2 py-0.5 bg-surface border border-outline-variant rounded hover:bg-surface-variant font-bold"
+                        title="Negrita"
+                      >
+                        B
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIniDescripcion(prev => prev + ' *texto en cursiva* ')}
+                        className="px-2 py-0.5 bg-surface border border-outline-variant rounded hover:bg-surface-variant italic"
+                        title="Cursiva"
+                      >
+                        I
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIniDescripcion(prev => prev + '\n- Elemento de lista\n- Elemento de lista')}
+                        className="px-2 py-0.5 bg-surface border border-outline-variant rounded hover:bg-surface-variant"
+                        title="Lista de viñetas"
+                      >
+                        • Lista
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIniDescripcion(prev => prev + ' [Nombre del enlace](https://enlace.org) ')}
+                        className="px-2 py-0.5 bg-surface border border-outline-variant rounded hover:bg-surface-variant text-primary"
+                        title="Enlace"
+                      >
+                        🔗 Enlace
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIniDescripcion(prev => prev + '\n> Nota o comunicado importante')}
+                        className="px-2 py-0.5 bg-surface border border-outline-variant rounded hover:bg-surface-variant"
+                        title="Cita destacada"
+                      >
+                        ❝ Cita
+                      </button>
+                    </div>
+                    <textarea
+                      value={iniDescripcion}
+                      onChange={(e) => setIniDescripcion(e.target.value)}
+                      rows={4}
+                      required
+                      placeholder="Describe las labores activas, capacidades en terreno, puntos de atención o albergues desplegados... Puedes usar **negrita**, listas con guiones y enlaces [texto](url)."
+                      className="w-full bg-surface border border-outline-variant rounded p-2 text-xs outline-none focus:border-secondary font-mono"
+                    />
+                  </>
+                ) : (
+                  <div className="w-full bg-surface border border-outline-variant rounded p-3 text-xs min-h-[100px] max-h-[200px] overflow-y-auto leading-relaxed">
+                    {iniDescripcion.trim() ? (
+                      <div className="space-y-1 text-on-surface">
+                        {iniDescripcion.split('\n').map((l, i) => (
+                          <p key={i}>{l || <br />}</p>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-on-surface-variant italic">Escribe en el editor para previsualizar aquí...</span>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1296,6 +1400,28 @@ export default function AdminDashboardPage() {
                     value={iniCobertura}
                     onChange={(e) => setIniCobertura(e.target.value)}
                     placeholder="Nacional / Popayán y Nariño"
+                    className="w-full bg-surface border border-outline-variant rounded p-2 text-xs outline-none focus:border-secondary"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-on-surface mb-1">Dirección Física / Punto de Acopio (Opcional)</label>
+                  <input
+                    value={iniDireccion}
+                    onChange={(e) => setIniDireccion(e.target.value)}
+                    placeholder="Ej. Calle 4 # 12-40, Coliseo El Pueblo, Pasto"
+                    className="w-full bg-surface border border-outline-variant rounded p-2 text-xs outline-none focus:border-secondary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-on-surface mb-1">Fecha y Hora del Evento Programado (Opcional)</label>
+                  <input
+                    type="datetime-local"
+                    value={iniFechaEvento}
+                    onChange={(e) => setIniFechaEvento(e.target.value)}
                     className="w-full bg-surface border border-outline-variant rounded p-2 text-xs outline-none focus:border-secondary"
                   />
                 </div>
@@ -1653,6 +1779,13 @@ export default function AdminDashboardPage() {
             </div>
           </section>
         </div>
+      ) : null}
+
+      {/* Tab 7: Analíticas y Telemetría de Red In-House (Admin Only) */}
+      {activeTab === 'analiticas' && currentUser?.rol === 'admin' ? (
+        <section className="animate-in fade-in duration-200">
+          <AnalyticsDashboard />
+        </section>
       ) : null}
     </div>
   );

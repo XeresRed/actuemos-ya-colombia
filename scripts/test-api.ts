@@ -18,6 +18,7 @@ import { GET as getSessionRoute } from '../src/app/api/auth/session/route';
 import { POST as masterLogin } from '../src/app/api/auth/master-login/route';
 import { GET as getLegalRequests, POST as postLegalRequest } from '../src/app/api/recursos/asistencia-legal/route';
 import { GET as getLegalRequestById, PATCH as patchLegalRequestById, DELETE as deleteLegalRequestById } from '../src/app/api/recursos/asistencia-legal/[id]/route';
+import { runMigrations } from '../src/db/migrate';
 import { AuthService } from '../src/core/services';
 import { UsuarioRepository } from '../src/db/repositories';
 
@@ -47,6 +48,9 @@ function assert(condition: boolean, message: string) {
 
 async function runApiTests() {
   console.log('🧪 Iniciando pruebas de integración de Controladores y Rutas API...\n');
+
+  // Asegurar que las migraciones estén ejecutadas
+  runMigrations();
 
   const adminUser = UsuarioRepository.findByEmail('admin@actuemosya.org') || UsuarioRepository.create({
     email: 'admin@actuemosya.org',
@@ -165,11 +169,16 @@ async function runApiTests() {
       categoria: 'organismo_oficial',
       urlOficial: 'https://cruzrojacolombiana.org/rcf',
       coberturaGeografica: 'Nacional',
+      direccion: 'Carrera 60 # 63-81, Bogotá',
+      fechaEvento: '2026-08-25T09:00',
     }),
   });
   const postIniRes = await postIniciativa(postIniReq);
   const postIniJson = await postIniRes.json() as any;
   assert(postIniRes.status === 201, 'Registra organismo oficial con HTTP 201');
+  assert(postIniJson.data.direccion === 'Carrera 60 # 63-81, Bogotá', 'API retorna dirección de iniciativa');
+  assert(postIniJson.data.fechaEvento === '2026-08-25T09:00', 'API retorna fechaEvento de iniciativa');
+
 
   const getOficialesReq = new NextRequest('http://localhost:3000/api/iniciativas?oficiales=true');
   const getOficialesRes = await getIniciativas(getOficialesReq);
@@ -221,6 +230,29 @@ async function runApiTests() {
   const postVolRes = await postVoluntario(postVolReq);
   const postVolJson = await postVolRes.json() as any;
   assert(postVolRes.status === 201 && postVolJson.data.voluntariado.estado === 'pendiente', 'Registra voluntariado con HTTP 201 en estado pendiente');
+  assert(postVolJson.data.voluntariado.organizacion === null, 'Voluntariado sin organización retorna organizacion = null');
+
+  // Test registro con organización opcional para solicitante (busco_profesional)
+  const postDemandReq = new NextRequest('http://localhost:3000/api/voluntarios', {
+    method: 'POST',
+    body: JSON.stringify({
+      tipo: 'busco_profesional',
+      areaProfesional: 'Ingeniería Civil / Estructural',
+      tituloNecesidad: 'Requerimos 2 Ingenieros para evaluar puente',
+      descripcion: 'Inspección de daños en infraestructura vial comunitaria.',
+      nombreContacto: 'Líder Veredal Jorge',
+      organizacion: 'Junta de Acción Comunal El Roble',
+      emailContacto: 'jac.elroble@comunidad.co',
+      ubicacion: 'Cali',
+      esMayorDeEdad: true,
+      aceptaTerminos: true,
+      captchaToken: 'test-token',
+    }),
+  });
+  const postDemandRes = await postVoluntario(postDemandReq);
+  const postDemandJson = await postDemandRes.json() as any;
+  assert(postDemandRes.status === 201, 'Registra solicitud con organización con HTTP 201');
+  assert(postDemandJson.data.voluntariado.organizacion === 'Junta de Acción Comunal El Roble', 'API retorna organización correctamente');
 
   const volId = postVolJson.data.voluntariado.id;
 
