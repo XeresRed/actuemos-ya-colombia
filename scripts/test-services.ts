@@ -130,13 +130,31 @@ async function runTests() {
   const { getAppBaseUrl } = await import('../src/lib/server-url');
   assert(getAppBaseUrl().startsWith('http'), 'getAppBaseUrl retorna una URL HTTP(S) válida');
   
-  // Probar con variable de entorno
+  // Probar con variable de entorno y neutralización de 0.0.0.0
   const prevDomain = process.env.APP_DOMAIN;
+  const prevNodeEnv = process.env.NODE_ENV;
+
+  // 1. Dominio canónico de producción
   process.env.APP_DOMAIN = 'actuayacolombia.org';
   assert(getAppBaseUrl() === 'https://actuayacolombia.org', 'getAppBaseUrl formatea APP_DOMAIN con https://');
   process.env.APP_DOMAIN = 'https://actuayacolombia.org/';
   assert(getAppBaseUrl() === 'https://actuayacolombia.org', 'getAppBaseUrl remueve trailing slash');
+
+  // 2. Neutralización de 0.0.0.0 en desarrollo
+  (process.env as Record<string, string | undefined>).NODE_ENV = 'development';
+  process.env.APP_DOMAIN = '0.0.0.0:3000';
+  assert(getAppBaseUrl() === 'http://localhost:3000', 'Neutraliza 0.0.0.0:3000 a http://localhost:3000 en dev');
+  process.env.APP_DOMAIN = 'https://0.0.0.0:3000';
+  assert(getAppBaseUrl() === 'http://localhost:3000', 'Corrige https://0.0.0.0:3000 a http://localhost:3000 en dev');
+
+  // 3. Neutralización de 0.0.0.0 en producción
+  (process.env as Record<string, string | undefined>).NODE_ENV = 'production';
+  process.env.APP_DOMAIN = '0.0.0.0:3000';
+  assert(getAppBaseUrl() === 'https://actuayacolombia.org', 'Neutraliza 0.0.0.0:3000 a https://actuayacolombia.org en producción');
+
+  // Restaurar entorno previo
   process.env.APP_DOMAIN = prevDomain;
+  (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
 
   // 4. IdeaService Tests (Pipeline de Estados & OTP)
   console.log('\n🔹 Probando IdeaService (Pipeline de Estados y OTP)...');

@@ -158,7 +158,14 @@ export const AuthService = {
       expiraEn,
     });
 
-    const magicLinkUrl = `${domain}/api/auth/magic-link/verify?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(rawToken)}`;
+    let magicLinkUrl = `${domain}/api/auth/magic-link/verify?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(rawToken)}`;
+    if (magicLinkUrl.includes('0.0.0.0')) {
+      const isProd = process.env.NODE_ENV === 'production';
+      magicLinkUrl = magicLinkUrl.replace(/0\.0\.0\.0:3000|0\.0\.0\.0/g, isProd ? 'actuayacolombia.org' : 'localhost:3000');
+      if (!isProd && magicLinkUrl.includes('localhost') && magicLinkUrl.startsWith('https://')) {
+        magicLinkUrl = magicLinkUrl.replace(/^https:\/\//, 'http://');
+      }
+    }
     await EmailService.sendSupervisorWelcomeEmail(user.email, magicLinkUrl, user.nombre || 'Moderador');
 
     return updatedUser;
@@ -247,7 +254,14 @@ export const AuthService = {
       expiraEn,
     });
 
-    const magicLinkUrl = `${domain}/api/auth/magic-link/verify?email=${encodeURIComponent(cleanEmail)}&token=${encodeURIComponent(rawToken)}`;
+    let magicLinkUrl = `${domain}/api/auth/magic-link/verify?email=${encodeURIComponent(cleanEmail)}&token=${encodeURIComponent(rawToken)}`;
+    if (magicLinkUrl.includes('0.0.0.0')) {
+      const isProd = process.env.NODE_ENV === 'production';
+      magicLinkUrl = magicLinkUrl.replace(/0\.0\.0\.0:3000|0\.0\.0\.0/g, isProd ? 'actuayacolombia.org' : 'localhost:3000');
+      if (!isProd && magicLinkUrl.includes('localhost') && magicLinkUrl.startsWith('https://')) {
+        magicLinkUrl = magicLinkUrl.replace(/^https:\/\//, 'http://');
+      }
+    }
     await EmailService.sendMagicLinkEmail(cleanEmail, magicLinkUrl, user.nombre);
 
     return { sent: true };
