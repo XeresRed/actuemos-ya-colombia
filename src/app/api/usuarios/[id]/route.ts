@@ -4,6 +4,7 @@ import { UsuarioRepository } from '../../../../db/repositories';
 import { apiSuccess, apiError } from '../../../../lib/api-response';
 import { requireRole } from '../../../../lib/api-auth';
 import { UpdateUsuarioSchema } from '../../../../lib/validations';
+import { getAppBaseUrl } from '../../../../lib/server-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     // Si se está activando a un supervisor pendiente, ejecutamos el flujo de aprobación y bienvenida
     if (validated.activo === true) {
-      const appDomain = req.nextUrl.origin;
+      const appDomain = getAppBaseUrl(req);
       updatedUser = await AuthService.approveSupervisor(params.id, appDomain, session.rol);
     } else {
       updatedUser = UsuarioRepository.update(params.id, validated);

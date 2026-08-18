@@ -5,6 +5,20 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.12.0-beta] - 2026-08-18
+
+### Corregido
+- **Resolución Canónica de Dominio en Enlaces Mágicos (`BUG-01`):**
+  - Creación de la utilidad [`getAppBaseUrl`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/lib/server-url.ts) que previene la resolución a `0.0.0.0` en entornos Docker / Proxies inversos.
+  - Actualización de [`AuthService.requestMagicLink`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/core/services/auth.service.ts), [`AuthService.approveSupervisor`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/core/services/auth.service.ts), `/api/auth/magic-link/request` y `/api/usuarios/[id]` para garantizar URLs absolutas canónicas basadas en `APP_DOMAIN` y cabeceras de proxy (`x-forwarded-host`).
+- **Corrección de Dominio Oficial en Difusión y Sobre Nosotros (`BUG-02`):**
+  - Corrección de la URL de difusión a `https://actuayacolombia.org` en los diccionarios bilingües de internacionalización ([`es.ts`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/lib/i18n/dictionaries/es.ts), [`en.ts`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/lib/i18n/dictionaries/en.ts)) y en la invocación de `navigator.share` en [`/sobre-nosotros`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/app/sobre-nosotros/page.tsx).
+- **Detección de Sesión Activa y Redirección Automática en Portales Administrativos (`BUG-03`):**
+  - Integración de verificación de sesión al montar [`/admin/login`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/app/admin/login/page.tsx) y [`/admin/registro`](file:///Users/juancamilo/Documents/actuemos-ya-colombia/src/app/admin/registro/page.tsx).
+  - Redirección fluida a `/admin` si el usuario ya cuenta con credenciales válidas y activas, desplegando un estado de carga sutil institucional para evitar parpadeos visuales.
+
+---
+
 ## [0.11.0-beta] - 2026-08-17
 
 ### Corregido

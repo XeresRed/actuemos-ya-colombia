@@ -29,7 +29,7 @@ export default function SobreNosotrosPage() {
         await navigator.share({
           title: 'ActuemosYaColombia',
           text: t.sobreNosotros.difusionMensajeTexto,
-          url: 'https://actuemosyacolombia.org',
+          url: 'https://actuayacolombia.org',
         });
       } catch {
         // Ignorar si el usuario canceló el diálogo nativo

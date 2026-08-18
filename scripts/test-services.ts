@@ -123,8 +123,20 @@ async function runTests() {
   assert(regSupervisor.isNew === true, 'Registra postulación de nuevo supervisor');
   assert(regSupervisor.user.activo === false, 'Supervisor queda inactivo (activo = false)');
 
-  const approvedSupervisor = await AuthService.approveSupervisor(regSupervisor.user.id, 'http://localhost:3000', 'admin');
-  assert(approvedSupervisor.activo === true, 'Admin aprueba y activa al supervisor');
+  const approvedSupervisor = await AuthService.approveSupervisor(regSupervisor.user.id, undefined, 'admin');
+  assert(approvedSupervisor.activo === true, 'Admin aprueba y activa al supervisor con dominio resuelto automáticamente');
+
+  // Probar getAppBaseUrl utility
+  const { getAppBaseUrl } = await import('../src/lib/server-url');
+  assert(getAppBaseUrl().startsWith('http'), 'getAppBaseUrl retorna una URL HTTP(S) válida');
+  
+  // Probar con variable de entorno
+  const prevDomain = process.env.APP_DOMAIN;
+  process.env.APP_DOMAIN = 'actuayacolombia.org';
+  assert(getAppBaseUrl() === 'https://actuayacolombia.org', 'getAppBaseUrl formatea APP_DOMAIN con https://');
+  process.env.APP_DOMAIN = 'https://actuayacolombia.org/';
+  assert(getAppBaseUrl() === 'https://actuayacolombia.org', 'getAppBaseUrl remueve trailing slash');
+  process.env.APP_DOMAIN = prevDomain;
 
   // 4. IdeaService Tests (Pipeline de Estados & OTP)
   console.log('\n🔹 Probando IdeaService (Pipeline de Estados y OTP)...');

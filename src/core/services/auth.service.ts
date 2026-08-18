@@ -3,6 +3,7 @@ import { AuthRepository, UsuarioRepository } from '../../db/repositories';
 import { EmailService } from './email.service';
 import { CaptchaService } from './captcha.service';
 import { SanitizeService } from './sanitize.service';
+import { getAppBaseUrl } from '../../lib/server-url';
 import { 
   NotFoundError, 
   UnauthorizedError, 
@@ -130,7 +131,7 @@ export const AuthService = {
   /**
    * Aprueba y activa a un supervisor pendiente, enviándole su Magic Link de bienvenida.
    */
-  async approveSupervisor(userId: string, appDomain = 'http://localhost:3000', adminRole?: UsuarioRol): Promise<Usuario> {
+  async approveSupervisor(userId: string, appDomain?: string, adminRole?: UsuarioRol): Promise<Usuario> {
     if (adminRole !== 'admin') {
       throw new ForbiddenError('Solo el Administrador General puede aprobar y activar supervisores.');
     }
@@ -141,6 +142,7 @@ export const AuthService = {
     }
 
     const updatedUser = UsuarioRepository.update(userId, { activo: true });
+    const domain = appDomain || getAppBaseUrl();
 
     // Enviar Magic Link de bienvenida al supervisor recién aprobado
     const rawToken = randomBytes(32).toString('hex');
@@ -156,7 +158,7 @@ export const AuthService = {
       expiraEn,
     });
 
-    const magicLinkUrl = `${appDomain}/api/auth/magic-link/verify?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(rawToken)}`;
+    const magicLinkUrl = `${domain}/api/auth/magic-link/verify?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(rawToken)}`;
     await EmailService.sendSupervisorWelcomeEmail(user.email, magicLinkUrl, user.nombre || 'Moderador');
 
     return updatedUser;
@@ -204,7 +206,7 @@ export const AuthService = {
   /**
    * Solicita el envío de un Magic Link para administradores y supervisores con Cooldown de 5 min.
    */
-  async requestMagicLink(email: string, appDomain = 'http://localhost:3000'): Promise<{ sent: boolean; cooldown?: boolean }> {
+  async requestMagicLink(email: string, appDomain?: string): Promise<{ sent: boolean; cooldown?: boolean }> {
     const cleanEmail = email.trim().toLowerCase();
     const user = UsuarioRepository.findByEmail(cleanEmail);
 
@@ -230,6 +232,7 @@ export const AuthService = {
 
     magicLinkCooldowns.set(cleanEmail, now);
 
+    const domain = appDomain || getAppBaseUrl();
     const rawToken = randomBytes(32).toString('hex');
     const codigoHash = this.hashToken(rawToken);
     const expiraEn = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 min
@@ -244,7 +247,7 @@ export const AuthService = {
       expiraEn,
     });
 
-    const magicLinkUrl = `${appDomain}/api/auth/magic-link/verify?email=${encodeURIComponent(cleanEmail)}&token=${encodeURIComponent(rawToken)}`;
+    const magicLinkUrl = `${domain}/api/auth/magic-link/verify?email=${encodeURIComponent(cleanEmail)}&token=${encodeURIComponent(rawToken)}`;
     await EmailService.sendMagicLinkEmail(cleanEmail, magicLinkUrl, user.nombre);
 
     return { sent: true };

@@ -3,6 +3,7 @@ import { AuthService } from '../../../../../core/services';
 import { apiSuccess, apiError } from '../../../../../lib/api-response';
 import { checkRateLimit } from '../../../../../lib/rate-limit';
 import { RequestMagicLinkSchema } from '../../../../../lib/validations';
+import { getAppBaseUrl } from '../../../../../lib/server-url';
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { email } = RequestMagicLinkSchema.parse(body);
 
-    const appDomain = req.nextUrl.origin;
+    const appDomain = getAppBaseUrl(req);
     const result = await AuthService.requestMagicLink(email, appDomain);
 
     return apiSuccess({

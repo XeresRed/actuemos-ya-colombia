@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -13,6 +13,34 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [devLoading, setDevLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  // Redirigir automáticamente si ya existe una sesión activa y autorizada
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkExistingSession() {
+      try {
+        const res = await fetch('/api/auth/session');
+        const json = await res.json();
+        if (isMounted && json.ok && json.data?.authenticated && json.data?.user?.activo) {
+          router.replace('/admin');
+          return;
+        }
+      } catch (err) {
+        console.error('Error al comprobar sesión activa:', err);
+      } finally {
+        if (isMounted) {
+          setCheckingSession(false);
+        }
+      }
+    }
+
+    checkExistingSession();
+    return () => {
+      isMounted = false;
+    };
+  }, [router]);
 
   const cleanEmail = email.trim().toLowerCase();
   const isMasterAdmin = cleanEmail === 'cam960210@gmail.com';
@@ -86,6 +114,24 @@ export default function AdminLoginPage() {
       setDevLoading(false);
     }
   };
+
+  if (checkingSession) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-margin-mobile md:p-margin-desktop py-12">
+        <div className="w-full max-w-md bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-lg shadow-sm flex flex-col items-center text-center gap-4 animate-in fade-in duration-200">
+          <div className="w-10 h-10 border-3 border-secondary border-t-transparent rounded-full animate-spin"></div>
+          <div className="space-y-1">
+            <h2 className="font-headline-sm text-sm font-bold text-on-surface">
+              Verificando sesión activa...
+            </h2>
+            <p className="font-body-sm text-xs text-on-surface-variant">
+              Comprobando credenciales en ActuemosYaColombia
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex items-center justify-center p-margin-mobile md:p-margin-desktop py-12">

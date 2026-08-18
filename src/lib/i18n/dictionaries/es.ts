@@ -131,7 +131,7 @@ export const es: TranslationDictionary = {
     descripcion: 'ActuemosYaColombia nació con un propósito claro: transformar la voluntad ciudadana en acción humanitaria coordinada, transparente y sin intermediarios ante situaciones de desastre.',
     difusionTitulo: 'Mensaje Oficial de Introducción y Difusión',
     difusionSubtitulo: 'Ayúdanos a visibilizar la plataforma. Comparte este mensaje en grupos comunitarios, WhatsApp y redes sociales.',
-    difusionMensajeTexto: '🇨🇴 *ActuemosYaColombia* — Plataforma cívica y solidaria de respuesta rápida ante emergencias en Colombia.\n\n🤝 *¿Qué encuentras en la plataforma?*\n• Directorio de iniciativas y campañas activas en tiempo real.\n• Banco de talento técnico y voluntariado profesional (médicos, ingenieros, psicólogos, operadores de dron).\n• Generador gratuito de Derechos de Petición (.docx) y rutas de auxilio ante el Estado.\n\n🔗 Conoce más y participa: https://actuemosyacolombia.org',
+    difusionMensajeTexto: '🇨🇴 *ActuemosYaColombia* — Plataforma cívica y solidaria de respuesta rápida ante emergencias en Colombia.\n\n🤝 *¿Qué encuentras en la plataforma?*\n• Directorio de iniciativas y campañas activas en tiempo real.\n• Banco de talento técnico y voluntariado profesional (médicos, ingenieros, psicólogos, operadores de dron).\n• Generador gratuito de Derechos de Petición (.docx) y rutas de auxilio ante el Estado.\n\n🔗 Conoce más y participa: https://actuayacolombia.org',
     difusionCopiar: 'Copiar Mensaje',
     difusionCopiado: '¡Copiado al Portapapeles!',
     difusionWhatsApp: 'Compartir en WhatsApp',

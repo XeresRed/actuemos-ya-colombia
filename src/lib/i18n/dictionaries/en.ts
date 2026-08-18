@@ -131,7 +131,7 @@ export const en: TranslationDictionary = {
     descripcion: 'ActuemosYaColombia was born with a clear purpose: to transform citizen willpower into coordinated, transparent, and direct humanitarian action in the face of disaster situations.',
     difusionTitulo: 'Official Introduction & Broadcast Message',
     difusionSubtitulo: 'Help us spread the word. Share this message in community groups, WhatsApp, and social networks.',
-    difusionMensajeTexto: '🇨🇴 *ActuemosYaColombia* — Civic and solidary rapid response platform for emergencies in Colombia.\n\n🤝 *What can you do on the platform?*\n• Directory of active initiatives and campaigns in real-time.\n• Technical talent & volunteer matching bank (doctors, engineers, psychologists, drone pilots).\n• Free Right of Petition generator (.docx) and disaster relief route guides.\n\n🔗 Learn more and take action: https://actuemosyacolombia.org',
+    difusionMensajeTexto: '🇨🇴 *ActuemosYaColombia* — Civic and solidary rapid response platform for emergencies in Colombia.\n\n🤝 *What can you do on the platform?*\n• Directory of active initiatives and campaigns in real-time.\n• Technical talent & volunteer matching bank (doctors, engineers, psychologists, drone pilots).\n• Free Right of Petition generator (.docx) and disaster relief route guides.\n\n🔗 Learn more and take action: https://actuayacolombia.org',
     difusionCopiar: 'Copy Message',
     difusionCopiado: 'Copied to Clipboard!',
     difusionWhatsApp: 'Share on WhatsApp',
