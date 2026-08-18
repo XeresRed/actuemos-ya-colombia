@@ -373,6 +373,20 @@ async function runApiTests() {
   const patchUserJson = await patchUserRes.json() as any;
   assert(patchUserRes.status === 200 && patchUserJson.data.activo === true, 'Admin activa a supervisor y dispara Magic Link');
 
+  // Probar GET /api/auth/magic-link/verify Redirection Headers
+  console.log('\n🔹 Probando GET /api/auth/magic-link/verify (Redirección Canónica)...');
+  const { GET: verifyMagicLinkGet } = await import('../src/app/api/auth/magic-link/verify/route');
+  
+  // Solicitud inválida redirige a /admin/login sin 0.0.0.0
+  const invalidVerifyReq = new NextRequest('http://0.0.0.0:3000/api/auth/magic-link/verify?email=invalido@test.org&token=fake', {
+    headers: { 'host': '0.0.0.0:3000' },
+  });
+  const invalidVerifyRes = await verifyMagicLinkGet(invalidVerifyReq);
+  assert(invalidVerifyRes.status === 307 || invalidVerifyRes.status === 302, 'Redirige en error de verificación');
+  const locationHeader = invalidVerifyRes.headers.get('location') || '';
+  assert(!locationHeader.includes('0.0.0.0'), 'Cabecera Location neutraliza 0.0.0.0 en redirección de error');
+  assert(locationHeader.includes('/admin/login?error=invalid_or_expired_link'), 'Location apunta a /admin/login?error=invalid_or_expired_link');
+
   // 10. Tests /api/auth/dev-login (Acceso Rápido de Desarrollo)
   console.log('\n🔹 Probando /api/auth/dev-login (Acceso Rápido de Desarrollo)...');
   const { POST: devLogin } = await import('../src/app/api/auth/dev-login/route');

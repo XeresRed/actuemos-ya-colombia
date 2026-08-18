@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AuthService } from '../../../../../core/services';
 import { apiSuccess, apiError } from '../../../../../lib/api-response';
 import { VerifyMagicLinkSchema } from '../../../../../lib/validations';
+import { getAppBaseUrl } from '../../../../../lib/server-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +15,9 @@ export async function GET(req: NextRequest) {
     const validated = VerifyMagicLinkSchema.parse({ email, token });
     const { sessionToken } = await AuthService.verifyMagicLink(validated.email, validated.token);
 
-    // Redirección directa al panel administrativo con Cookie HttpOnly segura
-    const redirectUrl = new URL('/admin', req.url);
+    // Redirección directa y canónica al panel administrativo con Cookie HttpOnly segura
+    const baseUrl = getAppBaseUrl(req);
+    const redirectUrl = new URL('/admin', baseUrl);
     const response = NextResponse.redirect(redirectUrl);
 
     response.cookies.set('auth_session', sessionToken, {
@@ -28,8 +30,9 @@ export async function GET(req: NextRequest) {
 
     return response;
   } catch (error) {
-    // Si hay error en el clic del navegador, redirigimos a login con query error
-    const loginUrl = new URL('/admin/login?error=invalid_or_expired_link', req.url);
+    // Si hay error en el clic del navegador, redirigimos a login con query error canónico
+    const baseUrl = getAppBaseUrl(req);
+    const loginUrl = new URL('/admin/login?error=invalid_or_expired_link', baseUrl);
     return NextResponse.redirect(loginUrl);
   }
 }
